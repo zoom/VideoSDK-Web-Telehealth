@@ -23,9 +23,7 @@ export default function Home() {
           <title>Zoom Telehealth Demo</title>
         </Head>
         <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
-          <h1 className="my-10 text-5xl font-bold leading-none text-gray-700">
-            Zoom Telehealth Demo
-          </h1>
+          <h1 className="my-10 text-5xl font-bold leading-none text-gray-700">Zoom Telehealth Demo</h1>
           <div className="my-10">
             <Button onClick={() => void signIn()}>Sign In</Button>
           </div>
@@ -37,12 +35,10 @@ export default function Home() {
   return (
     <>
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
-        <h1 className="my-10 flex text-5xl font-bold leading-none text-gray-700">
-          Zoom Telehealth Demo
-        </h1>
+        <h1 className="my-10 flex text-5xl font-bold leading-none text-gray-700">Zoom Telehealth Demo</h1>
         <div className="my-10 flex flex-col">
           <Link href={"/view"}>
-            <Button>View Posts</Button>
+            <Button>View Rooms</Button>
           </Link>
           <br />
         </div>

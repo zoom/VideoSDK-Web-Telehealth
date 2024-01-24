@@ -11,6 +11,7 @@ import { api } from "~/utils/api";
 export default function Home() {
   const { status } = useSession();
   const { data, isLoading } = api.post.getLatest.useQuery();
+
   const router = useRouter();
   if (status === "loading") {
     return (
@@ -31,20 +32,22 @@ export default function Home() {
 
   return (
     <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
-      <h1 className="my-10 flex text-center text-5xl font-bold leading-none text-gray-700">
-        Posts
-      </h1>
+      <h1 className="my-10 flex text-center text-5xl font-bold leading-none text-gray-700">Rooms</h1>
       {isLoading ? (
-        <p>Fetching posts...</p>
+        <p>Fetching Rooms...</p>
       ) : (
         <div className="flex flex-wrap justify-center">
           {data?.map((post) => (
-            <Card
-              key={post.id}
-              className="m-4 flex flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg"
-            >
+            <Card key={post.id} className="m-4 flex flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">
               <CardTitle>{post.title}</CardTitle>
               <CardContent>{post.content}</CardContent>
+              <Button
+                onClick={async () => {
+                  await router.push(`/room/${post.title}`);
+                }}
+              >
+                Join
+              </Button>
               <p>{post.name}</p>
               <p>{post.createdAt.toLocaleDateString()}</p>
             </Card>
@@ -67,9 +70,7 @@ const CreatePost = () => {
 
   return (
     <>
-      <h2 className="my-10 flex text-center text-3xl font-bold leading-none text-gray-700">
-        Create
-      </h2>
+      <h2 className="my-10 flex text-center text-3xl font-bold leading-none text-gray-700">Create</h2>
       <p>{createPost.status !== "idle" ? createPost.status : ""}</p>
       <form
         className="flex w-1/2 flex-col"
