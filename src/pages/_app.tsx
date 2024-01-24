@@ -4,18 +4,18 @@ import { type AppType } from "next/app";
 import { api } from "~/utils/api";
 import "~/styles/globals.css";
 import { Inter } from "next/font/google";
+import RouteValidator from "~/components/RouteValidator";
 
 const inter = Inter({ subsets: ["latin"] });
 
-const MyApp: AppType<{ session: Session | null }> = ({
-  Component,
-  pageProps: { session, ...pageProps },
-}) => {
+const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { session, ...pageProps } }) => {
   return (
     <SessionProvider session={session}>
-      <div className={inter.className}>
-        <Component {...pageProps} />
-      </div>
+      <RouteValidator>
+        <div className={inter.className}>
+          <Component {...pageProps} />
+        </div>
+      </RouteValidator>
     </SessionProvider>
   );
 };
