@@ -1,28 +1,47 @@
-# Create T3 App
+# Zoom Telehealth Sample App
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This sample app demonstrates how to use the [Zoom SDK](https://developers.zoom.us/docs/video-sdk/web/) to build a telehealth app on Web.
 
-## What's next? How do I make an app with this?
+## Tech Stack
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
+- TypeScript
+- React
+- Next.js
+- NextAuth
+- tRPC
+- [Zoom Video SDK](https://developers.zoom.us/docs/video-sdk/web/)
+- Tailwind CSS
+- shadcn/ui
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Prerequisites
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+- A Zoom Video SDK Account
+- Node.js 18+
+- Bun (or npm)
 
-## Learn More
+## Getting Started
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+1. Clone the repo
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+```bash
+git clone https://github.com/EkaanshArora/Zoom-Telehealth
+```
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+2. Install dependencies
 
-## How do I deploy this?
+```bash
+cd Zoom-Telehealth
+bun install # or npm install
+```
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+3. Copy the `.env.example` file to `.env` and fill in the required values
+
+4. Run the app
+
+```bash
+bun dev # or npm run dev
+```
+
+5. Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+Use of this sample app is subject to our [Terms of Use](https://explore.zoom.us/en/video-sdk-terms/).
