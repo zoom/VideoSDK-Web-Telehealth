@@ -10,10 +10,27 @@ const Videocall = dynamic<{ jwt: string; session: string }>(() => import("../../
 export default function Home() {
   const { status } = useSession();
   const router = useRouter();
-  const { data, isLoading: loadingJwt } = api.zoom.createJWT.useQuery({
-    role: 1,
-    sessionName: router.query.slug as string,
-  });
+  const {
+    data,
+    isLoading: loadingJwt,
+    isError,
+    error,
+  } = api.room.getById.useQuery(
+    { id: `${router.query.slug as string}` },
+    {
+      retry: false,
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  if (isError) {
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
+        <h1>Error: {error.message}</h1>
+      </div>
+    );
+  }
+
   if (status === "loading" || loadingJwt) {
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
@@ -33,7 +50,7 @@ export default function Home() {
   if (!loadingJwt && data) {
     return (
       <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
-        <Videocall jwt={data} session={router.query.slug as string} />
+        <Videocall jwt={data.jwt} session={data.room.id} />
       </div>
     );
   }

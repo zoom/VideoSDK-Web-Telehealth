@@ -7,10 +7,13 @@ import { Label } from "~/components/ui/label";
 import { api } from "~/utils/api";
 
 export default function Home() {
-  const createPost = api.post.create.useMutation();
-  const { refetch } = api.post.getLatest.useQuery();
+  const createPost = api.room.create.useMutation();
+  const { refetch } = api.room.getCreated.useQuery();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [email, setEmail] = useState<string>("");
+  const [emails, setEmails] = useState<string[]>([]);
+
   return (
     <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
       <h1 className="my-10 flex text-center text-3xl font-bold leading-none text-gray-700">Create</h1>
@@ -19,10 +22,6 @@ export default function Home() {
           className="flex w-full flex-col"
           onSubmit={async (e) => {
             e.preventDefault();
-            await createPost.mutateAsync({ title, content });
-            await refetch();
-            setTitle("");
-            setContent("");
           }}
         >
           <Label htmlFor="title" className="mb-2">
@@ -47,8 +46,44 @@ export default function Home() {
               setContent(e.target.value);
             }}
           />
+          <Label htmlFor="email" className="mb-2">
+            Emails
+          </Label>
+          {emails.map((email, index) => (
+            <p key={index}>{email}</p>
+          ))}
+          <div className="flex">
+            <Input
+              id="email"
+              className="mb-4 mr-2"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value);
+              }}
+            />
+            <Button
+              className="mb-4 ml-2"
+              onClick={() => {
+                setEmails([...emails, email]);
+                setEmail("");
+              }}
+            >
+              Add
+            </Button>
+          </div>
           <p className="mb-4 text-center">{createPost.status !== "idle" ? createPost.status : ""}</p>
-          <Button>Create</Button>
+          <Button
+            onClick={async () => {
+              await createPost.mutateAsync({ title, content, emails });
+              await refetch();
+              setTitle("");
+              setContent("");
+              setEmail("");
+              setEmails([]);
+            }}
+          >
+            Create
+          </Button>
         </form>
       </Card>
       <Link href="/">

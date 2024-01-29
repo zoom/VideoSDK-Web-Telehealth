@@ -7,18 +7,18 @@ import {
 import { generateSignature } from "~/utils/signJwt";
 
 export const zoomRouter = createTRPCRouter({
-  createJWT: protectedProcedure
-    .input(
-      z.object({
-        sessionName: z.string(),
-        role: z.number(),
-      })
-    )
-    .query(async ({ ctx, input }) => {
-      return generateSignature(
-        input.sessionName,
-        input.role,
-      )
-    }),
+  // createJWT: protectedProcedure
+  //   .input(
+  //     z.object({
+  //       sessionName: z.string(),
+  //       role: z.number(),
+  //     })
+  //   )
+  //   .query(async ({ ctx, input }) => {
+  //     return generateSignature(
+  //       input.sessionName,
+  //       input.role,
+  //     )
+  //   }),
 });
 

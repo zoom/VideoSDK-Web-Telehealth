@@ -8,15 +8,17 @@ datasource db {
     directUrl = env("DATABASE_DIRECT_URL")
 }
 
-model Post {
-    id          Int      @id @default(autoincrement())
-    name        String?
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
-    title       String
-    content     String
-    createdBy   User     @relation(fields: [createdById], references: [id])
-    createdById String
+model Room {
+    id              String   @id @default(cuid())
+    name            String?
+    createdAt       DateTime @default(now())
+    updatedAt       DateTime @updatedAt
+    title           String
+    content         String
+    User_CreatedBy  User     @relation("RoomByUser", fields: [createdById], references: [id])
+    createdById     String
+    // User_CreatedFor User[]   @relation("RoomForUser")
+    createdForEmail String[]
 
     @@index([name])
 }
@@ -50,14 +52,16 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
+    id             String    @id @default(cuid())
+    name           String?
+    email          String?   @unique
+    emailVerified  DateTime?
+    image          String?
+    accounts       Account[]
+    sessions       Session[]
+    roomId         Int?
+    // Room_CreatedFor Room[]    @relation("RoomForUser")
+    Room_CreatedBy Room[]    @relation("RoomByUser")
 }
 
 model VerificationToken {
