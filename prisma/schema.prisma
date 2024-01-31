@@ -10,17 +10,16 @@ datasource db {
 
 model Room {
     id              String   @id @default(cuid())
-    name            String?
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
     title           String
     content         String
-    User_CreatedBy  User     @relation("RoomByUser", fields: [createdById], references: [id])
-    createdById     String
-    // User_CreatedFor User[]   @relation("RoomForUser")
-    createdForEmail String[]
-
-    @@index([name])
+    time            DateTime
+    duration        Int
+    User_CreatedBy  User     @relation("RoomByUser", fields: [createByUserId], references: [id])
+    createByUserId  String
+    User_CreatedFor User[]   @relation("RoomForUser")
+    // createdForUserIds String[]
 }
 
 // Necessary for Next auth
@@ -52,16 +51,45 @@ model Session {
 }
 
 model User {
-    id             String    @id @default(cuid())
-    name           String?
-    email          String?   @unique
-    emailVerified  DateTime?
-    image          String?
-    accounts       Account[]
-    sessions       Session[]
-    roomId         Int?
-    // Room_CreatedFor Room[]    @relation("RoomForUser")
-    Room_CreatedBy Room[]    @relation("RoomByUser")
+    id              String    @id @default(cuid())
+    name            String?
+    email           String?   @unique
+    emailVerified   DateTime?
+    image           String?
+    accounts        Account[]
+    sessions        Session[]
+    role            Role      @default(patient)
+    Room_CreatedFor Room[]    @relation("RoomForUser")
+    Room_CreatedBy  Room[]    @relation("RoomByUser")
+    patientId       String?   @unique
+    Patient         Patient?  @relation(fields: [patientId], references: [id])
+    doctorId        String?   @unique
+    Doctor          Doctor?   @relation(fields: [doctorId], references: [id])
+}
+
+model Patient {
+    id          String   @id @default(cuid())
+    height      Float?
+    weight      Float?
+    bloodType   String?
+    allergies   String?
+    medications String?
+    filesIds    String[]
+    userId      String
+    User        User?
+}
+
+model Doctor {
+    id         String  @id @default(cuid())
+    userId     String
+    User       User?
+    department String?
+    speciality String?
+}
+
+enum Role {
+    doctor
+    patient
 }
 
 model VerificationToken {
