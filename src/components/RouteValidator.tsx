@@ -1,4 +1,4 @@
-import { useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 const RouteValidator = ({ children }: { children: React.ReactNode }) => {
@@ -18,7 +18,8 @@ const RouteValidator = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (status === "unauthenticated") {
-    void router.replace("/");
+    const route = router.asPath;
+    void signIn("github", { callbackUrl: route });
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
         <h1>Loading...</h1>
