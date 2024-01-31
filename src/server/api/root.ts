@@ -1,6 +1,6 @@
 import { roomRouter } from "~/server/api/routers/room";
 import { createTRPCRouter } from "~/server/api/trpc";
-import { zoomRouter } from "./routers/zoom";
+import { S3Router } from "./routers/S3";
 
 /**
  * This is the primary router for your server.
@@ -9,7 +9,7 @@ import { zoomRouter } from "./routers/zoom";
  */
 export const appRouter = createTRPCRouter({
   room: roomRouter,
-  zoom: zoomRouter
+  S3: S3Router
 });
 
 // export type definition of API
