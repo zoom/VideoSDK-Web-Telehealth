@@ -17,30 +17,44 @@ export const roomRouter = createTRPCRouter({
     }),
 
   create: protectedProcedure
-    .input(z.object({ title: z.string().min(3), content: z.string(), emails: z.array(z.string().email()).min(1) }))
+    .input(z.object({
+      title: z.string().min(3), content: z.string(), emails: z.array(z.string().email()).min(1),
+      time: z.date(), duration: z.number()
+    }))
     .mutation(async ({ ctx, input }) => {
+      const { title, content, emails, time, duration } = input;
       return ctx.db.room.create({
         data: {
-          title: input.title,
-          content: input.content,
+          title,
+          content,
           User_CreatedBy: { connect: { id: ctx.session.user.id } },
-          createdForEmail: input.emails,
+          duration,
+          time,
+          User_CreatedFor: { connect: emails.map((email) => ({ email })) },
         },
       });
     }),
 
-  getCreated: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.room.findMany({
-      orderBy: { createdAt: "desc" },
-      where: { User_CreatedBy: { id: ctx.session.user.id } },
-    });
-  }),
+  getCreated: protectedProcedure
+    .input(z.object({ time: z.date() }))
+    .query(({ input, ctx }) => {
+      return ctx.db.room.findMany({
+        orderBy: { time: "asc" },
+        where: {
+          User_CreatedBy: { id: ctx.session.user.id },
+          time: { gte: input.time }
+        },
+      });
+    }),
 
-  getInvited: protectedProcedure.query(({ ctx }) => {
+  getInvited: protectedProcedure.input(z.object({ time: z.date() })).query(({ input, ctx }) => {
     return ctx.db.room.findMany({
-      orderBy: { createdAt: "desc" },
+      orderBy: { time: "asc" },
       where: {
-        createdForEmail: { has: ctx.session.user.email },
+        time: { gte: input.time },
+        User_CreatedFor: {
+          some: { id: ctx.session.user.id }
+        },
       },
     });
   }),
@@ -50,16 +64,17 @@ export const roomRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const room = await ctx.db.room.findUnique({
         where: { id: input.id },
+        include: { User_CreatedBy: true, User_CreatedFor: true }
       });
       if (room) {
-        if ((room.createdById === ctx.session.user.id)) {
+        if ((room.createByUserId === ctx.session.user.id)) {
           const jwt = generateSignature(
             `${room.id}`,
             1,
           )
           return { room, jwt };
         }
-        else if (room.createdForEmail.includes(ctx.session.user.email!)) {
+        else if (room.User_CreatedFor.findIndex(e => e.id === ctx.session.user.id) !== -1) {
           const jwt = generateSignature(
             `${room.id}`,
             0,
@@ -78,4 +93,17 @@ export const roomRouter = createTRPCRouter({
         });
       }
     }),
+
+  getUserByEmail: protectedProcedure.input(z.object({ email: z.string().email() })).mutation(async ({ ctx, input }) => {
+    const user = await ctx.db.user.findUnique({ where: { email: input.email } });
+    if (user) {
+      return user;
+    }
+    else {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+  }),
 });

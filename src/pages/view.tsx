@@ -1,3 +1,4 @@
+import { type PrismaClient } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Button } from "~/components/ui/button";
@@ -5,72 +6,57 @@ import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/utils/api";
 
-export default function Home() {
-  const { data: createdRooms, isLoading } = api.room.getCreated.useQuery();
-  const { data: invitedRooms, isLoading: invitedRoomsLoading } = api.room.getInvited.useQuery();
+const utcTime = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60);
 
-  const router = useRouter();
+export default function Home() {
+  const { data: createdRooms, isLoading: createdRoomsLoading } = api.room.getCreated.useQuery({ time: utcTime });
+  const { data: invitedRooms, isLoading: invitedRoomsLoading } = api.room.getInvited.useQuery({ time: utcTime });
 
   return (
     <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
       <h1 className="my-10 flex text-center text-5xl font-bold leading-none text-gray-700">Rooms</h1>
       <h3 className="gray text-left text-2xl font-bold text-gray-700">Created</h3>
-      <div className="mb-12 flex flex-wrap justify-center">
-        {isLoading ? (
-          <Card className="m-4 flex h-64 w-80 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">
-            <Skeleton className="h-full w-full animate-pulse" />
-          </Card>
-        ) : (
-          createdRooms?.map((post) => (
-            <Card key={post.id} className="m-2 flex h-64 w-80 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">
-              <CardContent className="w-full">
-                <CardTitle className="mb-2 w-full">{post.title}</CardTitle>
-                <p>{post.content} </p>
-                <p>by: {post.name}</p>
-                <p>on: {post.createdAt.toLocaleDateString()}</p>
-              </CardContent>
-              <Button
-                className="w-full"
-                onClick={async () => {
-                  await router.push(`/room/${post.id}`);
-                }}
-              >
-                Join
-              </Button>
-            </Card>
-          ))
-        )}
-      </div>
+      <Rooms rooms={createdRooms} isLoading={createdRoomsLoading} />
       <h3 className="text-left text-xl font-bold text-gray-700">Invited</h3>
-      <div className="mb-8 flex flex-wrap justify-center">
-        {invitedRoomsLoading ? (
-          <Card className="m-4 flex h-64 w-80 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">
-            <Skeleton className="h-full w-full animate-pulse" />
-          </Card>
-        ) : (
-          invitedRooms?.map((post) => (
-            <Card key={post.id} className="m-2 flex h-64 w-80 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">
-              <CardContent className="w-full">
-                <CardTitle className="mb-2 w-full">{post.title}</CardTitle>
-                <p>{post.content} </p>
-                <p>by: {post.name}</p>
-                <p>on: {post.createdAt.toLocaleDateString()}</p>
-              </CardContent>
-              <Button
-                className="w-full"
-                onClick={async () => {
-                  await router.push(`/room/${post.id}`);
-                }}
-              >
-                Join
-              </Button>
-            </Card>
-          ))
-        )}
-      </div>
+      <Rooms rooms={invitedRooms} isLoading={invitedRoomsLoading} />
       <Link href="/">
         <Button variant={"link"}>back</Button>
       </Link>
     </div>
   );
 }
+
+const Rooms = ({ rooms, isLoading }: { rooms?: Awaited<ReturnType<PrismaClient["room"]["findMany"]>>; isLoading: boolean }) => {
+  const router = useRouter();
+  return (
+    <div className="mb-12 flex flex-wrap justify-center">
+      {isLoading ? (
+        <Card className="m-4 flex h-64 w-80 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">
+          <Skeleton className="h-full w-full animate-pulse" />
+        </Card>
+      ) : rooms?.length === 0 ? (
+        <>
+          <Card className="m-4 flex h-64 w-80 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">No Rooms</Card>
+        </>
+      ) : (
+        rooms?.map((room) => (
+          <Card key={room.id} className="m-2 flex h-64 w-80 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">
+            <CardContent className="w-full">
+              <CardTitle className="mb-2 w-full">{room.title}</CardTitle>
+              <p>{room.content} </p>
+              <p>on: {new Date(room.time.getTime() - new Date().getTimezoneOffset() * 60 * 1000).toLocaleString().slice(0, -3)}</p>
+            </CardContent>
+            <Button
+              className="w-full"
+              onClick={async () => {
+                await router.push(`/room/${room.id}`);
+              }}
+            >
+              Join
+            </Button>
+          </Card>
+        ))
+      )}
+    </div>
+  );
+};

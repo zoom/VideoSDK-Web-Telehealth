@@ -8,11 +8,14 @@ import { api } from "~/utils/api";
 
 export default function Home() {
   const createPost = api.room.create.useMutation();
-  const { refetch } = api.room.getCreated.useQuery();
+  const getUser = api.room.getUserByEmail.useMutation();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [duration, setDuration] = useState<number>(1);
+  const [time, setTime] = useState<string>(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60).toISOString().slice(0, 16));
   const [email, setEmail] = useState<string>("");
   const [emails, setEmails] = useState<string[]>([]);
+  const [emailError, setEmailError] = useState<string>("");
 
   return (
     <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
@@ -50,8 +53,13 @@ export default function Home() {
             Emails
           </Label>
           {emails.map((email, index) => (
-            <p key={index}>{email}</p>
+            <p className="my-2" key={index}>
+              - {email}
+            </p>
           ))}
+          <div>
+            <p className="mb-2 text-sm text-red-800">{emailError}</p>
+          </div>
           <div className="flex">
             <Input
               id="email"
@@ -63,19 +71,66 @@ export default function Home() {
             />
             <Button
               className="mb-4 ml-2"
-              onClick={() => {
-                setEmails([...emails, email]);
-                setEmail("");
+              onClick={async () => {
+                if (!email) {
+                  return;
+                }
+                setEmailError("");
+                if (emails.includes(email)) {
+                  setEmailError("Email already added");
+                  return;
+                }
+                let user;
+                try {
+                  user = await getUser.mutateAsync({ email });
+                } catch (e) {
+                  setEmailError("User not found");
+                }
+                if (user) {
+                  setEmails([...emails, email]);
+                  setEmail("");
+                }
               }}
             >
               Add
             </Button>
           </div>
+
+          <Label htmlFor="duration" className="mb-2">
+            Duration
+          </Label>
+          <div className="flex">
+            <Input
+              id="duration"
+              type="number"
+              className="mb-4 mr-2"
+              value={duration}
+              onChange={(e) => {
+                setDuration(parseInt(e.target.value));
+              }}
+            />
+            <p className="mb-4 mt-auto flex">hours</p>
+          </div>
+          <Label htmlFor="time" className="mb-2">
+            Time (GMT)
+          </Label>
+          <div className="flex">
+            <Input
+              id="time"
+              type="datetime-local"
+              className="mb-4 mr-2"
+              value={time}
+              min={time}
+              onChange={(e) => {
+                setTime(e.target.value);
+              }}
+            />
+          </div>
           <p className="mb-4 text-center">{createPost.status !== "idle" ? createPost.status : ""}</p>
           <Button
             onClick={async () => {
-              await createPost.mutateAsync({ title, content, emails });
-              await refetch();
+              const utcTime = convertToUTC(time);
+              await createPost.mutateAsync({ title, content, emails, duration, time: utcTime });
               setTitle("");
               setContent("");
               setEmail("");
@@ -92,3 +147,9 @@ export default function Home() {
     </div>
   );
 }
+
+const convertToUTC = (localTime: string) => {
+  const localDate = new Date(localTime);
+  const utcDate = new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60 * 1000);
+  return utcDate;
+};
