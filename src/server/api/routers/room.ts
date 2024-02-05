@@ -106,4 +106,17 @@ export const roomRouter = createTRPCRouter({
       });
     }
   }),
+
+  setRole: protectedProcedure.input(z.enum(['patient', 'doctor'])).mutation(async ({ ctx, input }) => {
+    const user = await ctx.db.user.update({ where: { id: ctx.session.user.id }, data: { role: input } });
+    if (user) {
+      return user;
+    }
+    else {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+  }),
 });

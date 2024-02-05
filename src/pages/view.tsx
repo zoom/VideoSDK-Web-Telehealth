@@ -1,4 +1,4 @@
-import { type PrismaClient } from "@prisma/client";
+import { type Room } from "@prisma/client";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Button } from "~/components/ui/button";
@@ -26,7 +26,7 @@ export default function Home() {
   );
 }
 
-const Rooms = ({ rooms, isLoading }: { rooms?: Awaited<ReturnType<PrismaClient["room"]["findMany"]>>; isLoading: boolean }) => {
+const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => {
   const router = useRouter();
   return (
     <div className="mb-12 flex flex-wrap justify-center">
