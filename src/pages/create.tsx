@@ -5,10 +5,12 @@ import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { api } from "~/utils/api";
+import moment from "moment";
 
 export default function Home() {
   const createPost = api.room.create.useMutation();
   const getUser = api.room.getUserByEmail.useMutation();
+  const utils = api.useUtils();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [duration, setDuration] = useState<number>(1);
@@ -129,8 +131,9 @@ export default function Home() {
           <p className="mb-4 text-center">{createPost.status !== "idle" ? createPost.status : ""}</p>
           <Button
             onClick={async () => {
-              const utcTime = convertToUTC(time);
+              const utcTime = moment(time).utc().toDate();
               await createPost.mutateAsync({ title, content, emails, duration, time: utcTime });
+              await utils.room.getCreated.invalidate();
               setTitle("");
               setContent("");
               setEmail("");
@@ -147,9 +150,3 @@ export default function Home() {
     </div>
   );
 }
-
-const convertToUTC = (localTime: string) => {
-  const localDate = new Date(localTime);
-  const utcDate = new Date(localDate.getTime() + localDate.getTimezoneOffset() * 60 * 1000);
-  return utcDate;
-};

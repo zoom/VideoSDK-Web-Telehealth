@@ -1,4 +1,5 @@
 import { type Room } from "@prisma/client";
+import moment from "moment";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Button } from "~/components/ui/button";
@@ -6,11 +7,9 @@ import { Card, CardContent, CardTitle } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/utils/api";
 
-const utcTime = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60);
-
 export default function Home() {
-  const { data: createdRooms, isLoading: createdRoomsLoading } = api.room.getCreated.useQuery({ time: utcTime });
-  const { data: invitedRooms, isLoading: invitedRoomsLoading } = api.room.getInvited.useQuery({ time: utcTime });
+  const { data: createdRooms, isLoading: createdRoomsLoading } = api.room.getCreated.useQuery();
+  const { data: invitedRooms, isLoading: invitedRoomsLoading } = api.room.getInvited.useQuery();
 
   return (
     <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
@@ -44,7 +43,7 @@ const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => 
             <CardContent className="w-full">
               <CardTitle className="mb-2 w-full">{room.title}</CardTitle>
               <p>{room.content} </p>
-              <p>on: {new Date(room.time.getTime() - new Date().getTimezoneOffset() * 60 * 1000).toLocaleString().slice(0, -3)}</p>
+              <p>on: {moment(room.time).local().toLocaleString()}</p>
             </CardContent>
             <Button
               className="w-full"

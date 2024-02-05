@@ -1,4 +1,5 @@
 import { TRPCError } from "@trpc/server";
+import moment from "moment";
 import { z } from "zod";
 import {
   createTRPCRouter,
@@ -36,28 +37,31 @@ export const roomRouter = createTRPCRouter({
     }),
 
   getCreated: protectedProcedure
-    .input(z.object({ time: z.date() }))
-    .query(({ input, ctx }) => {
+    .query(({ ctx }) => {
+      const time = moment().utc().toDate();
+      console.log(time);
       return ctx.db.room.findMany({
         orderBy: { time: "asc" },
         where: {
           User_CreatedBy: { id: ctx.session.user.id },
-          time: { gte: input.time }
+          time: { gte: time }
         },
       });
     }),
 
-  getInvited: protectedProcedure.input(z.object({ time: z.date() })).query(({ input, ctx }) => {
-    return ctx.db.room.findMany({
-      orderBy: { time: "asc" },
-      where: {
-        time: { gte: input.time },
-        User_CreatedFor: {
-          some: { id: ctx.session.user.id }
+  getInvited: protectedProcedure
+    .query(({ ctx }) => {
+      const time = moment().utc().toDate();
+      return ctx.db.room.findMany({
+        orderBy: { time: "asc" },
+        where: {
+          time: { gte: time },
+          User_CreatedFor: {
+            some: { id: ctx.session.user.id }
+          },
         },
-      },
-    });
-  }),
+      });
+    }),
 
   getById: protectedProcedure
     .input(z.object({ id: z.string() }))
