@@ -19,6 +19,8 @@ model Room {
     User_CreatedBy  User     @relation("RoomByUser", fields: [createByUserId], references: [id])
     createByUserId  String
     User_CreatedFor User[]   @relation("RoomForUser")
+    Notes           String? // @db.Text
+    Transcript      String? // @db.Text
     // createdForUserIds String[]
 }
 
@@ -68,23 +70,34 @@ model User {
 }
 
 model Patient {
-    id          String   @id @default(cuid())
+    id          String    @id @default(cuid())
     height      Float?
     weight      Float?
     bloodType   String?
     allergies   String?
     medications String?
-    filesIds    String[]
-    userId      String
+    DOB         DateTime?
+    userId      String    @unique
     User        User?
+    files       File[]
+}
+
+model File {
+    id        String   @id @default(cuid())
+    name      String
+    type      String
+    Patient   Patient  @relation(fields: [patientId], references: [id])
+    patientId String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Doctor {
     id         String  @id @default(cuid())
-    userId     String
+    userId     String  @unique
     User       User?
     department String?
-    speciality String?
+    position   String?
 }
 
 enum Role {

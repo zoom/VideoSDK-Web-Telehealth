@@ -34,11 +34,13 @@ const Videocall = (props: { jwt: string; session: string }) => {
   };
 
   const leaveCall = () => {
-    if (!incall) {
-      uitoolkit.closePreview(previewContainer.current!);
-    } else {
-      uitoolkit.closeSession(sessionContainer.current!);
-    }
+    try {
+      if (!incall) {
+        uitoolkit.closePreview(previewContainer.current!);
+      } else {
+        uitoolkit.closeSession(sessionContainer.current!);
+      }
+    } catch (e) {}
     void router.push("/");
   };
 
