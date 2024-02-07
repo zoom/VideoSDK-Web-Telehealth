@@ -112,7 +112,12 @@ export const roomRouter = createTRPCRouter({
   }),
 
   setRole: protectedProcedure.input(z.enum(['patient', 'doctor'])).mutation(async ({ ctx, input }) => {
-    const user = await ctx.db.user.update({ where: { id: ctx.session.user.id }, data: { role: input } });
+    let user;
+    if (input === 'patient') {
+      user = await ctx.db.user.update({ where: { id: ctx.session.user.id }, data: { role: input, Patient: { create: { userId: ctx.session.user.id } } } });
+    } else {
+      user = await ctx.db.user.update({ where: { id: ctx.session.user.id }, data: { role: input, Doctor: { create: { userId: ctx.session.user.id } } } });
+    }
     if (user) {
       return user;
     }
