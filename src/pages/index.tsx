@@ -38,7 +38,7 @@ export default function Home() {
     <>
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
         <h1 className="my-10 flex text-5xl font-bold leading-none text-gray-700">Zoom Telehealth Demo</h1>
-        <div className="my-10 flex flex-col justify-center ">{data?.user.role === "doctor" ? <DoctorView /> : <PatientView />}</div>
+        <div className="my-10 flex flex-col justify-center ">{data?.user.role !== "doctor" ? <DoctorView /> : <PatientView />}</div>
       </div>
     </>
   );

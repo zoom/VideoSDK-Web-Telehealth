@@ -8,7 +8,7 @@ import UpcomingSession from "./UpcomingSession";
 const DoctorView = () => {
   const { data: userData } = useSession();
   const { data, isLoading } = api.room.getCreated.useQuery();
-  console.log(data);
+
   return (
     <>
       <h2 className="mb-8 self-center text-2xl font-bold">Welcome Dr. {userData?.user.name}</h2>

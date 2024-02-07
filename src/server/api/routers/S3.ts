@@ -10,6 +10,7 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env } from "~/env";
 import { z } from "zod";
+import { TRPCError } from "@trpc/server";
 
 const S3 = new S3Client({
   region: "auto",
@@ -33,29 +34,32 @@ export const S3Router = createTRPCRouter({
     .mutation(async ({ input, ctx }) => {
       await ctx.db.patient.update({
         data: {
-          filesIds: { push: input.filename },
+          files: { create: { name: input.filename, type: "PDF" } },
         },
         where: {
-          id: ctx.session.user.id
+          userId: ctx.session.user.id
         }
       })
     }),
   getUploadList: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input, ctx }) => {
-      const user = await ctx.db.user.findUnique({
+      if (ctx.session.user.role !== "doctor" || ctx.session.user.id !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
+      const user = await ctx.db.patient.findUnique({
         where: {
-          id: input.userId
+          userId: input.userId
         },
         include: {
-          Patient: true
-        }
+          files: { orderBy: { createdAt: "desc" } },
+        },
       })
-      return user?.Patient?.filesIds
+      if (!user) throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+      if (!user.files) throw new TRPCError({ code: "NOT_FOUND", message: "Files not found" })
+      return user.files
     }),
   getDownloadLink: protectedProcedure
     .input(z.object({ filename: z.string() }))
-    .query(async ({ input, ctx }) => {
+    .mutation(async ({ input, ctx }) => {
       const url = await getSignedUrl(S3, new GetObjectCommand({ Bucket: env.S3_BUCKET, Key: input.filename }), { expiresIn: 3600 })
       return url
     }),
