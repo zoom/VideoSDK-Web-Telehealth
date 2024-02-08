@@ -9,7 +9,6 @@ import moment from "moment";
 
 export default function Home() {
   const createPost = api.room.create.useMutation();
-  const getUser = api.room.getUserByEmail.useMutation();
   const utils = api.useUtils();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -17,7 +16,6 @@ export default function Home() {
   const [time, setTime] = useState<string>(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60).toISOString().slice(0, 16));
   const [email, setEmail] = useState<string>("");
   const [emails, setEmails] = useState<string[]>([]);
-  const [emailError, setEmailError] = useState<string>("");
 
   return (
     <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
@@ -51,52 +49,7 @@ export default function Home() {
               setContent(e.target.value);
             }}
           />
-          <Label htmlFor="email" className="mb-2">
-            Emails
-          </Label>
-          {emails.map((email, index) => (
-            <p className="my-2" key={index}>
-              - {email}
-            </p>
-          ))}
-          <div>
-            <p className="mb-2 text-sm text-red-800">{emailError}</p>
-          </div>
-          <div className="flex">
-            <Input
-              id="email"
-              className="mb-4 mr-2"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-              }}
-            />
-            <Button
-              className="mb-4 ml-2"
-              onClick={async () => {
-                if (!email) {
-                  return;
-                }
-                setEmailError("");
-                if (emails.includes(email)) {
-                  setEmailError("Email already added");
-                  return;
-                }
-                let user;
-                try {
-                  user = await getUser.mutateAsync({ email });
-                } catch (e) {
-                  setEmailError("User not found");
-                }
-                if (user) {
-                  setEmails([...emails, email]);
-                  setEmail("");
-                }
-              }}
-            >
-              Add
-            </Button>
-          </div>
+          <EmailInput email={email} emails={emails} setEmail={setEmail} setEmails={setEmails} />
 
           <Label htmlFor="duration" className="mb-2">
             Duration
@@ -150,3 +103,68 @@ export default function Home() {
     </div>
   );
 }
+
+const EmailInput = ({
+  email,
+  emails,
+  setEmail,
+  setEmails,
+}: {
+  email: string;
+  emails: string[];
+  setEmail: React.Dispatch<React.SetStateAction<string>>;
+  setEmails: React.Dispatch<React.SetStateAction<string[]>>;
+}) => {
+  const getUser = api.room.getUserByEmail.useMutation();
+  const [emailError, setEmailError] = useState<string>("");
+  return (
+    <>
+      <Label htmlFor="email" className="mb-2">
+        Emails
+      </Label>
+      {emails.map((email, index) => (
+        <p className="my-2" key={index}>
+          - {email}
+        </p>
+      ))}
+      <div>
+        <p className="mb-2 text-sm text-red-800">{emailError}</p>
+      </div>
+      <div className="flex">
+        <Input
+          id="email"
+          className="mb-4 mr-2"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+        />
+        <Button
+          className="mb-4 ml-2"
+          onClick={async () => {
+            if (!email) {
+              return;
+            }
+            setEmailError("");
+            if (emails.includes(email)) {
+              setEmailError("Email already added");
+              return;
+            }
+            let user;
+            try {
+              user = await getUser.mutateAsync({ email });
+            } catch (e) {
+              setEmailError("User not found");
+            }
+            if (user) {
+              setEmails([...emails, email]);
+              setEmail("");
+            }
+          }}
+        >
+          Add
+        </Button>
+      </div>
+    </>
+  );
+};
