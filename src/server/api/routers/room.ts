@@ -116,15 +116,20 @@ export const roomRouter = createTRPCRouter({
     }
   }),
 
-  setRole: protectedProcedure.input(z.enum(['patient', 'doctor'])).mutation(async ({ ctx, input }) => {
-    let user;
-    if (input === 'patient') {
-      user = await ctx.db.user.update({ where: { id: ctx.session.user.id }, data: { role: input, Patient: { create: { userId: ctx.session.user.id } } } });
-    } else {
-      user = await ctx.db.user.update({ where: { id: ctx.session.user.id }, data: { role: input, Doctor: { create: { userId: ctx.session.user.id } } } });
-    }
+  setDoctor: protectedProcedure.input(z.object({
+    department: z.string(), position: z.string()
+  })).mutation(async ({ ctx, input }) => {
+    const user = await ctx.db.user.update({
+      where: { id: ctx.session.user.id },
+      data: { role: 'doctor' }
+    });
+    const doctor = await ctx.db.doctor.create({
+      data: {
+        userId: ctx.session.user.id, department: input.department, position: input.position
+      }
+    });
     if (user) {
-      return user;
+      return { user, doctor };
     }
     else {
       throw new TRPCError({
@@ -133,4 +138,33 @@ export const roomRouter = createTRPCRouter({
       });
     }
   }),
+
+  setPatient: protectedProcedure.input(z.object({
+    height: z.number(),
+    weight: z.number(),
+    bloodType: z.string(),
+    allergies: z.string(),
+    medications: z.string(),
+    DOB: z.date(),
+  })).mutation(async ({ ctx, input }) => {
+    const user = await ctx.db.user.update({
+      where: { id: ctx.session.user.id },
+      data: { role: 'patient' }
+    });
+    const patient = await ctx.db.patient.create({
+      data: {
+        userId: ctx.session.user.id, height: input.height, weight: input.weight,
+        bloodType: input.bloodType, allergies: input.allergies, medications: input.medications, DOB: input.DOB
+      }
+    });
+    if (user) {
+      return { user, patient };
+    }
+    else {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "User not found",
+      });
+    }
+  })
 });
