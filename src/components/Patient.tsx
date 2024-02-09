@@ -12,9 +12,14 @@ const DoctorView = () => {
   return (
     <>
       <h2 className="mb-2 self-center text-2xl font-bold">Welcome Patient, {userData?.user.name}</h2>
-      <div className="my-4 flex self-center">
+      <p className="mb-2 mt-4 text-center text-xl font-bold">Documents</p>
+      <div className="mb-4 flex self-center">
         <Link href={"/upload"}>
-          <Button variant={"outline"}>Upload Document</Button>
+          <Button>Upload</Button>
+        </Link>
+        <div className="w-2"></div>
+        <Link href={`/uploaded/${userData?.user.id}`}>
+          <Button variant={"outline"}>View</Button>
         </Link>
       </div>
       <h3 className="self-center text-xl font-bold">Upcoming Session</h3>

@@ -15,7 +15,7 @@ const Uploaded = () => {
   }
 
   return (
-    <div className="flex h-screen w-screen flex-col items-center  bg-gray-100">
+    <div className="flex h-screen w-screen flex-col items-center overflow-y-scroll bg-gray-100">
       <h1 className="my-10 flex text-3xl font-bold leading-none text-gray-700">Uploaded documents</h1>
       <div className="my-10 flex flex-col justify-center ">
         {isLoading ? (
