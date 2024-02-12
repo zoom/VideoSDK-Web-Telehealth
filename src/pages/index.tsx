@@ -15,14 +15,7 @@ export default function Home() {
       </div>
     );
   }
-
-  if (data?.user.role === undefined) {
-    void router.push("/onboarding");
-    <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
-      <h1>Loading...</h1>
-    </div>;
-  }
-
+  // check `/` for auth as it is not protected by RouteValidator
   if (status === "unauthenticated") {
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
@@ -32,6 +25,13 @@ export default function Home() {
         </Button>
       </div>
     );
+  }
+  // check `/` for role as it is not protected by RouteValidator
+  if (data?.user.role === null) {
+    void router.push("/onboarding");
+    <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
+      <h1>Loading...</h1>
+    </div>;
   }
 
   return (

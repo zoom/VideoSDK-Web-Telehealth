@@ -16,8 +16,8 @@ const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { s
         <div className={inter.className}>
           <Component {...pageProps} />
         </div>
-        <Toaster />
       </RouteValidator>
+      <Toaster />
     </SessionProvider>
   );
 };

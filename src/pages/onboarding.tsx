@@ -7,6 +7,7 @@ import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { useToast } from "~/components/ui/use-toast";
 import { api } from "~/utils/api";
 
 const Onboarding = () => {
@@ -14,7 +15,7 @@ const Onboarding = () => {
   const { data } = useSession();
   const [role, setRoleState] = useState<Role>("patient");
 
-  if (data?.user.role === undefined) {
+  if (data?.user.role !== null) {
     void router.push("/");
   }
 
@@ -40,6 +41,8 @@ const Onboarding = () => {
 };
 
 const PatientFields = () => {
+  const { update } = useSession();
+  const { toast } = useToast();
   const setPatient = api.room.setPatient.useMutation();
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
@@ -75,16 +78,20 @@ const PatientFields = () => {
       </Label>
       <Input type="date" id="DOB" className="mb-4" value={DOB} onChange={(e) => setDOB(e.target.value)} />
       <Button
-        onClick={() =>
-          setPatient.mutate({
+        onClick={async () => {
+          await setPatient.mutateAsync({
             height: parseFloat(height),
             weight: parseFloat(weight),
             bloodType,
             allergies,
             medications,
             DOB: new Date(DOB),
-          })
-        }
+          });
+          toast({
+            title: "Account created, redirecting...",
+          });
+          await update();
+        }}
       >
         Submit
       </Button>
@@ -93,9 +100,11 @@ const PatientFields = () => {
 };
 
 const DoctorFields = () => {
+  const { update } = useSession();
+  const { toast } = useToast();
+  const setDoctor = api.room.setDoctor.useMutation();
   const [department, setDepartment] = useState("");
   const [position, setPosition] = useState("");
-  const setDoctor = api.room.setDoctor.useMutation();
 
   return (
     <>
@@ -107,7 +116,17 @@ const DoctorFields = () => {
         Designation
       </Label>
       <Input id="position" className="mb-4" value={position} onChange={(e) => setPosition(e.target.value)} />
-      <Button onClick={() => setDoctor.mutate({ department, position })}>Submit</Button>
+      <Button
+        onClick={async () => {
+          await setDoctor.mutateAsync({ department, position });
+          toast({
+            title: "Account created, redirecting...",
+          });
+          await update();
+        }}
+      >
+        Submit
+      </Button>
     </>
   );
 };

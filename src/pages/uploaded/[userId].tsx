@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -7,11 +8,20 @@ import { api } from "~/utils/api";
 const Uploaded = () => {
   const router = useRouter();
   const { userId } = router.query;
-  const { data, isLoading, error, isError } = api.S3.getUploadList.useQuery({ userId: userId as string });
+  const { data, isLoading, error, isError } = api.S3.getUploadList.useQuery({ userId: userId as string }, { retry: 0 });
   const { mutateAsync } = api.S3.getDownloadLink.useMutation();
 
   if (isError) {
-    return <div>Error: {error.message}</div>;
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
+        <Card className="flex w-96 flex-col justify-center self-center p-8">Error: {error?.message}</Card>
+        <Link href="/">
+          <Button variant={"link"} className="mx-auto flex">
+            back
+          </Button>
+        </Link>
+      </div>
+    );
   }
 
   return (
@@ -42,6 +52,11 @@ const Uploaded = () => {
             </Card>
           ))
         )}
+        <Link href="/">
+          <Button variant={"link"} className="mx-auto flex">
+            back
+          </Button>
+        </Link>
       </div>
     </div>
   );

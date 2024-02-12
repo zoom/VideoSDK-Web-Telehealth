@@ -15,7 +15,7 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
   const { toast } = useToast();
 
   return (
-    <>
+    <div className="mb-auto flex flex-col">
       <div className="mb-4">
         <Button
           variant={"link"}
@@ -25,8 +25,8 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
             toast({ title: "Copied link to clipoard", description: link });
           }}
         >
-          <span className="mb-1 text-xl font-bold">{rooms.title}</span>
-          <LinkIcon height={20} className="mb-2 ml-2" />
+          <span className="text-2xl font-bold">{rooms.title}</span>
+          <LinkIcon height={20} className="mb-1 ml-2" />
         </Button>
         <p className="text-sm ">(Starting in ~{moment(rooms.time).local().fromNow(true)})</p>
       </div>
@@ -77,7 +77,7 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

@@ -12,7 +12,7 @@ export default function Home() {
   const { data: invitedRooms, isLoading: invitedRoomsLoading } = api.room.getInvited.useQuery();
 
   return (
-    <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
+    <div className="flex h-screen w-screen flex-col items-center overflow-y-scroll bg-gray-100">
       <h1 className="my-10 flex text-center text-5xl font-bold leading-none text-gray-700">Rooms</h1>
       <h3 className="gray text-left text-2xl font-bold text-gray-700">Created</h3>
       <Rooms rooms={createdRooms} isLoading={createdRoomsLoading} />

@@ -44,7 +44,7 @@ export const S3Router = createTRPCRouter({
   getUploadList: protectedProcedure
     .input(z.object({ userId: z.string() }))
     .query(async ({ input, ctx }) => {
-      if (ctx.session.user.role !== "doctor" || ctx.session.user.id !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
+      if (ctx.session.user.role !== "doctor" && ctx.session.user.id !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
       const user = await ctx.db.patient.findUnique({
         where: {
           userId: input.userId
@@ -60,6 +60,7 @@ export const S3Router = createTRPCRouter({
   getDownloadLink: protectedProcedure
     .input(z.object({ filename: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      // if (ctx.session.user.role !== "doctor" || ctx.session.user.id !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
       const url = await getSignedUrl(S3, new GetObjectCommand({ Bucket: env.S3_BUCKET, Key: input.filename }), { expiresIn: 3600 })
       return url
     }),

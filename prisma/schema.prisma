@@ -16,7 +16,7 @@ model Room {
     content         String
     time            DateTime
     duration        Int
-    User_CreatedBy  User     @relation("RoomByUser", fields: [createByUserId], references: [id])
+    User_CreatedBy  User     @relation("RoomByUser", fields: [createByUserId], references: [id], onDelete: Cascade)
     createByUserId  String
     User_CreatedFor User[]   @relation("RoomForUser")
     Notes           String? // @db.Text
@@ -60,13 +60,13 @@ model User {
     image           String?
     accounts        Account[]
     sessions        Session[]
-    role            Role      @default(patient)
+    role            Role?
     Room_CreatedFor Room[]    @relation("RoomForUser")
     Room_CreatedBy  Room[]    @relation("RoomByUser")
     patientId       String?   @unique
-    Patient         Patient?  @relation(fields: [patientId], references: [id])
+    Patient         Patient?  @relation(fields: [patientId], references: [id], onDelete: Cascade)
     doctorId        String?   @unique
-    Doctor          Doctor?   @relation(fields: [doctorId], references: [id])
+    Doctor          Doctor?   @relation(fields: [doctorId], references: [id], onDelete: Cascade)
 }
 
 model Patient {
@@ -103,6 +103,7 @@ model Doctor {
 enum Role {
     doctor
     patient
+    null
 }
 
 model VerificationToken {
