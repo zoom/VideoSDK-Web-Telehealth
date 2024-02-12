@@ -14,8 +14,8 @@ const DoctorView = () => {
     <>
       <h2 className="mb-8 self-center text-2xl font-bold">Welcome Dr. {userData?.user.name}</h2>
       <h3 className="self-center text-xl font-bold">Upcoming Session</h3>
-      <Card className="m-4 flex min-h-64 w-64 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
-        {isLoading ? <Skeleton className="w-54 h-56"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} isDoctor /> : <p>No Sessions</p>}
+      <Card className="m-4 flex min-h-72 min-w-72 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
+        {isLoading ? <Skeleton className="h-64 w-64"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} isDoctor /> : <p>No Sessions</p>}
       </Card>
       <div className="mx-8 my-4 flex flex-row justify-around">
         <Link href={"/view"}>

@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
+import { useToast } from "./ui/use-toast";
+import { LinkIcon } from "lucide-react";
 
 const Videocall = (props: { jwt: string; session: string }) => {
   const isRender = useRef(0);
@@ -12,6 +14,7 @@ const Videocall = (props: { jwt: string; session: string }) => {
   const sessionContainer = useRef<HTMLDivElement>(null);
   const { data } = useSession();
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (isRender.current === 0) {
@@ -50,9 +53,24 @@ const Videocall = (props: { jwt: string; session: string }) => {
       {!incall ? (
         <>
           <div id="preview" className="mb-40 mt-8 h-[60vh] w-[60vw]" ref={previewContainer} />
-          <Button onClick={startCall} className="mx-auto flex w-48">
-            Join
-          </Button>
+          <div className="mx-auto flex w-64 self-center">
+            <Button className="flex flex-1" onClick={startCall}>
+              Join
+            </Button>
+            <div className="w-4"></div>
+            <Button
+              variant={"outline"}
+              className="flex flex-1"
+              onClick={async () => {
+                const link = `${window.location.toString()}`;
+                await navigator.clipboard.writeText(link);
+                toast({ title: "Copied link to clipoard", description: link });
+              }}
+            >
+              Copy Link
+              <LinkIcon height={16} />
+            </Button>
+          </div>
         </>
       ) : (
         <></>

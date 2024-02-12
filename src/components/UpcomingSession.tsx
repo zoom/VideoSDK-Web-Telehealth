@@ -2,6 +2,8 @@ import { type User, type Room } from "@prisma/client";
 import moment from "moment";
 import Link from "next/link";
 import { Button } from "./ui/button";
+import { useToast } from "./ui/use-toast";
+import { LinkIcon } from "lucide-react";
 
 type RoomData = Room & {
   User_CreatedFor?: User[];
@@ -10,10 +12,22 @@ type RoomData = Room & {
 
 const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolean }) => {
   const rooms = data;
+  const { toast } = useToast();
+
   return (
     <>
       <div className="mb-4">
-        <p className="mb-1 text-lg font-bold">{rooms.title}</p>
+        <Button
+          variant={"link"}
+          onClick={async () => {
+            const link = `${window.location.origin}/room/${rooms.id}`;
+            await navigator.clipboard.writeText(link);
+            toast({ title: "Copied link to clipoard", description: link });
+          }}
+        >
+          <span className="mb-1 text-xl font-bold">{rooms.title}</span>
+          <LinkIcon height={20} className="mb-2 ml-2" />
+        </Button>
         <p className="text-sm ">(Starting in ~{moment(rooms.time).local().fromNow(true)})</p>
       </div>
       <div className="m-auto">
@@ -47,14 +61,15 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
         ) : (
           <></>
         )}
-        <div className="">
+        <div className="mb-2 mt-4 flex flex-row justify-center">
           <Link href={`/room/${rooms.id}`}>
-            <Button className="mb-2 mt-4">Join</Button>
+            <Button className="flex flex-1">Join</Button>
           </Link>
+          <div className="w-2"></div>
           {isDoctor && rooms.User_CreatedFor?.[0]?.id ? (
             <Link href={`/uploaded/${rooms.User_CreatedFor[0].id}`}>
-              <Button className="mb-2 ml-2 mt-4" variant={"outline"}>
-                Documents
+              <Button className="" variant={"outline"}>
+                View Documents
               </Button>
             </Link>
           ) : (
