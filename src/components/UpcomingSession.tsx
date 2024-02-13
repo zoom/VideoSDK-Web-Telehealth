@@ -25,8 +25,8 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
             toast({ title: "Copied link to clipoard", description: link });
           }}
         >
-          <span className="text-2xl font-bold">{rooms.title}</span>
-          <LinkIcon height={20} className="mb-1 ml-2" />
+          <span className="ml-6 text-2xl font-bold">{rooms.title}</span>
+          <LinkIcon height={18} strokeWidth={3} />
         </Button>
         <p className="text-sm ">(Starting in ~{moment(rooms.time).local().fromNow(true)})</p>
       </div>
