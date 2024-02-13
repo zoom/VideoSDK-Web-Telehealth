@@ -116,6 +116,20 @@ export const roomRouter = createTRPCRouter({
     }
   }),
 
+  getPatientDetails: protectedProcedure.input(z.object({ userId: z.string() })).query(async ({ ctx, input }) => {
+    if (ctx.session.user.role !== "doctor" && ctx.session.user.id !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
+    const patient = await ctx.db.patient.findUnique({ where: { userId: input.userId }, include: { User: true } });
+    if (patient) {
+      return patient;
+    }
+    else {
+      throw new TRPCError({
+        code: "NOT_FOUND",
+        message: "Patient not found",
+      });
+    }
+  }),
+
   setDoctor: protectedProcedure.input(z.object({
     department: z.string(), position: z.string()
   })).mutation(async ({ ctx, input }) => {

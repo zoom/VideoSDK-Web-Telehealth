@@ -17,7 +17,7 @@ const DoctorView = () => {
         {isLoading ? <Skeleton className="w-54 h-56"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} /> : <p>No Sessions</p>}
       </Card>
       <div className="mx-8 my-4 flex self-center">
-        <Link href={"/view"}>
+        <Link href={"/viewRooms"}>
           <Button>All Sessions</Button>
         </Link>
         <div className="w-2"></div>
@@ -26,15 +26,15 @@ const DoctorView = () => {
         </Link>
         <br />
       </div>
-      <div className="my-8 flex flex-col">
-        <p className="my-4 flex self-center text-xl font-bold">Documents</p>
+      <div className="my-4 flex flex-col">
+        <p className="my-4 flex self-center text-xl font-bold">Profile</p>
         <div className="mb-4 flex self-center">
           <Link href={"/upload"}>
-            <Button>Upload</Button>
+            <Button>Upload a Document</Button>
           </Link>
           <div className="w-2"></div>
-          <Link href={`/uploaded/${userData?.user.id}`}>
-            <Button variant={"outline"}>View</Button>
+          <Link href={`/viewPatient/${userData?.user.id}`}>
+            <Button variant={"outline"}>View Details</Button>
           </Link>
         </div>
       </div>

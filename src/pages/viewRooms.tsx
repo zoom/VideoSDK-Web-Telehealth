@@ -1,9 +1,9 @@
 import { type Room } from "@prisma/client";
-import moment from "moment";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import UpcomingSession from "~/components/UpcomingSession";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardTitle } from "~/components/ui/card";
+import { Card } from "~/components/ui/card";
 import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/utils/api";
 
@@ -26,33 +26,19 @@ export default function Home() {
 }
 
 const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => {
-  const router = useRouter();
+  const { data } = useSession();
   return (
     <div className="mb-12 flex flex-wrap justify-center">
       {isLoading ? (
-        <Card className="m-4 flex h-64 w-80 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">
-          <Skeleton className="h-full w-full animate-pulse" />
+        <Card className="m-4 flex min-h-64 w-64 flex-col justify-center self-center rounded-lg bg-white p-5 text-center shadow-lg">
+          <Skeleton className="h-56 w-56 animate-pulse" />
         </Card>
       ) : rooms?.length === 0 ? (
-        <>
-          <Card className="m-4 flex h-64 w-80 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">No Rooms</Card>
-        </>
+        <Card className="m-4 flex min-h-64 w-64 flex-col justify-center self-center rounded-lg bg-white p-5 text-center shadow-lg">No Rooms</Card>
       ) : (
         rooms?.map((room) => (
-          <Card key={room.id} className="m-2 flex h-64 w-80 flex-col items-center justify-center rounded-lg bg-white p-4 shadow-lg">
-            <CardContent className="w-full">
-              <CardTitle className="mb-2 w-full">{room.title}</CardTitle>
-              <p>{room.content} </p>
-              <p>on: {moment(room.time).local().toLocaleString()}</p>
-            </CardContent>
-            <Button
-              className="w-full"
-              onClick={async () => {
-                await router.push(`/room/${room.id}`);
-              }}
-            >
-              Join
-            </Button>
+          <Card key={room.id} className="m-4 flex min-h-64 w-64 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
+            <UpcomingSession data={room} isDoctor={data?.user.role === "doctor"} key={room.id} />
           </Card>
         ))
       )}

@@ -28,7 +28,7 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
           <span className="ml-6 text-2xl font-bold">{rooms.title}</span>
           <LinkIcon height={18} strokeWidth={3} />
         </Button>
-        <p className="text-sm ">(Starting in ~{moment(rooms.time).local().fromNow(true)})</p>
+        <p className="text-sm ">{moment(rooms.time).local().fromNow(true)} from now</p>
       </div>
       <div className="m-auto">
         <p className="mb-1 text-left">
@@ -67,9 +67,9 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
           </Link>
           <div className="w-2"></div>
           {isDoctor && rooms.User_CreatedFor?.[0]?.id ? (
-            <Link href={`/uploaded/${rooms.User_CreatedFor[0].id}`}>
+            <Link href={`/viewPatient/${rooms.User_CreatedFor[0].id}`}>
               <Button className="" variant={"outline"}>
-                View Documents
+                Patient Details
               </Button>
             </Link>
           ) : (
