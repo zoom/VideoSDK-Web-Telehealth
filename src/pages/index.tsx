@@ -19,7 +19,7 @@ export default function Home() {
   if (status === "unauthenticated") {
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
-        <h1 className="my-10 flex text-5xl font-bold leading-none text-gray-700">Zoom Telehealth Demo</h1>
+        <h1 className="my-4 flex text-5xl font-bold leading-none text-gray-700">Zoom Telehealth Demo</h1>
         <Button variant={"outline"} onClick={() => void signIn("github")}>
           Sign in
         </Button>
@@ -36,9 +36,9 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
-        <h1 className="my-10 flex text-5xl font-bold leading-none text-gray-700">Zoom Telehealth Demo</h1>
-        <div className="my-10 flex flex-col justify-center ">{data?.user.role === "doctor" ? <DoctorView /> : <PatientView />}</div>
+      <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
+        <h1 className="mb-8 mt-12 flex text-5xl font-bold leading-none text-gray-700">Zoom Telehealth Demo</h1>
+        <div className="mt-2 flex flex-col justify-center ">{data?.user.role === "doctor" ? <DoctorView /> : <PatientView />}</div>
       </div>
     </>
   );

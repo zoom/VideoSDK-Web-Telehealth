@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -60,6 +61,11 @@ const InputFile = () => {
             Upload
           </Button>
         </Card>
+        <Link href="/">
+          <Button variant={"link"} className="mx-auto mt-4 flex">
+            back
+          </Button>
+        </Link>
       </div>
     </div>
   );

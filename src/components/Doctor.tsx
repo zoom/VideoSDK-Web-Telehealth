@@ -17,7 +17,7 @@ const DoctorView = () => {
       <Card className="m-4 flex min-h-72 min-w-72 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
         {isLoading ? <Skeleton className="h-64 w-64"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} isDoctor /> : <p>No Sessions</p>}
       </Card>
-      <div className="mx-8 my-4 flex flex-row justify-around">
+      <div className="mx-8 mb-8 mt-4 flex flex-row justify-around">
         <Link href={"/view"}>
           <Button>All Sessions</Button>
         </Link>
