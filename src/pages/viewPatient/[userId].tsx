@@ -8,9 +8,7 @@ import { api } from "~/utils/api";
 const Uploaded = () => {
   const router = useRouter();
   const { userId } = router.query;
-  const { data: patientData, isLoading: patientLoading } = api.room.getPatientDetails.useQuery({ userId: userId as string });
-  const { data, isLoading, error, isError } = api.S3.getUploadList.useQuery({ userId: userId as string }, { retry: 0 });
-  const { mutateAsync } = api.S3.getDownloadLink.useMutation();
+  const { error, isError } = api.S3.getUploadList.useQuery({ userId: userId as string }, { retry: 0 });
 
   if (isError) {
     return (
@@ -24,10 +22,27 @@ const Uploaded = () => {
       </div>
     );
   }
-
   return (
     <div className="flex h-screen w-screen flex-col items-center overflow-y-scroll bg-gray-100">
       <h1 className="mb-2 mt-8 flex text-3xl font-bold leading-none text-gray-700">Patient Details</h1>
+      <ViewPatient userId={userId as string} />
+      <Link href="/">
+        <Button variant={"link"} className="mx-auto flex">
+          back
+        </Button>
+      </Link>
+    </div>
+  );
+};
+
+const ViewPatient = (props: { userId: string }) => {
+  const { userId } = props;
+  const { data: patientData, isLoading: patientLoading } = api.room.getPatientDetails.useQuery({ userId: userId });
+  const { data, isLoading } = api.S3.getUploadList.useQuery({ userId: userId }, { retry: 0 });
+  const { mutateAsync } = api.S3.getDownloadLink.useMutation();
+
+  return (
+    <>
       {patientLoading ? (
         <Card className="flex w-96 flex-col justify-center self-center p-8">
           <Skeleton className="m-1 h-8 w-80 animate-pulse" />
@@ -83,14 +98,9 @@ const Uploaded = () => {
             </Card>
           ))
         )}
-        <Link href="/">
-          <Button variant={"link"} className="mx-auto flex">
-            back
-          </Button>
-        </Link>
       </div>
-    </div>
+    </>
   );
 };
-
+export { ViewPatient };
 export default Uploaded;

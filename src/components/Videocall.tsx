@@ -48,7 +48,7 @@ const Videocall = (props: { jwt: string; session: string }) => {
   };
 
   return (
-    <div>
+    <div className="flex flex-col">
       <div id="meeting" className={incall ? "mb-40 mt-8 h-[60vh] w-[60vw]" : "hidden"} ref={sessionContainer} />
       {!incall ? (
         <>

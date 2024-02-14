@@ -19,7 +19,8 @@ export const roomRouter = createTRPCRouter({
 
   create: protectedProcedure
     .input(z.object({
-      title: z.string().min(3), content: z.string(), emails: z.array(z.string().email()).min(1),
+      title: z.string().min(3), content: z.string(),
+      emails: z.array(z.string().email()).min(1),
       time: z.date(), duration: z.number()
     }))
     .mutation(async ({ ctx, input }) => {
@@ -103,32 +104,38 @@ export const roomRouter = createTRPCRouter({
       }
     }),
 
-  getUserByEmail: protectedProcedure.input(z.object({ email: z.string().email() })).mutation(async ({ ctx, input }) => {
-    const user = await ctx.db.user.findUnique({ where: { email: input.email } });
-    if (user) {
-      return user;
-    }
-    else {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "User not found",
-      });
-    }
-  }),
+  getUserByEmail: protectedProcedure.input(z.object({ email: z.string().email() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({ where: { email: input.email } });
+      if (user) {
+        return user;
+      }
+      else {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+    }),
 
-  getPatientDetails: protectedProcedure.input(z.object({ userId: z.string() })).query(async ({ ctx, input }) => {
-    if (ctx.session.user.role !== "doctor" && ctx.session.user.id !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
-    const patient = await ctx.db.patient.findUnique({ where: { userId: input.userId }, include: { User: true } });
-    if (patient) {
-      return patient;
-    }
-    else {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "Patient not found",
+  getPatientDetails: protectedProcedure.input(z.object({ userId: z.string() }))
+    .query(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "doctor" && ctx.session.user.id !== input.userId)
+        throw new TRPCError({ code: "FORBIDDEN" });
+      const patient = await ctx.db.patient.findUnique({
+        where: { userId: input.userId },
+        include: { User: true }
       });
-    }
-  }),
+      if (patient) {
+        return patient;
+      }
+      else {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Patient not found",
+        });
+      }
+    }),
 
   setDoctor: protectedProcedure.input(z.object({
     department: z.string(), position: z.string()
@@ -168,7 +175,8 @@ export const roomRouter = createTRPCRouter({
     const patient = await ctx.db.patient.create({
       data: {
         userId: ctx.session.user.id, height: input.height, weight: input.weight,
-        bloodType: input.bloodType, allergies: input.allergies, medications: input.medications, DOB: input.DOB
+        bloodType: input.bloodType, allergies: input.allergies,
+        medications: input.medications, DOB: input.DOB
       }
     });
     if (user) {
@@ -180,5 +188,58 @@ export const roomRouter = createTRPCRouter({
         message: "User not found",
       });
     }
+  }),
+
+  getNotesFromRoom: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      if (ctx.session.user.role !== "doctor") {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not allowed to add notes",
+        });
+      }
+      const room = await ctx.db.room.findFirstOrThrow({
+        where: { id: input.id },
+        include: { User_CreatedBy: true, User_CreatedFor: true, Notes: true }
+      });
+      return room.Notes;
+      // if (room) {
+      //   if ((room.createByUserId === ctx.session.user.id)) {
+      //     return room.Notes;
+      //   }
+      //   else if (room.User_CreatedFor.findIndex(e => e.id === ctx.session.user.id) !== -1) {
+      //     return room.Notes;
+      //   }
+      //   throw new TRPCError({
+      //     code: "FORBIDDEN",
+      //     message: "You are not allowed to access this room",
+      //   });
+      // }
+      // else {
+      //   throw new TRPCError({
+      //     code: "NOT_FOUND",
+      //     message: "Room not found",
+      //   });
+      // }
+    }),
+
+  addNote: protectedProcedure.input(z.object({
+    roomId: z.string(),
+    content: z.string(),
+  })).mutation(async ({ ctx, input }) => {
+    if (ctx.session.user.role !== "doctor") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You are not allowed to add notes",
+      });
+    }
+    const note = await ctx.db.notes.create({
+      data: {
+        content: input.content,
+        roomId: input.roomId,
+      }
+    });
+    return note;
   })
 });
