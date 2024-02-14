@@ -19,9 +19,8 @@ model Room {
     User_CreatedBy  User     @relation("RoomByUser", fields: [createByUserId], references: [id], onDelete: Cascade)
     createByUserId  String
     User_CreatedFor User[]   @relation("RoomForUser")
-    Notes           String? // @db.Text
     Transcript      String? // @db.Text
-    // createdForUserIds String[]
+    Notes           Notes[]
 }
 
 // Necessary for Next auth
@@ -86,10 +85,19 @@ model File {
     id        String   @id @default(cuid())
     name      String
     type      String
-    Patient   Patient  @relation(fields: [patientId], references: [id])
+    Patient   Patient  @relation(fields: [patientId], references: [id], onDelete: Cascade)
     patientId String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+}
+
+model Notes {
+    id        String   @id @default(cuid())
+    content   String // @db.Text
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    Room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+    roomId    String
 }
 
 model Doctor {
