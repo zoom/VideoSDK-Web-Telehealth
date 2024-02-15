@@ -48,11 +48,11 @@ const Videocall = (props: { jwt: string; session: string }) => {
   };
 
   return (
-    <div className="flex flex-col">
-      <div id="meeting" className={incall ? "mb-40 mt-8 h-[60vh] w-[60vw]" : "hidden"} ref={sessionContainer} />
+    <>
+      <div id="meeting" className={incall ? "mb-8 mt-8 flex flex-1" : "hidden"} ref={sessionContainer} />
       {!incall ? (
         <>
-          <div id="preview" className="mb-40 mt-8 h-[60vh] w-[60vw]" ref={previewContainer} />
+          <div id="preview" className="mb-8 mt-8 flex flex-1" ref={previewContainer} />
           <div className="mx-auto flex w-64 self-center">
             <Button className="flex flex-1" onClick={startCall}>
               Join
@@ -75,10 +75,7 @@ const Videocall = (props: { jwt: string; session: string }) => {
       ) : (
         <></>
       )}
-      <Button onClick={leaveCall} className="mx-auto flex w-48" variant={"link"}>
-        back
-      </Button>
-    </div>
+    </>
   );
 };
 

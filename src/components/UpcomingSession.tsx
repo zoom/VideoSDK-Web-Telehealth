@@ -61,20 +61,27 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
         ) : (
           <></>
         )}
-        <div className="mb-2 mt-4 flex flex-row justify-center">
-          <Link href={`/room/${rooms.id}`}>
-            <Button className="flex flex-1">Join</Button>
-          </Link>
-          <div className="w-2"></div>
-          {isDoctor && rooms.User_CreatedFor?.[0]?.id ? (
+        {isDoctor && rooms.User_CreatedFor?.[0]?.id ? (
+          <div className="mb-2 mt-4 flex flex-1 flex-row justify-center">
             <Link href={`/viewPatient/${rooms.User_CreatedFor[0].id}`}>
-              <Button className="" variant={"outline"}>
+              <Button className="" variant={"secondary"}>
                 Patient Details
               </Button>
             </Link>
-          ) : (
-            <> </>
-          )}
+            <div className="w-2"></div>
+            <Link href={`/viewNotes/${rooms.id}`}>
+              <Button className="" variant={"secondary"}>
+                Notes
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <> </>
+        )}
+        <div className="mb-2 mt-4 flex flex-1 flex-row justify-center">
+          <Link className="flex w-full flex-1" href={`/room/${rooms.id}`}>
+            <Button className="flex flex-1">Join</Button>
+          </Link>
         </div>
       </div>
     </div>

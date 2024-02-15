@@ -39,24 +39,31 @@ export default function Home() {
   }
   if (!isLoading && data) {
     return (
-      <div className="flex h-screen w-screen flex-1 flex-row items-center justify-around overflow-y-scroll bg-gray-100 pb-8">
-        <Videocall jwt={data.jwt} session={data.room.id} />
-        {userData?.user.role === "doctor" ? (
-          <Tabs defaultValue="account" className="mt-16 w-[400px] self-start">
-            <TabsList>
-              <TabsTrigger value="password">Patient Data</TabsTrigger>
-              <TabsTrigger value="account">Notes</TabsTrigger>
-            </TabsList>
-            <TabsContent value="password">
-              <ViewPatient userId={data.room.User_CreatedFor[0]?.id ?? "0"} />
-            </TabsContent>
-            <TabsContent value="account">
-              <ViewNotes roomId={data.room.id} />
-            </TabsContent>
-          </Tabs>
-        ) : (
-          <></>
-        )}
+      <div className="m-0 flex min-h-screen w-screen flex-1 flex-col overflow-y-scroll bg-gray-100 px-0 pb-8">
+        <div className="flex w-full flex-1 flex-col items-center self-center lg:flex-row lg:justify-around">
+          <div className="flex flex-[4] flex-col items-center">
+            <Videocall jwt={data.jwt} session={data.room.id} />
+          </div>
+          {userData?.user.role === "doctor" ? (
+            <Tabs defaultValue="account" className="mr-8 mt-16 flex flex-1 flex-col self-start">
+              <TabsList>
+                <TabsTrigger value="password">Patient Data</TabsTrigger>
+                <TabsTrigger value="account">Notes</TabsTrigger>
+              </TabsList>
+              <TabsContent value="password">
+                <ViewPatient userId={data.room.User_CreatedFor[0]?.id ?? "0"} />
+              </TabsContent>
+              <TabsContent value="account">
+                <ViewNotes roomId={data.room.id} />
+              </TabsContent>
+            </Tabs>
+          ) : (
+            <></>
+          )}
+        </div>
+        <Button onClick={() => void router.push("/")} className="mx-auto flex w-48" variant={"link"}>
+          back
+        </Button>
         <ConfidnetialDialog />
       </div>
     );

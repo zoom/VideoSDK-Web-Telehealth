@@ -19,7 +19,7 @@ const DoctorView = () => {
       </Card>
       <div className="mx-8 mb-8 mt-4 flex flex-row justify-around">
         <Link href={"/viewRooms"}>
-          <Button>All Sessions</Button>
+          <Button variant={"outline"}>All Sessions</Button>
         </Link>
         <div className="w-2"></div>
         <Link href={"/create"}>

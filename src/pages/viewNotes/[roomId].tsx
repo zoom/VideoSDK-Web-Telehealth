@@ -33,7 +33,7 @@ const ViewNotes = ({ roomId }: { roomId: string }) => {
   return (
     <>
       <Card className="mt-2 min-w-96 p-8 pl-12">
-        {isLoading ? <Skeleton /> : <></>}
+        {isLoading ? <Skeleton className="h-8 w-72" /> : <></>}
         {data?.length !== 0 ? (
           <ul>
             {data?.map((note) => (

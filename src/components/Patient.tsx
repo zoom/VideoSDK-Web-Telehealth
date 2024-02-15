@@ -18,7 +18,7 @@ const DoctorView = () => {
       </Card>
       <div className="mx-8 my-4 flex self-center">
         <Link href={"/viewRooms"}>
-          <Button>All Sessions</Button>
+          <Button variant={"outline"}>All Sessions</Button>
         </Link>
         <div className="w-2"></div>
         <Link href={"/create"}>
