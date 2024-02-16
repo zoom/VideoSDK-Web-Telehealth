@@ -76,9 +76,13 @@ const ViewPatient = (props: { userId: string }) => {
         <p className="mb-2 flex text-center text-3xl font-bold leading-none text-gray-700">Files</p>
         {isLoading ? (
           <Card className="flex w-96 flex-col justify-center self-center p-8">
-            <Skeleton className="my-2 h-6 w-80 animate-pulse" />
-            <Skeleton className="my-4 h-6 w-80 animate-pulse" />
-            <Skeleton className="my-2 h-12 w-80 animate-pulse" />
+            <Skeleton className="my-2 h-4 w-80 animate-pulse" />
+            <Skeleton className="my-2 h-4 w-80 animate-pulse" />
+            <Skeleton className="my-2 h-8 w-80 animate-pulse" />
+          </Card>
+        ) : data?.length === 0 ? (
+          <Card className="my-2 flex h-36 w-96 flex-col justify-center self-center p-6">
+            <p className="text-center text-lg">No files uploaded</p>
           </Card>
         ) : (
           data?.map((e) => (

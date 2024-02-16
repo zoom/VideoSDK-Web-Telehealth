@@ -8,12 +8,12 @@ import { Skeleton } from "./ui/skeleton";
 
 const DoctorView = () => {
   const { data: userData } = useSession();
-  const { data, isLoading } = api.room.getCreated.useQuery();
+  const { data, isLoading } = api.room.getCreatedUpcoming.useQuery();
 
   return (
     <>
-      <h2 className="mb-8 self-center text-2xl font-bold">Welcome Dr. {userData?.user.name}</h2>
-      <h3 className="self-center text-xl font-bold">Upcoming Session</h3>
+      <h2 className="mb-8 self-center text-2xl font-bold text-gray-700">Welcome Dr. {userData?.user.name}</h2>
+      <h3 className="self-center text-xl font-bold text-gray-700">Upcoming Session</h3>
       <Card className="m-4 flex min-h-72 min-w-72 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
         {isLoading ? <Skeleton className="h-64 w-64"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} isDoctor /> : <p>No Sessions</p>}
       </Card>

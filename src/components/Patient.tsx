@@ -8,7 +8,7 @@ import { Skeleton } from "./ui/skeleton";
 
 const DoctorView = () => {
   const { data: userData } = useSession();
-  const { data, isLoading } = api.room.getInvited.useQuery();
+  const { data, isLoading } = api.room.getInvitedUpcoming.useQuery();
   return (
     <>
       <h2 className="mb-2 self-center text-2xl font-bold">Welcome Patient, {userData?.user.name}</h2>

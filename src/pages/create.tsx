@@ -19,7 +19,7 @@ export default function Home() {
 
   return (
     <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
-      <h1 className="my-10 flex text-center text-3xl font-bold leading-none text-gray-700">Create</h1>
+      <h1 className="my-10 flex text-center text-3xl font-bold leading-none text-gray-700">Schedule Session</h1>
       <Card className="mb-8 flex w-96 flex-col flex-wrap justify-center p-4 shadow-lg">
         <form
           className="flex w-full flex-col"
@@ -86,7 +86,7 @@ export default function Home() {
             onClick={async () => {
               const utcTime = moment(time).utc().toDate();
               await createPost.mutateAsync({ title, content, emails, duration, time: utcTime });
-              await utils.room.getCreated.invalidate();
+              await utils.room.getCreatedUpcoming.invalidate();
               setTitle("");
               setContent("");
               setEmail("");
@@ -130,41 +130,46 @@ const EmailInput = ({
       <div>
         <p className="mb-2 text-sm text-red-800">{emailError}</p>
       </div>
-      <div className="flex">
-        <Input
-          id="email"
-          className="mb-4 mr-2"
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-          }}
-        />
-        <Button
-          className="mb-4 ml-2"
-          onClick={async () => {
-            if (!email) {
-              return;
-            }
-            setEmailError("");
-            if (emails.includes(email)) {
-              setEmailError("Email already added");
-              return;
-            }
-            let user;
-            try {
-              user = await getUser.mutateAsync({ email });
-            } catch (e) {
-              setEmailError("User not found");
-            }
-            if (user) {
-              setEmails([...emails, email]);
-              setEmail("");
-            }
-          }}
-        >
-          Add
-        </Button>
-      </div>
+      {/* only allow one patient for now */}
+      {emails.length < 1 ? (
+        <div className="flex">
+          <Input
+            id="email"
+            className="mb-4 mr-2"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+            }}
+          />
+          <Button
+            className="mb-4 ml-2"
+            onClick={async () => {
+              if (!email) {
+                return;
+              }
+              setEmailError("");
+              if (emails.includes(email)) {
+                setEmailError("Email already added");
+                return;
+              }
+              let user;
+              try {
+                user = await getUser.mutateAsync({ email });
+              } catch (e) {
+                setEmailError("User not found");
+              }
+              if (user) {
+                setEmails([...emails, email]);
+                setEmail("");
+              }
+            }}
+          >
+            Add
+          </Button>
+        </div>
+      ) : (
+        <></>
+      )}
     </>
   );
 };
