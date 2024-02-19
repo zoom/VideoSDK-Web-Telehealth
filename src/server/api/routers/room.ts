@@ -168,6 +168,20 @@ export const roomRouter = createTRPCRouter({
       }
     }),
 
+  getDoctors: protectedProcedure.query(async ({ ctx }) => {
+    const doctors = await ctx.db.doctor.findMany({
+      include: { User: true }
+    });
+    return doctors;
+  }),
+
+  getPatients: protectedProcedure.query(async ({ ctx }) => {
+    const patients = await ctx.db.patient.findMany({
+      include: { User: true }
+    });
+    return patients;
+  }),
+
   setDoctor: protectedProcedure.input(z.object({
     department: z.string(), position: z.string()
   })).mutation(async ({ ctx, input }) => {

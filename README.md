@@ -44,4 +44,8 @@ bun dev # or npm run dev
 
 5. Open [http://localhost:3000](http://localhost:3000) with your browser.
 
+### Disclaimers
+
 Use of this sample app is subject to our [Terms of Use](https://explore.zoom.us/en/video-sdk-terms/).
+
+HIPAA Disclaimer: This sample app is not designed to be a compliant solution for use with protected health information (PHI) under the Health Insurance Portability and Accountability Act (HIPAA).
