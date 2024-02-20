@@ -37,6 +37,27 @@ export const roomRouter = createTRPCRouter({
       });
     }),
 
+  getUpcoming: protectedProcedure
+    .query(async ({ ctx }) => {
+      const time = moment().utc().toDate();
+      console.log(time);
+      const rooms = await ctx.db.room.findMany({
+        orderBy: { time: "asc" },
+        where: {
+          time: { gte: time },
+          OR: [
+            { User_CreatedBy: { id: ctx.session.user.id } },
+            { User_CreatedFor: { some: { id: ctx.session.user.id } } }
+          ]
+        },
+        include: {
+          User_CreatedFor: true,
+          User_CreatedBy: true
+        }
+      });
+      return rooms;
+    }),
+
   getCreatedUpcoming: protectedProcedure
     .query(async ({ ctx }) => {
       const time = moment().utc().toDate();
