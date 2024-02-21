@@ -25,6 +25,7 @@ const Videocall = (props: { jwt: string; session: string }) => {
   const [liveTranscription, setLiveTranscription] = useState<any>();
   const [isStartedLiveTranscription, setIsStartedLiveTranscription] = useState(false);
   const [cloudRecording, setCloudRecording] = useState<any>();
+  const [isRecording, setIsRecording] = useState(cloudRecording?.getCloudRecordingStatus())
 
 
   useEffect(() => {
@@ -40,10 +41,9 @@ const Videocall = (props: { jwt: string; session: string }) => {
       await client.join(props.session, props.jwt, data?.user.name ?? "User").catch((e) => {
         console.log(e)
       });
-     const stream = client.getMediaStream();
-     setMediaStream(stream);
-     const transcription = client.getLiveTranscriptionClient();
-     setLiveTranscription(transcription);
+     setMediaStream(client.getMediaStream());
+     setLiveTranscription(client.getLiveTranscriptionClient());
+     setCloudRecording(client.getRecordingClient())
     } catch(e) {
       console.log(e)
     }
@@ -106,8 +106,14 @@ const Videocall = (props: { jwt: string; session: string }) => {
     }
   }
 
+  //create menu button to include access to previous recordings
   const onRecordingClick = async() => {
-
+    if (isRecording) {
+      cloudRecording.stopCloudRecording();
+      setIsRecording(false)
+    } else {
+      cloudRecording.startCloudRecording();
+    }
   }
 
 
@@ -143,6 +149,7 @@ const Videocall = (props: { jwt: string; session: string }) => {
           <Button onClick={onCameraClick}>Start Video</Button>
           <Button onClick={onMicrophoneClick}>Start Audio</Button>
           <Button onClick={onTranscriptionClick}>Start Transcription</Button>
+          <Button onClick={onRecordingClick}>Start Recording</Button>
         </div>
 
       )}
