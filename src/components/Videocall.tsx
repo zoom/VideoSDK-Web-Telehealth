@@ -22,8 +22,10 @@ const Videocall = (props: { jwt: string; session: string }) => {
   const [audioStarted, setAudioStarted] = useState(client.getCurrentUserInfo() && client.getCurrentUserInfo().audio !== '')
   const [isMuted, setIsMuted] = useState(client.getCurrentUserInfo()?.muted);
   const [mediaStream, setMediaStream] = useState<any>()
+  const [liveTranscription, setLiveTranscription] = useState<any>();
+  const [isStartedLiveTranscription, setIsStartedLiveTranscription] = useState(false);
+  const [cloudRecording, setCloudRecording] = useState<any>();
 
-  let liveTranscription: any;
 
   useEffect(() => {
     if (isRender.current === 0) {
@@ -39,9 +41,9 @@ const Videocall = (props: { jwt: string; session: string }) => {
         console.log(e)
       });
      const stream = client.getMediaStream();
-     console.log('init', stream)
      setMediaStream(stream);
-    //  console.log('MEDIASTREAM', mediaStream)
+     const transcription = client.getLiveTranscriptionClient();
+     setLiveTranscription(transcription);
     } catch(e) {
       console.log(e)
     }
@@ -51,35 +53,10 @@ const Videocall = (props: { jwt: string; session: string }) => {
     setIncall(true);
     uitoolkit.closePreview(previewContainer.current!);
     init();
-    // console.log('stream', mediaStream)
-    // await client.init('en-US', 'CDN').then(() => {
-    //   client.join(props.session, props.jwt, data?.user.name ?? "User").then(() => {
-    //     console.log('session Joined');
-    //     stream = client.getMediaStream();
-    //     console.log('stream', stream)
-    //     liveTranscription = client.getLiveTranscriptionClient();
-    //   }).catch((e) => {
-    //     console.log(e)
-    //   })
-    }
-    
-    // uitoolkit.joinSession(sessionContainer.current!, {
-    //   videoSDKJWT: props.jwt,
-    //   sessionName: props.session,
-    //   userName: data?.user.name ?? "User",
-    //   sessionPasscode: "",
-    //   features: ["video", "audio", "share", "chat", "users", "settings"],
-    // });
-    // uitoolkit.onSessionClosed(leaveCall);
-  // };
+  }
 
   const leaveCall = () => {
     try {
-      // if (!incall) {
-      //   uitoolkit.closePreview(previewContainer.current!);
-      // } else {
-      //   uitoolkit.closeSession(sessionContainer.current!);
-      // }
     client.leave(true)
     } catch (e) {}
     void router.push("/");
@@ -87,14 +64,50 @@ const Videocall = (props: { jwt: string; session: string }) => {
 
   const onCameraClick = async() => {
     console.log(mediaStream)
-    await mediaStream.startVideo();
-    client.getAllUser().forEach((user) => {
-      if (user.bVideoOn) {
-        mediaStream.attachVideo(user.userId, 3).then((userVideo) => {
-          document.querySelector('video-player-container')?.appendChild(userVideo)
-        })
+    if (videoStarted) {
+      mediaStream.stopVideo();
+      setVideoStarted(false);
+    } else {
+      await mediaStream.startVideo();
+      client.getAllUser().forEach((user) => {
+        if (user.bVideoOn) {
+          mediaStream.attachVideo(user.userId, 3).then((userVideo) => {
+            document.querySelector('video-player-container')?.appendChild(userVideo)
+          })
+        }
+      })
+      setVideoStarted(true)
+    }
+  }
+
+  const onMicrophoneClick = async() => {
+    //adjust button to change wording with mute/unmute
+    if (audioStarted) {
+      if (isMuted) {
+        await mediaStream?.unmuteAudio();
+      } else {
+        await mediaStream?.muteAudio();
       }
-    })
+    } else {
+      await mediaStream?.startAudio();
+      setAudioStarted(true);
+    }
+  }
+  //create nice captions 
+  const onTranscriptionClick = async() => {
+    if (isStartedLiveTranscription) {
+      liveTranscription.disableCaptions();
+      setIsStartedLiveTranscription(false);
+    } else {
+      liveTranscription.startLiveTranscription();
+      client.on(`caption-message`, (payload) => {
+        console.log(`${payload.displayName} said: ${payload.text}`)
+      });
+    }
+  }
+
+  const onRecordingClick = async() => {
+
   }
 
 
@@ -126,8 +139,10 @@ const Videocall = (props: { jwt: string; session: string }) => {
       ) : (
         <div>
            <div>hello</div>
-          <Button onClick={onCameraClick}>Start Video</Button>
           <video-player-container></video-player-container>
+          <Button onClick={onCameraClick}>Start Video</Button>
+          <Button onClick={onMicrophoneClick}>Start Audio</Button>
+          <Button onClick={onTranscriptionClick}>Start Transcription</Button>
         </div>
 
       )}
