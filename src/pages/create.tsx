@@ -115,7 +115,7 @@ const EmailInput = ({
   setEmail: React.Dispatch<React.SetStateAction<string>>;
   setEmails: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
-  const getUser = api.room.getUserByEmail.useMutation();
+  const getUser = api.user.getUserByEmail.useMutation();
   const [emailError, setEmailError] = useState<string>("");
   return (
     <>
