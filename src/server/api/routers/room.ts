@@ -307,5 +307,24 @@ export const roomRouter = createTRPCRouter({
       }
     });
     return note;
-  })
+  }),
+
+  addTranscript: protectedProcedure.input(z.object({
+    roomId: z.string(),
+    content: z.string(),
+  })).mutation(async ({ ctx, input }) => {
+    if (ctx.session.user.role !== "doctor") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You are not allowed to add notes",
+      });
+    }
+    const transcript = await ctx.db.transcript.create({
+      data: {
+        content: input.content,
+        roomId: input.roomId,
+      }
+    });
+    return transcript;
+  }),
 });
