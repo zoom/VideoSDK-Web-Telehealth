@@ -188,4 +188,18 @@ export const sessionRouter = createTRPCRouter({
     });
     return transcript;
   }),
+  delete: protectedProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+    const room = await ctx.db.room.findFirstOrThrow({
+      where: { id: input.id },
+      include: { User_CreatedBy: true }
+    });
+    if (room.createByUserId !== ctx.session.user.id) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You are not allowed to delete this room",
+      });
+    }
+    await ctx.db.room.delete({ where: { id: input.id } });
+    return true;
+  }),
 });
