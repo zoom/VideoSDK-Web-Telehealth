@@ -7,6 +7,8 @@ import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 import { useToast } from "./ui/use-toast";
 import { LinkIcon } from "lucide-react";
 import ZoomVideo from '@zoom/videosdk';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 const Videocall = (props: { jwt: string; session: string }) => {
   const isRender = useRef(0);
@@ -146,7 +148,43 @@ const Videocall = (props: { jwt: string; session: string }) => {
         </div>
 
       )}
+      <br />
+      <SettingsModal />
     </>
+  );
+};
+
+
+const SettingsModal = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">SettingsModal</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Heading</DialogTitle>
+          <DialogDescription>Desc</DialogDescription>
+        </DialogHeader>
+        <Tabs defaultValue="t1" className="mt-2 flex w-full flex-col self-center">
+          <TabsList>
+            <TabsTrigger value="t1">TabOne</TabsTrigger>
+            <TabsTrigger value="t2">TabTwo</TabsTrigger>
+          </TabsList>
+          <TabsContent value="t1">
+            <div>hello</div>
+          </TabsContent>
+          <TabsContent value="t2">
+            <div>world</div>
+          </TabsContent>
+        </Tabs>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button">Close</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
