@@ -43,7 +43,7 @@ const Onboarding = () => {
 const PatientFields = () => {
   const { update } = useSession();
   const { toast } = useToast();
-  const setPatient = api.room.setPatient.useMutation();
+  const setPatient = api.user.setPatient.useMutation();
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
   const [bloodType, setBloodType] = useState("");
@@ -102,7 +102,7 @@ const PatientFields = () => {
 const DoctorFields = () => {
   const { update } = useSession();
   const { toast } = useToast();
-  const setDoctor = api.room.setDoctor.useMutation();
+  const setDoctor = api.user.setDoctor.useMutation();
   const [department, setDepartment] = useState("");
   const [position, setPosition] = useState("");
 

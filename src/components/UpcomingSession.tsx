@@ -3,7 +3,8 @@ import moment from "moment";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
-import { LinkIcon } from "lucide-react";
+import { LinkIcon, X } from "lucide-react";
+import { api } from "~/utils/api";
 
 type RoomData = Room & {
   User_CreatedFor?: User[];
@@ -13,21 +14,37 @@ type RoomData = Room & {
 const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolean }) => {
   const rooms = data;
   const { toast } = useToast();
+  const deleteRoom = api.room.delete.useMutation();
+  const utils = api.useUtils();
 
   return (
     <div className="mb-auto flex flex-col">
       <div className="mb-4">
-        <Button
-          variant={"link"}
-          onClick={async () => {
-            const link = `${window.location.origin}/room/${rooms.id}`;
-            await navigator.clipboard.writeText(link);
-            toast({ title: "Copied link to clipoard", description: link });
-          }}
-        >
-          <span className="ml-6 text-2xl font-bold">{rooms.title}</span>
-          <LinkIcon height={18} strokeWidth={3} />
-        </Button>
+        <div className="relative w-full">
+          <Button
+            variant={"link"}
+            onClick={async () => {
+              const link = `${window.location.origin}/room/${rooms.id}`;
+              await navigator.clipboard.writeText(link);
+              toast({ title: "Copied link to clipoard", description: link });
+            }}
+            className="max-w-full"
+          >
+            <span className="truncate text-2xl font-bold">{rooms.title}</span>
+            <LinkIcon height={18} strokeWidth={3} />
+          </Button>
+          <Button
+            variant={"destructive"}
+            className="absolute right-0 m-[-8px] h-6 w-6 p-0"
+            onClick={async () => {
+              toast({ title: "Deleting Room", description: rooms.title });
+              await deleteRoom.mutateAsync({ id: rooms.id });
+              await utils.room.invalidate();
+            }}
+          >
+            <X size={18} />
+          </Button>
+        </div>
         <p className="text-sm ">{moment(rooms.time).local().fromNow()}</p>
       </div>
       <div className="m-auto">

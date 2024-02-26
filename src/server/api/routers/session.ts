@@ -1,22 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import moment from "moment";
 import { z } from "zod";
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { generateSignature } from "~/utils/signJwt";
 
-export const roomRouter = createTRPCRouter({
-  hello: publicProcedure
-    .input(z.object({ text: z.string() }))
-    .query(({ input }) => {
-      return {
-        greeting: `Hello ${input.text}`,
-      };
-    }),
-
+export const sessionRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({
       title: z.string().min(3), content: z.string(),
@@ -36,7 +24,6 @@ export const roomRouter = createTRPCRouter({
         },
       });
     }),
-
   getUpcoming: protectedProcedure
     .query(async ({ ctx }) => {
       const time = moment().utc().toDate();
@@ -57,7 +44,6 @@ export const roomRouter = createTRPCRouter({
       });
       return rooms;
     }),
-
   getCreatedUpcoming: protectedProcedure
     .query(async ({ ctx }) => {
       const time = moment().utc().toDate();
@@ -75,7 +61,6 @@ export const roomRouter = createTRPCRouter({
       });
       return rooms;
     }),
-
   getInvitedUpcoming: protectedProcedure
     .query(({ ctx }) => {
       const time = moment().utc().toDate();
@@ -89,7 +74,6 @@ export const roomRouter = createTRPCRouter({
         },
       });
     }),
-
   getCreatedPast: protectedProcedure
     .query(async ({ ctx }) => {
       const time = moment().utc().toDate();
@@ -106,7 +90,6 @@ export const roomRouter = createTRPCRouter({
       });
       return rooms;
     }),
-
   getInvitedPast: protectedProcedure
     .query(({ ctx }) => {
       const time = moment().utc().toDate();
@@ -120,7 +103,6 @@ export const roomRouter = createTRPCRouter({
         },
       });
     }),
-
   getById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -155,107 +137,6 @@ export const roomRouter = createTRPCRouter({
         });
       }
     }),
-
-  getUserByEmail: protectedProcedure.input(z.object({ email: z.string().email() }))
-    .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({ where: { email: input.email } });
-      if (user) {
-        return user;
-      }
-      else {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User not found",
-        });
-      }
-    }),
-
-  getPatientDetails: protectedProcedure.input(z.object({ userId: z.string() }))
-    .query(async ({ ctx, input }) => {
-      if (ctx.session.user.role !== "doctor" && ctx.session.user.id !== input.userId)
-        throw new TRPCError({ code: "FORBIDDEN" });
-      const patient = await ctx.db.patient.findUnique({
-        where: { userId: input.userId },
-        include: { User: true }
-      });
-      if (patient) {
-        return patient;
-      }
-      else {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Patient not found",
-        });
-      }
-    }),
-
-  getDoctors: protectedProcedure.query(async ({ ctx }) => {
-    const doctors = await ctx.db.doctor.findMany({
-      include: { User: true }
-    });
-    return doctors;
-  }),
-
-  getPatients: protectedProcedure.query(async ({ ctx }) => {
-    const patients = await ctx.db.patient.findMany({
-      include: { User: true }
-    });
-    return patients;
-  }),
-
-  setDoctor: protectedProcedure.input(z.object({
-    department: z.string(), position: z.string()
-  })).mutation(async ({ ctx, input }) => {
-    const doctor = await ctx.db.doctor.create({
-      data: {
-        userId: ctx.session.user.id, department: input.department, position: input.position
-      }
-    });
-    const user = await ctx.db.user.update({
-      where: { id: ctx.session.user.id },
-      data: { role: 'doctor', doctorId: doctor.id }
-    });
-    if (user) {
-      return { user, doctor };
-    }
-    else {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "User not found",
-      });
-    }
-  }),
-
-  setPatient: protectedProcedure.input(z.object({
-    height: z.number(),
-    weight: z.number(),
-    bloodType: z.string(),
-    allergies: z.string(),
-    medications: z.string(),
-    DOB: z.date(),
-  })).mutation(async ({ ctx, input }) => {
-    const user = await ctx.db.user.update({
-      where: { id: ctx.session.user.id },
-      data: { role: 'patient' }
-    });
-    const patient = await ctx.db.patient.create({
-      data: {
-        userId: ctx.session.user.id, height: input.height, weight: input.weight,
-        bloodType: input.bloodType, allergies: input.allergies,
-        medications: input.medications, DOB: input.DOB
-      }
-    });
-    if (user) {
-      return { user, patient };
-    }
-    else {
-      throw new TRPCError({
-        code: "NOT_FOUND",
-        message: "User not found",
-      });
-    }
-  }),
-
   getNotesFromRoom: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -270,26 +151,7 @@ export const roomRouter = createTRPCRouter({
         include: { User_CreatedBy: true, User_CreatedFor: true, Notes: true }
       });
       return room.Notes;
-      // if (room) {
-      //   if ((room.createByUserId === ctx.session.user.id)) {
-      //     return room.Notes;
-      //   }
-      //   else if (room.User_CreatedFor.findIndex(e => e.id === ctx.session.user.id) !== -1) {
-      //     return room.Notes;
-      //   }
-      //   throw new TRPCError({
-      //     code: "FORBIDDEN",
-      //     message: "You are not allowed to access this room",
-      //   });
-      // }
-      // else {
-      //   throw new TRPCError({
-      //     code: "NOT_FOUND",
-      //     message: "Room not found",
-      //   });
-      // }
     }),
-
   addNote: protectedProcedure.input(z.object({
     roomId: z.string(),
     content: z.string(),
@@ -307,5 +169,37 @@ export const roomRouter = createTRPCRouter({
       }
     });
     return note;
-  })
+  }),
+  addTranscript: protectedProcedure.input(z.object({
+    roomId: z.string(),
+    content: z.string(),
+  })).mutation(async ({ ctx, input }) => {
+    if (ctx.session.user.role !== "doctor") {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You are not allowed to add notes",
+      });
+    }
+    const transcript = await ctx.db.transcript.create({
+      data: {
+        content: input.content,
+        roomId: input.roomId,
+      }
+    });
+    return transcript;
+  }),
+  delete: protectedProcedure.input(z.object({ id: z.string() })).mutation(async ({ ctx, input }) => {
+    const room = await ctx.db.room.findFirstOrThrow({
+      where: { id: input.id },
+      include: { User_CreatedBy: true }
+    });
+    if (room.createByUserId !== ctx.session.user.id) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+        message: "You are not allowed to delete this room",
+      });
+    }
+    await ctx.db.room.delete({ where: { id: input.id } });
+    return true;
+  }),
 });
