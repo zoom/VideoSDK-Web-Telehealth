@@ -37,7 +37,7 @@ const Uploaded = () => {
 
 const ViewPatient = (props: { userId: string }) => {
   const { userId } = props;
-  const { data: patientData, isLoading: patientLoading } = api.room.getPatientDetails.useQuery({ userId: userId });
+  const { data: patientData, isLoading: patientLoading } = api.user.getPatientDetails.useQuery({ userId: userId });
   const { data, isLoading } = api.S3.getUploadList.useQuery({ userId: userId }, { retry: 0 });
   const { mutateAsync } = api.S3.getDownloadLink.useMutation();
 

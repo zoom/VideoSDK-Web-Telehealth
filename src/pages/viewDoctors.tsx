@@ -19,7 +19,7 @@ const Doctors = () => {
 };
 
 const ViewDoctor = () => {
-  const { data, isLoading } = api.room.getDoctors.useQuery();
+  const { data, isLoading } = api.user.getDoctors.useQuery();
 
   return (
     <>

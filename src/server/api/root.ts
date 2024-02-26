@@ -1,5 +1,6 @@
-import { roomRouter } from "~/server/api/routers/room";
 import { createTRPCRouter } from "~/server/api/trpc";
+import { sessionRouter } from "./routers/session";
+import { userRouter } from "./routers/user";
 import { S3Router } from "./routers/S3";
 
 /**
@@ -8,7 +9,8 @@ import { S3Router } from "./routers/S3";
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  room: roomRouter,
+  user: userRouter,
+  room: sessionRouter,
   S3: S3Router
 });
 

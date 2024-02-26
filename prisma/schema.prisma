@@ -9,17 +9,17 @@ datasource db {
 }
 
 model Room {
-    id              String   @id @default(cuid())
-    createdAt       DateTime @default(now())
-    updatedAt       DateTime @updatedAt
+    id              String       @id @default(cuid())
+    createdAt       DateTime     @default(now())
+    updatedAt       DateTime     @updatedAt
     title           String
     content         String
     time            DateTime
     duration        Int
-    User_CreatedBy  User     @relation("RoomByUser", fields: [createByUserId], references: [id], onDelete: Cascade)
+    User_CreatedBy  User         @relation("RoomByUser", fields: [createByUserId], references: [id], onDelete: Cascade)
     createByUserId  String
-    User_CreatedFor User[]   @relation("RoomForUser")
-    Transcript      String? // @db.Text
+    User_CreatedFor User[]       @relation("RoomForUser")
+    Transcripts     Transcript[]
     Notes           Notes[]
 }
 
@@ -92,6 +92,15 @@ model File {
 }
 
 model Notes {
+    id        String   @id @default(cuid())
+    content   String // @db.Text
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    Room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
+    roomId    String
+}
+
+model Transcript {
     id        String   @id @default(cuid())
     content   String // @db.Text
     createdAt DateTime @default(now())
