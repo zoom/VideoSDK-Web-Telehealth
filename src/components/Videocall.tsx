@@ -27,8 +27,8 @@ const Videocall = (props: { jwt: string; session: string }) => {
   const [liveTranscription, setLiveTranscription] = useState<any>();
   const [isStartedLiveTranscription, setIsStartedLiveTranscription] = useState(false);
   const [transcriptionSubtitle, setTranscriptionSubtitle] = useState<string>(' ');
-  const [visible, setVisible] = useState(false);
-  const timerRef = useRef<number>();
+  // const [visible, setVisible] = useState(false);
+  // const timerRef = useRef<number>();
   const [cloudRecording, setCloudRecording] = useState<any>();
   const [isRecording, setIsRecording] = useState(cloudRecording?.getCloudRecordingStatus())
 
@@ -48,7 +48,7 @@ const Videocall = (props: { jwt: string; session: string }) => {
   //     }
   //     timerRef.current = window.setTimeout(() => {
   //       setVisible(false);
-  //     }, 3000)
+  //     }, 60)
   //   }
   // }, [transcriptionSubtitle])
 
@@ -120,6 +120,7 @@ const Videocall = (props: { jwt: string; session: string }) => {
       client.on(`caption-message`, (payload) => {
         console.log(`${payload.displayName} said: ${payload.text}`);
         setTranscriptionSubtitle(payload.text)
+        setIsStartedLiveTranscription(true)
       });
     }
   }
@@ -164,13 +165,11 @@ const Videocall = (props: { jwt: string; session: string }) => {
         <div>
            <div>hello</div>
           <video-player-container></video-player-container>
-          <Button onClick={onCameraClick}>Start Video</Button>
-          <Button onClick={onMicrophoneClick}>Start Audio</Button>
-          <Button onClick={onTranscriptionClick}>Start Transcription</Button>
-          <Button onClick={onRecordingClick}>Start Recording</Button>
-          {/* <div className={classNames('transcript-subtitle', { 'transcript-subtitle-show': visible })}> */}
-            <p className="transcript-subtitle-message">{transcriptionSubtitle}</p>
-          {/* </div> */}
+          <Button onClick={onCameraClick}>{`${videoStarted ? 'stop camera' : 'start camera'}`}</Button>
+          <Button onClick={onMicrophoneClick}>{`${audioStarted ? (isMuted ? 'unMute' : 'Mute' ) : 'start audio'}`}</Button>
+          <Button onClick={onTranscriptionClick}>{`${isStartedLiveTranscription ? 'stop transcription' : 'start transcription'}`}</Button>
+          <Button onClick={onRecordingClick}>{`${cloudRecording ? 'stop recording' : 'start recording'}`}</Button>
+            <p>{transcriptionSubtitle}</p>
         </div>
 
       )}
