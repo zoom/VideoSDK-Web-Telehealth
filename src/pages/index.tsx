@@ -1,4 +1,5 @@
 import { signIn, signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import { useRouter } from "next/router";
 import DoctorView from "~/components/Doctor";
 import PatientView from "~/components/Patient";
@@ -19,7 +20,10 @@ export default function Home() {
   if (status === "unauthenticated") {
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
-        <h1 className="my-4 flex text-5xl font-bold leading-none text-gray-700">Zoom Telehealth Demo</h1>
+        <span className="my-8 flex justify-start">
+          <Image className="inline" src={"/logo.svg"} height={34} width={150} alt="product logo" />
+          <h1 className="ml-2 inline text-5xl font-bold leading-none text-gray-700">Telehealth</h1>
+        </span>
         <Button variant={"outline"} onClick={() => void signIn("github")}>
           Sign in
         </Button>
@@ -35,14 +39,15 @@ export default function Home() {
   }
 
   return (
-    <>
-      <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
-        <h1 className="mb-8 mt-12 flex text-5xl font-bold leading-none text-gray-700">Zoom Telehealth</h1>
-        <div className="mt-2 flex flex-col justify-center">{data?.user.role === "doctor" ? <DoctorView /> : <PatientView />}</div>
-        <Button variant={"outline"} className="mt-8 w-48 self-center" onClick={() => void signOut()}>
-          Sign Out
-        </Button>
-      </div>
-    </>
+    <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
+      <span className="my-8 flex justify-start">
+        <Image className="inline" src={"/logo.svg"} height={34} width={150} alt="product logo" />
+        <h1 className="ml-2 inline text-5xl font-bold leading-none text-gray-700">Telehealth</h1>
+      </span>
+      <div className="mt-2 flex flex-col justify-center">{data?.user.role === "doctor" ? <DoctorView /> : <PatientView />}</div>
+      <Button variant={"outline"} className="mt-8 w-48 self-center" onClick={() => void signOut()}>
+        Sign Out
+      </Button>
+    </div>
   );
 }
