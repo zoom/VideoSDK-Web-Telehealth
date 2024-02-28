@@ -7,6 +7,7 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
+// import config from "tailwind.config";
 import { env } from "~/env";
 import { db } from "~/server/db";
 
@@ -53,6 +54,12 @@ export const authOptions: NextAuthOptions = {
     },
   },
   adapter: PrismaAdapter(db),
+  theme: {
+    // brandColor: config.theme.extend.colors.primary.DEFAULT,
+    // buttonText: config.theme.extend.colors.primary.foreground,
+    colorScheme: "light",
+    logo: "/logo.svg",
+  },
   providers: [
     GithubProvider({
       clientId: env.GITHUB_CLIENT_ID,
