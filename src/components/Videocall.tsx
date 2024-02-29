@@ -26,11 +26,12 @@ const Videocall = (props: { jwt: string; session: string }) => {
   const [mediaStream, setMediaStream] = useState<any>()
   const [liveTranscription, setLiveTranscription] = useState<any>();
   const [isStartedLiveTranscription, setIsStartedLiveTranscription] = useState(false);
-  const [transcriptionSubtitle, setTranscriptionSubtitle] = useState<string>(' ');
+  const [transcriptionSubtitle, setTranscriptionSubtitle] = useState('');
   // const [visible, setVisible] = useState(false);
   // const timerRef = useRef<number>();
   const [cloudRecording, setCloudRecording] = useState<any>();
-  const [isRecording, setIsRecording] = useState(cloudRecording?.getCloudRecordingStatus())
+  const [isRecording, setIsRecording] = useState(cloudRecording?.getCloudRecordingStatus());
+  const [receiveRecordings, setReceiveRecordings] = useState(false);
 
 
   useEffect(() => {
@@ -40,27 +41,15 @@ const Videocall = (props: { jwt: string; session: string }) => {
     }
   }, []);
 
-  // useEffect(() => {
-  //   if (transcriptionSubtitle) {
-  //     setVisible(true);
-  //     if (timerRef.current) {
-  //       window.clearTimeout(timerRef.current);
-  //     }
-  //     timerRef.current = window.setTimeout(() => {
-  //       setVisible(false);
-  //     }, 60)
-  //   }
-  // }, [transcriptionSubtitle])
-
   const init = async() => {
     await client.init('en-US', 'CDN')
     try {
       await client.join(props.session, props.jwt, data?.user.name ?? "User").catch((e) => {
         console.log(e)
       });
-     setMediaStream(client.getMediaStream());
-     setLiveTranscription(client.getLiveTranscriptionClient());
-     setCloudRecording(client.getRecordingClient())
+      setMediaStream(client.getMediaStream());
+      setLiveTranscription(client.getLiveTranscriptionClient());
+      setCloudRecording(client.getRecordingClient())
     } catch(e) {
       console.log(e)
     }
@@ -82,7 +71,7 @@ const Videocall = (props: { jwt: string; session: string }) => {
   const onCameraClick = async() => {
     console.log(mediaStream)
     if (videoStarted) {
-      mediaStream.stopVideo();
+      await mediaStream.stopVideo();
       setVideoStarted(false);
     } else {
       await mediaStream.startVideo();
@@ -111,12 +100,12 @@ const Videocall = (props: { jwt: string; session: string }) => {
     }
   }
   //create nice captions + disable button if audio is not started
-  const onTranscriptionClick = async() => {
+  const onTranscriptionClick = async () => {
     if (isStartedLiveTranscription) {
-      liveTranscription.disableCaptions();
+      await liveTranscription.disableCaptions();
       setIsStartedLiveTranscription(false);
     } else {
-      liveTranscription.startLiveTranscription();
+      await liveTranscription.startLiveTranscription();
       client.on(`caption-message`, (payload) => {
         console.log(`${payload.displayName} said: ${payload.text}`);
         setTranscriptionSubtitle(payload.text)
@@ -128,11 +117,18 @@ const Videocall = (props: { jwt: string; session: string }) => {
   //create menu button to include access to previous recordings
   const onRecordingClick = async() => {
     if (isRecording) {
-      cloudRecording.stopCloudRecording();
+      await cloudRecording.stopCloudRecording();
       setIsRecording(false)
     } else {
-      cloudRecording.startCloudRecording();
+      await cloudRecording.startCloudRecording();
     }
+  }
+
+  const onReceiveRecordings = (data:any) => {
+    const downloadLink = data.downloadLink;
+    const session = data.sessionId;
+
+
   }
 
 
@@ -163,12 +159,11 @@ const Videocall = (props: { jwt: string; session: string }) => {
         </>
       ) : (
         <div>
-           <div>hello</div>
           <video-player-container></video-player-container>
           <Button onClick={onCameraClick}>{`${videoStarted ? 'stop camera' : 'start camera'}`}</Button>
           <Button onClick={onMicrophoneClick}>{`${audioStarted ? (isMuted ? 'unMute' : 'Mute' ) : 'start audio'}`}</Button>
           <Button onClick={onTranscriptionClick}>{`${isStartedLiveTranscription ? 'stop transcription' : 'start transcription'}`}</Button>
-          <Button onClick={onRecordingClick}>{`${cloudRecording ? 'stop recording' : 'start recording'}`}</Button>
+          <Button onClick={onRecordingClick}>{`${isRecording ? 'stop recording' : 'start recording'}`}</Button>
             <p>{transcriptionSubtitle}</p>
         </div>
 
@@ -181,6 +176,47 @@ const Videocall = (props: { jwt: string; session: string }) => {
 
 
 const SettingsModal = () => {
+const [cameraList, setCameraList] = useState<Array<Object>>();
+const [micList, setMicList] = useState<Array<Object>>();
+const [speakerList, setSpeakerList] = useState<Array<Object>>();
+
+  const getDevices = async () => {
+    const allDevices = await ZoomVideo.getDevices();
+
+    const cameraDevices = allDevices.filter((el) => {
+    return el.kind === 'videoinput';
+    });
+    const micDevices = allDevices.filter((el) => {
+      return el.kind === 'audioinput';
+    });
+    const speakerDevices = allDevices.filter((el) => {
+      return el.kind === 'audiooutput'
+    });
+
+    return {
+      cameras: cameraDevices.map((el) => {
+        return {label: el.label, deviceId: el.deviceId}
+      }),
+      mics: micDevices.map((el) => {
+        return {label: el.label, deviceId: el.deviceId}
+      }),
+      speakers: speakerDevices.map((el) => {
+        return  {label: el.label, deviceId: el.deviceId}
+      })
+    }
+  }
+  
+
+  useEffect(() => {
+    getDevices().then((devices) => {
+      setCameraList(devices.cameras);
+      setMicList(devices.mics);
+      setSpeakerList(devices.speakers)
+    }) 
+  }, [])
+
+  console.log('camera', micList);
+ 
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -193,14 +229,17 @@ const SettingsModal = () => {
         </DialogHeader>
         <Tabs defaultValue="t1" className="mt-2 flex w-full flex-col self-center">
           <TabsList>
-            <TabsTrigger value="t1">TabOne</TabsTrigger>
-            <TabsTrigger value="t2">TabTwo</TabsTrigger>
+            <TabsTrigger value="t1">Camera Settings</TabsTrigger>
+            <TabsTrigger value="t2">Audio Settings</TabsTrigger>
+            <TabsTrigger value="t3">Speaker Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="t1">
-            <div>hello</div>
+            {cameraList?.map((camera) => {
+              <p>{camera.label}</p>
+            })}
           </TabsContent>
           <TabsContent value="t2">
-            <div>world</div>
+          Select Microphone
           </TabsContent>
         </Tabs>
         <DialogFooter>
