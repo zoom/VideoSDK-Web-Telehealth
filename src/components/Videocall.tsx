@@ -234,9 +234,9 @@ const [speakerList, setSpeakerList] = useState<Array<Object>>();
             <TabsTrigger value="t3">Speaker Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="t1">
-            {cameraList?.map((camera) => {
+            {/* {cameraList?.map((camera) => {
               <p>{camera.label}</p>
-            })}
+            })} */}select camera
           </TabsContent>
           <TabsContent value="t2">
           Select Microphone
