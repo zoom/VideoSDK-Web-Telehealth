@@ -26,6 +26,7 @@ export const env = createEnv({
     S3_BUCKET: z.string(),
     S3_ACCESS_KEY_ID: z.string(),
     S3_SECRET_ACCESS_KEY: z.string(),
+    TESTMODE: z.boolean().default(false),
     ZOOM_SDK_KEY: z.string(),
     ZOOM_SDK_SECRET: z.string(),
   },

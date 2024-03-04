@@ -1,5 +1,7 @@
 import { TRPCError } from "@trpc/server";
+import moment from "moment";
 import { z } from "zod";
+import { env } from "~/env";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const userRouter = createTRPCRouter({
@@ -59,6 +61,18 @@ export const userRouter = createTRPCRouter({
       data: { role: 'doctor', doctorId: doctor.id }
     });
     if (user) {
+      if (env.TESTMODE === true) {
+        await ctx.db.room.create({
+          data: {
+            title: "Test Session",
+            content: "This is a test session",
+            User_CreatedBy: { connect: { id: ctx.session.user.id } },
+            duration: 1,
+            time: moment().utc().toDate(),
+            User_CreatedFor: { connect: { email: 'test@test.com' } },
+          },
+        });
+      }
       return { user, doctor };
     }
     else {
@@ -88,6 +102,18 @@ export const userRouter = createTRPCRouter({
       }
     });
     if (user) {
+      if (env.TESTMODE === true) {
+        await ctx.db.room.create({
+          data: {
+            title: "Test Session",
+            content: "This is a test session",
+            User_CreatedBy: { connect: { id: ctx.session.user.id } },
+            duration: 1,
+            time: moment().utc().toDate(),
+            User_CreatedFor: { connect: { email: 'test@test.com' } },
+          },
+        });
+      }
       return { user, patient };
     }
     else {
