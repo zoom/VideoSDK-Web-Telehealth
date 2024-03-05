@@ -9,7 +9,7 @@ async function main() {
         email: 'alice@test.com',
         name: 'Alice',
         role: 'patient',
-      }
+      },
     });
     const alicePatient = await prisma.patient.create({
       data: {
