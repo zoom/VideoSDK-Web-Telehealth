@@ -17,6 +17,10 @@ import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, Di
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { api } from "~/utils/api";
+import Link from "next/link";
+import { Upload } from "lucide-react";
+
 
 const Videocall = (props: { jwt: string; session: string }) => {
   const isRender = useRef(0);
@@ -36,7 +40,7 @@ const Videocall = (props: { jwt: string; session: string }) => {
   const [isStartedLiveTranscription, setIsStartedLiveTranscription] = useState(false);
   const [transcriptionSubtitle, setTranscriptionSubtitle] = useState("");
   const [isRecording, setIsRecording] = useState(RecordingStatus.Stopped);
-  // const [receiveRecordings, setReceiveRecordings] = useState(false);
+  const [recordingsModalOpen, setRecordingsModalOpen] = useState(false);
 
   useEffect(() => {
     if (isRender.current === 0) {
@@ -137,10 +141,6 @@ const Videocall = (props: { jwt: string; session: string }) => {
     }
   };
 
-  // const onReceiveRecordings = (data: any) => {
-  //   const downloadLink = data.downloadLink;
-  //   const session = data.sessionId;
-  // };
 
   return (
     <>
@@ -179,10 +179,105 @@ const Videocall = (props: { jwt: string; session: string }) => {
         </div>
       )}
       <br />
+      {incall && <ActionModal client={client} recordingsModalOpen={recordingsModalOpen} setRecordingsModalOpen={setRecordingsModalOpen} toast={toast}/>}
      {incall && <SettingsModal client={client}/>} 
+     {recordingsModalOpen && <RecordingsModal/>}
     </>
   );
 };
+
+const ActionModal = (props: {client: any; toast: any; recordingsModalOpen: boolean; setRecordingsModalOpen: React.Dispatch<React.SetStateAction<boolean>>}) => {
+  const {client, recordingsModalOpen, setRecordingsModalOpen, toast} = props;
+  const mediaStream = client.current.getMediaStream();
+
+  const onInviteClick = () => {
+
+  }
+
+  return (
+    <Dialog>
+    <DialogTrigger asChild>
+      <Button variant="outline">Action Menu</Button>
+    </DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Customize As You See Fit</DialogTitle>
+      </DialogHeader>
+      <Button onClick={() => setRecordingsModalOpen(true)}>See Past Recordings</Button>
+                  <Button
+              variant={"outline"}
+              className="flex flex-1"
+              onClick={async () => {
+                const link = `${window.location.toString()}`;
+                await navigator.clipboard.writeText(link);
+                toast({ title: "Copied link to clipoard", description: link });
+              }}
+            >
+              Invite Others
+              <LinkIcon height={16} />
+            </Button>
+      <Link href={"/upload"} className="m-2 flex flex-row justify-around">
+                <Button>
+                  <Upload size={18} className="mr-2" />
+                  Upload Document
+                </Button>
+              </Link>
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button type="button">Close</Button>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+  )
+}
+
+//figure out how to get this modal to open over action modal 
+const RecordingsModal = () => {
+  const [recordings, setRecordings] = useState([])
+
+  // useEffect(() => {
+  //   const receivedRecordings = api.room.getRecordings.useQuery()
+  //   setRecordings(receivedRecordings)
+  // }, [])
+  return (
+    <Dialog>
+    <DialogTrigger asChild>
+      <Button variant="outline">Your Recordings</Button>
+    </DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>Recordings</DialogTitle>
+      </DialogHeader>
+        {/* {recordings.map((el: any) => (
+          <ul>
+            <li>
+              {el.start_time}
+            </li>
+            <li>
+              {el.duration}
+            </li>
+            <li>
+              {el.recording_files.map((files: any) => (
+                <li>
+                  {files.id}
+                </li>
+              ))}
+            </li>
+            <li>
+              {el.download_url}
+            </li>
+          </ul>
+        ))} */}
+      <DialogFooter>
+        <DialogClose asChild>
+          <Button type="button">Close</Button>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  </Dialog>
+  )
+}
 
 const SettingsModal = (props: {client: any}) => {
   const [cameraList, setCameraList] = useState<device[]>();
