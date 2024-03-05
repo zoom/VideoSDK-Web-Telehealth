@@ -14,6 +14,8 @@ import ZoomVideo, {
   type LiveTranscriptionMessage,
 } from "@zoom/videosdk";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { Label } from "~/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 const Videocall = (props: { jwt: string; session: string }) => {
@@ -177,12 +179,12 @@ const Videocall = (props: { jwt: string; session: string }) => {
         </div>
       )}
       <br />
-      <SettingsModal />
+     {incall && <SettingsModal client={client}/>} 
     </>
   );
 };
 
-const SettingsModal = () => {
+const SettingsModal = (props: {client: any}) => {
   const [cameraList, setCameraList] = useState<device[]>();
   const [micList, setMicList] = useState<device[]>();
   const [speakerList, setSpeakerList] = useState<device[]>();
@@ -221,6 +223,27 @@ const SettingsModal = () => {
     });
   }, []);
 
+  const setCameraDevice = async (camera: device) => {
+    const mediaStream = props.client.current.getMediaStream();
+    if (mediaStream) {
+      await mediaStream.switchCamera(camera);
+    }
+  }
+
+  const setMicDevice = async (mic: device) => {
+    const mediaStream = props.client.current.getMediaStream();
+    if (mediaStream) {
+      await mediaStream.switchMicrophone(mic);
+    }
+  }
+
+  const setSpeakerDevice = async (speaker: device) => {
+    const mediaStream = props.client.current.getMediaStream();
+    if (mediaStream) {
+      await mediaStream.switchSpeaker(speaker);
+    }
+  }
+
   console.log("camera", micList);
 
   return (
@@ -230,8 +253,7 @@ const SettingsModal = () => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Heading</DialogTitle>
-          <DialogDescription>Desc</DialogDescription>
+          <DialogTitle>Select Your Preferred Device</DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="t1" className="mt-2 flex w-full flex-col self-center">
           <TabsList>
@@ -240,13 +262,36 @@ const SettingsModal = () => {
             <TabsTrigger value="t3">Speaker Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="t1">
-            {/* {cameraList?.map((camera) => {
-              <p>{camera.label}</p>
-            })} */}
-            select camera
+            <RadioGroup className="my-4 flex flex-row">
+              {cameraList?.map((device) => (
+                <div className="flex items-center space-x-2">
+                <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setCameraDevice(device)}/>
+                <Label htmlFor={device.deviceId}>{device.label}</Label>
+              </div>
+              ))}
+          </RadioGroup>
           </TabsContent>
-          <TabsContent value="t2">Select Microphone</TabsContent>
-        </Tabs>
+          <TabsContent value="t2">
+            <RadioGroup className="my-4 flex flex-row">
+              {micList?.map((device) => (
+                <div className="flex items-center space-x-2">
+                <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setMicDevice(device)}/>
+                <Label htmlFor={device.deviceId}>{device.label}</Label>
+              </div>
+              ))}
+          </RadioGroup>            
+        </TabsContent>
+        <TabsContent value="t3">
+            <RadioGroup className="my-4 flex flex-row">
+              {speakerList?.map((device) => (
+                <div className="flex items-center space-x-2">
+                <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setSpeakerDevice(device)}/>
+                <Label htmlFor={device.deviceId}>{device.label}</Label>
+              </div>
+              ))}
+          </RadioGroup>            
+        </TabsContent>
+        </Tabs>  
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button">Close</Button>
