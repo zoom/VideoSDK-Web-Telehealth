@@ -18,7 +18,7 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
   const utils = api.useUtils();
 
   return (
-    <div className="mb-auto flex flex-col">
+    <div className="mb-auto flex h-full flex-col">
       <div className="mb-4">
         <div className="relative w-full">
           <Button

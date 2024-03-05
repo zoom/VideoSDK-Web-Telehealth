@@ -1,4 +1,4 @@
-import { useSession, signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { api } from "~/utils/api";
@@ -17,7 +17,7 @@ const DoctorView = () => {
         <div className="flex flex-1 flex-col">
           <h3 className="self-center text-xl font-bold text-gray-700">Upcoming Session</h3>
           <Card className="m-4 mx-8 flex min-h-96 min-w-72 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
-            {isLoading ? <Skeleton className="h-64 w-64"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} isDoctor /> : <p>No Sessions</p>}
+            {isLoading ? <Skeleton className="h-64 w-64"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} /> : <p>No Sessions</p>}
           </Card>
         </div>
         <div className="flex flex-1 flex-col">
