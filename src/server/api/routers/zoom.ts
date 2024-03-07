@@ -1,65 +1,68 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { env } from "~/env";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { generateVideoSdkApiJwt } from "~/utils/signJwt";
 
 export const zoomRouter = createTRPCRouter({
-  getSessionRecordings: protectedProcedure.input(z.object({ sessionName: z.string() }))
+  getLatestRecording: protectedProcedure.input(z.object({ roomId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const getSessions = await fetch(`https://api.zoom.us/v2/videosdk/sessions?type=past`, {
-        headers: {
-          'Authorization': `Bearer ${generateVideoSdkApiJwt(env.ZOOM_API_KEY, env.ZOOM_API_SECRET)}`
+      const room = await ctx.db.room.findUnique({
+        where: { id: input.roomId },
+      });
+      if (room) {
+        const sessionId = room.zoomSessionsIds[room.zoomSessionsIds.length - 1];
+        const getRecording = await fetch(`https://api.zoom.us/v2/videosdk/sessions/${sessionId}/recordings`, {
+          headers: {
+            'Authorization': `Bearer ${generateVideoSdkApiJwt(env.ZOOM_API_KEY, env.ZOOM_API_SECRET)}`
+          }
+        })
+        if (getRecording.status === 3301) {
+          return { status: "processing", data: null }
+        } else if (getRecording.status === 200) {
+          const data = await getRecording.json() as typeof ExampleRecordingJSON;
+          return { status: "completed", data: data };
+        } else if (getRecording.status === 404) {
+          return { status: "not_found", data: null }
+        } else {
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Error fetching recording' });
         }
-      })
-      if (getSessions.status !== 200) {
-        return null;
       }
-      const sessions = await getSessions.json() as typeof ExampleSessionJSON;
-      let sessionId: string | null = null;
-      for (const session of sessions.sessions) {
-        if (session.session_name === input.sessionName) {
-          sessionId = session.id;
-          break;
-        }
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Room not found' });
+    }),
+  getAllRecordings: protectedProcedure.input(z.object({ roomId: z.string() }))
+    // might get rate-limited?
+    .mutation(async ({ ctx, input }) => {
+      const room = await ctx.db.room.findUnique({
+        where: { id: input.roomId },
+      });
+      if (room) {
+        const recordings = await Promise.all(
+          room.zoomSessionsIds.map(async (sessionId) => {
+            const getRecording = await fetch(`https://api.zoom.us/v2/videosdk/sessions/${sessionId}/recordings`, {
+              headers: {
+                'Authorization': `Bearer ${generateVideoSdkApiJwt(env.ZOOM_API_KEY, env.ZOOM_API_SECRET)}`
+              }
+            })
+            if (getRecording.status === 3301) {
+              return { status: "processing", data: null }
+            } else if (getRecording.status === 200) {
+              const data = await getRecording.json() as typeof ExampleRecordingJSON;
+              return { status: "completed", data: data };
+            } else if (getRecording.status === 404) {
+              return { status: "not_found", data: null }
+            } else {
+              throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Error fetching recording' });
+            }
+          }));
+        const validData = recordings.filter((recording) => recording.status === "completed").map((recording) => recording.data);
+        return validData
       }
-      const getRecording = await fetch(`https://api.zoom.us/v2/videosdk/sessions/${sessionId}/recordings`, {
-        headers: {
-          'Authorization': `Bearer ${generateVideoSdkApiJwt(env.ZOOM_API_KEY, env.ZOOM_API_SECRET)}`
-        }
-      })
-      if (getRecording.status === 200) {
-        const data = await getRecording.json() as typeof ExampleRecordingJSON;
-        return data;
-      } else {
-        return null;
-      }
+      throw new TRPCError({ code: 'NOT_FOUND', message: 'Room not found' });
     }),
 });
 
 // for typescript
-const ExampleSessionJSON = {
-  "from": "2021-12-01",
-  "to": "2021-12-02",
-  "page_size": 30,
-  "next_page_token": "suQA5LvDBnH5No5OYD7mqpJuFzJqUOHK8U2",
-  "sessions": [
-    {
-      "id": "sfk/aOFJSJSYhGwk1hnxgw==",
-      "session_name": "My session",
-      "start_time": "2019-08-20T19:09:01Z",
-      "end_time": "2019-08-20T19:19:01Z",
-      "duration": "30:00",
-      "user_count": 2,
-      "has_voip": true,
-      "has_video": true,
-      "has_screen_share": true,
-      "has_recording": true,
-      "has_pstn": true,
-      "session_key": "my_session_key"
-    }
-  ]
-};
-
 const ExampleRecordingJSON = {
   "timezone": "",
   "duration": 1,
