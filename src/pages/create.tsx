@@ -82,11 +82,26 @@ export default function Home() {
             />
           </div>
           <p className="mb-4 text-center">{createPost.status !== "idle" ? createPost.status : ""}</p>
+          {createPost.error?.data?.zodError ? (
+            <p className="mb-4 text-center text-sm">
+              {Object.entries(createPost.error.data.zodError.fieldErrors).map((fieldData, index) => (
+                <p key={index}>
+                  {fieldData[0]}: {fieldData[1]}
+                </p>
+              ))}
+            </p>
+          ) : (
+            <></>
+          )}
           <Button
             onClick={async () => {
               const utcTime = moment(time).utc().toDate();
-              await createPost.mutateAsync({ title, content, emails, duration, time: utcTime });
-              await utils.room.getCreatedUpcoming.invalidate();
+              try {
+                await createPost.mutateAsync({ title, content, emails, duration, time: utcTime });
+                await utils.room.getCreatedUpcoming.invalidate();
+              } catch (e) {
+                console.error(e);
+              }
               setTitle("");
               setContent("");
               setEmail("");
