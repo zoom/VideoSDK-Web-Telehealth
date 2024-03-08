@@ -1,7 +1,7 @@
 import uitoolkit from "@zoom/videosdk-ui-toolkit";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { type MutableRefObject, useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 import { useToast } from "./ui/use-toast";
@@ -12,6 +12,7 @@ import ZoomVideo, {
   type RecordingClient,
   type LiveTranscriptionClient,
   type LiveTranscriptionMessage,
+  type VideoClient,
 } from "@zoom/videosdk";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
@@ -21,8 +22,8 @@ import { api } from "~/utils/api";
 import Link from "next/link";
 import { Upload } from "lucide-react";
 
-
-const Videocall = (props: { jwt: string; session: string }) => {
+const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) => {
+  const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
   const isRender = useRef(0);
   const [incall, setIncall] = useState(false);
   const previewContainer = useRef<HTMLDivElement>(null);
@@ -55,6 +56,9 @@ const Videocall = (props: { jwt: string; session: string }) => {
       await client.current.join(props.session, props.jwt, data?.user.name ?? "User").catch((e) => {
         console.log(e);
       });
+      if (props.isCreator) {
+        await writeZoomSessionID.mutateAsync({ zoomSessionsId: client.current.getSessionInfo().sessionId, roomId: props.session });
+      }
     } catch (e) {
       console.log(e);
     }
@@ -141,7 +145,6 @@ const Videocall = (props: { jwt: string; session: string }) => {
     }
   };
 
-
   return (
     <>
       <div id="meeting" className={incall ? "mb-8 mt-8 flex flex-1" : "hidden"} ref={sessionContainer} />
@@ -179,62 +182,65 @@ const Videocall = (props: { jwt: string; session: string }) => {
         </div>
       )}
       <br />
-      {incall && <ActionModal client={client} recordingsModalOpen={recordingsModalOpen} setRecordingsModalOpen={setRecordingsModalOpen} toast={toast}/>}
-     {incall && <SettingsModal client={client}/>} 
-     {recordingsModalOpen && <RecordingsModal/>}
+      {incall && <ActionModal client={client} recordingsModalOpen={recordingsModalOpen} setRecordingsModalOpen={setRecordingsModalOpen} />}
+      {incall && <SettingsModal client={client} />}
+      {recordingsModalOpen && <RecordingsModal />}
     </>
   );
 };
 
-const ActionModal = (props: {client: any; toast: any; recordingsModalOpen: boolean; setRecordingsModalOpen: React.Dispatch<React.SetStateAction<boolean>>}) => {
-  const {client, recordingsModalOpen, setRecordingsModalOpen, toast} = props;
+const ActionModal = (props: {
+  client: MutableRefObject<typeof VideoClient>;
+  recordingsModalOpen: boolean;
+  setRecordingsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
+  const { toast } = useToast();
+  const { client, recordingsModalOpen, setRecordingsModalOpen } = props;
   const mediaStream = client.current.getMediaStream();
 
-  const onInviteClick = () => {
-
-  }
+  const onInviteClick = () => {};
 
   return (
     <Dialog>
-    <DialogTrigger asChild>
-      <Button variant="outline">Action Menu</Button>
-    </DialogTrigger>
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Customize As You See Fit</DialogTitle>
-      </DialogHeader>
-      <Button onClick={() => setRecordingsModalOpen(true)}>See Past Recordings</Button>
-                  <Button
-              variant={"outline"}
-              className="flex flex-1"
-              onClick={async () => {
-                const link = `${window.location.toString()}`;
-                await navigator.clipboard.writeText(link);
-                toast({ title: "Copied link to clipoard", description: link });
-              }}
-            >
-              Invite Others
-              <LinkIcon height={16} />
-            </Button>
-      <Link href={"/upload"} className="m-2 flex flex-row justify-around">
-                <Button>
-                  <Upload size={18} className="mr-2" />
-                  Upload Document
-                </Button>
-              </Link>
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button type="button">Close</Button>
-        </DialogClose>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
-  )
-}
+      <DialogTrigger asChild>
+        <Button variant="outline">Action Menu</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Customize As You See Fit</DialogTitle>
+        </DialogHeader>
+        <Button onClick={() => setRecordingsModalOpen(true)}>See Past Recordings</Button>
+        <Button
+          variant={"outline"}
+          className="flex flex-1"
+          onClick={async () => {
+            const link = `${window.location.toString()}`;
+            await navigator.clipboard.writeText(link);
+            toast({ title: "Copied link to clipoard", description: link });
+          }}
+        >
+          Invite Others
+          <LinkIcon height={16} />
+        </Button>
+        <Link href={"/upload"} className="m-2 flex flex-row justify-around">
+          <Button>
+            <Upload size={18} className="mr-2" />
+            Upload Document
+          </Button>
+        </Link>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button">Close</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
-//figure out how to get this modal to open over action modal 
+//figure out how to get this modal to open over action modal
 const RecordingsModal = () => {
-  const [recordings, setRecordings] = useState([])
+  const [recordings, setRecordings] = useState([]);
 
   // useEffect(() => {
   //   const receivedRecordings = api.room.getRecordings.useQuery()
@@ -242,13 +248,13 @@ const RecordingsModal = () => {
   // }, [])
   return (
     <Dialog>
-    <DialogTrigger asChild>
-      <Button variant="outline">Your Recordings</Button>
-    </DialogTrigger>
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle>Recordings</DialogTitle>
-      </DialogHeader>
+      <DialogTrigger asChild>
+        <Button variant="outline">Your Recordings</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Recordings</DialogTitle>
+        </DialogHeader>
         {/* {recordings.map((el: any) => (
           <ul>
             <li>
@@ -269,17 +275,17 @@ const RecordingsModal = () => {
             </li>
           </ul>
         ))} */}
-      <DialogFooter>
-        <DialogClose asChild>
-          <Button type="button">Close</Button>
-        </DialogClose>
-      </DialogFooter>
-    </DialogContent>
-  </Dialog>
-  )
-}
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button">Close</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
-const SettingsModal = (props: {client: any}) => {
+const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) => {
   const [cameraList, setCameraList] = useState<device[]>();
   const [micList, setMicList] = useState<device[]>();
   const [speakerList, setSpeakerList] = useState<device[]>();
@@ -321,21 +327,21 @@ const SettingsModal = (props: {client: any}) => {
   const setCameraDevice = async (camera: device) => {
     const mediaStream = props.client.current.getMediaStream();
     if (mediaStream) {
-      await mediaStream.switchCamera(camera);
+      await mediaStream.switchCamera(camera.deviceId);
     }
   }
 
   const setMicDevice = async (mic: device) => {
     const mediaStream = props.client.current.getMediaStream();
     if (mediaStream) {
-      await mediaStream.switchMicrophone(mic);
+      await mediaStream.switchMicrophone(mic.deviceId);
     }
   }
 
   const setSpeakerDevice = async (speaker: device) => {
     const mediaStream = props.client.current.getMediaStream();
     if (mediaStream) {
-      await mediaStream.switchSpeaker(speaker);
+      await mediaStream.switchSpeaker(speaker.deviceId);
     }
   }
 
@@ -359,34 +365,34 @@ const SettingsModal = (props: {client: any}) => {
           <TabsContent value="t1">
             <RadioGroup className="my-4 flex flex-row">
               {cameraList?.map((device) => (
-                <div className="flex items-center space-x-2">
-                <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setCameraDevice(device)}/>
-                <Label htmlFor={device.deviceId}>{device.label}</Label>
-              </div>
+                <div className="flex items-center space-x-2" key={device.deviceId}>
+                  <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setCameraDevice(device)} />
+                  <Label htmlFor={device.deviceId}>{device.label}</Label>
+                </div>
               ))}
-          </RadioGroup>
+            </RadioGroup>
           </TabsContent>
           <TabsContent value="t2">
             <RadioGroup className="my-4 flex flex-row">
               {micList?.map((device) => (
-                <div className="flex items-center space-x-2">
-                <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setMicDevice(device)}/>
-                <Label htmlFor={device.deviceId}>{device.label}</Label>
-              </div>
+                <div className="flex items-center space-x-2" key={device.deviceId}>
+                  <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setMicDevice(device)} />
+                  <Label htmlFor={device.deviceId}>{device.label}</Label>
+                </div>
               ))}
-          </RadioGroup>            
-        </TabsContent>
-        <TabsContent value="t3">
+            </RadioGroup>
+          </TabsContent>
+          <TabsContent value="t3">
             <RadioGroup className="my-4 flex flex-row">
               {speakerList?.map((device) => (
-                <div className="flex items-center space-x-2">
-                <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setSpeakerDevice(device)}/>
-                <Label htmlFor={device.deviceId}>{device.label}</Label>
-              </div>
+                <div className="flex items-center space-x-2" key={device.deviceId}>
+                  <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setSpeakerDevice(device)} />
+                  <Label htmlFor={device.deviceId}>{device.label}</Label>
+                </div>
               ))}
-          </RadioGroup>            
-        </TabsContent>
-        </Tabs>  
+            </RadioGroup>
+          </TabsContent>
+        </Tabs>
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button">Close</Button>
