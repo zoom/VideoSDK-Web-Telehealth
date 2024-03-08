@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 import { LinkIcon, X } from "lucide-react";
 import { api } from "~/utils/api";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 
 type RoomData = Room & {
   User_CreatedFor?: User[];
@@ -79,19 +80,24 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
           <></>
         )}
         {isDoctor && rooms.User_CreatedFor?.[0]?.id ? (
-          <div className="mb-2 mt-4 flex flex-1 flex-row justify-center">
-            <Link href={`/viewPatient/${rooms.User_CreatedFor[0].id}`}>
-              <Button className="" variant={"secondary"}>
-                Patient Details
-              </Button>
-            </Link>
-            <div className="w-2"></div>
-            <Link href={`/viewNotes/${rooms.id}`}>
-              <Button className="" variant={"secondary"}>
-                Notes
-              </Button>
-            </Link>
-          </div>
+          <>
+            <div className="mb-2 mt-4 flex flex-1 flex-row justify-center">
+              <Link href={`/viewNotes/${rooms.id}`}>
+                <Button className="h-2" variant={"link"}>
+                  Notes
+                </Button>
+              </Link>
+              <div className="w-2"></div>
+              <RecordingModal roomId={rooms.id} />
+            </div>
+            <div className="mb-2 mt-4 flex flex-1 flex-row justify-center">
+              <Link href={`/viewPatient/${rooms.User_CreatedFor[0].id}`}>
+                <Button className="" variant={"secondary"}>
+                  Patient Details
+                </Button>
+              </Link>
+            </div>
+          </>
         ) : (
           <> </>
         )}
@@ -102,6 +108,50 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
         </div>
       </div>
     </div>
+  );
+};
+
+const RecordingModal = (props: { roomId: string }) => {
+  const getAllRecordings = api.zoom.getAllRecordings.useMutation();
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button
+          variant="link"
+          className="h-6"
+          onClick={() => {
+            if (getAllRecordings.status === "idle") getAllRecordings.mutate({ roomId: props.roomId }, {});
+          }}
+        >
+          Recordings
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Recordings</DialogTitle>
+        </DialogHeader>
+        {getAllRecordings.isLoading && <DialogDescription>Loading...</DialogDescription>}
+        {getAllRecordings.data?.map((e) => (
+          <div key={e.session_id} className="flex flex-row justify-between">
+            <div className="flex flex-col">
+              <p>{new Date(e.start_time).toLocaleDateString()}</p>
+              {e.recording_files.map((f) => (
+                <Link key={f.id} href={f.download_url} target="_blank" className="h-6">
+                  <Button variant="link">
+                    {new Date(f.recording_start).toLocaleTimeString()} - {new Date(f.recording_end).toLocaleTimeString()}
+                  </Button>
+                </Link>
+              ))}
+            </div>
+          </div>
+        ))}
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button">Close</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 

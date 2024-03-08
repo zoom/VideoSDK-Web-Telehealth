@@ -45,22 +45,30 @@ export const zoomRouter = createTRPCRouter({
               }
             })
             if (getRecording.status === 3301) {
-              return { status: "processing", data: null }
+              return { status: "processing", data: null } as const;
             } else if (getRecording.status === 200) {
               const data = await getRecording.json() as typeof ExampleRecordingJSON;
-              return { status: "completed", data: data };
+              return { status: "completed", data: data } as const;
             } else if (getRecording.status === 404) {
-              return { status: "not_found", data: null }
+              return { status: "not_found", data: null } as const;
             } else {
               throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Error fetching recording' });
             }
           }));
-        const validData = recordings.filter((recording) => recording.status === "completed").map((recording) => recording.data);
-        return validData
+        const completed = getCompletedRecordings(recordings
+          .filter(e => e.status === 'completed' && e.data !== null)
+          .map((e) => e.data));
+        return completed;
       }
       throw new TRPCError({ code: 'NOT_FOUND', message: 'Room not found' });
     }),
 });
+
+// type hack for non null
+const getCompletedRecordings = (recordings: (typeof ExampleRecordingJSON | null)[]) => {
+  return recordings as typeof ExampleRecordingJSON[];
+}
+
 
 // for typescript
 const ExampleRecordingJSON = {
