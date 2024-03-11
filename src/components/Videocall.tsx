@@ -14,13 +14,14 @@ import ZoomVideo, {
   type LiveTranscriptionMessage,
   type VideoClient,
 } from "@zoom/videosdk";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { Label } from "~/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { api } from "~/utils/api";
 import Link from "next/link";
 import { Upload } from "lucide-react";
+import RecordingModal from "./RecordingModal";
 
 const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) => {
   const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
@@ -41,7 +42,6 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
   const [isStartedLiveTranscription, setIsStartedLiveTranscription] = useState(false);
   const [transcriptionSubtitle, setTranscriptionSubtitle] = useState("");
   const [isRecording, setIsRecording] = useState(RecordingStatus.Stopped);
-  const [recordingsModalOpen, setRecordingsModalOpen] = useState(false);
 
   useEffect(() => {
     if (isRender.current === 0) {
@@ -68,9 +68,10 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
   };
 
   const startCall = async () => {
-    setIncall(true);
-    uitoolkit.closePreview(previewContainer.current!);
+    toast({ title: "Joining", description: "Please wait..." });
     await init();
+    uitoolkit.closePreview(previewContainer.current!);
+    setIncall(true);
   };
 
   const leaveCall = async () => {
@@ -182,23 +183,15 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
         </div>
       )}
       <br />
-      {incall && <ActionModal client={client} recordingsModalOpen={recordingsModalOpen} setRecordingsModalOpen={setRecordingsModalOpen} />}
+      {incall && <ActionModal client={client} />}
       {incall && <SettingsModal client={client} />}
-      {recordingsModalOpen && <RecordingsModal />}
     </>
   );
 };
 
-const ActionModal = (props: {
-  client: MutableRefObject<typeof VideoClient>;
-  recordingsModalOpen: boolean;
-  setRecordingsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}) => {
+const ActionModal = (props: { client: MutableRefObject<typeof VideoClient> }) => {
   const { toast } = useToast();
-  const { client, recordingsModalOpen, setRecordingsModalOpen } = props;
-  const mediaStream = client.current.getMediaStream();
-
-  const onInviteClick = () => {};
+  const { client } = props;
 
   return (
     <Dialog>
@@ -209,7 +202,8 @@ const ActionModal = (props: {
         <DialogHeader>
           <DialogTitle>Customize As You See Fit</DialogTitle>
         </DialogHeader>
-        <Button onClick={() => setRecordingsModalOpen(true)}>See Past Recordings</Button>
+        <RecordingModal roomId={client.current.getSessionInfo().topic} buttonVariant="default" />
+        <p>{client.current.getSessionInfo().topic}</p>
         <Button
           variant={"outline"}
           className="flex flex-1"
@@ -228,53 +222,6 @@ const ActionModal = (props: {
             Upload Document
           </Button>
         </Link>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button type="button">Close</Button>
-          </DialogClose>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-//figure out how to get this modal to open over action modal
-const RecordingsModal = () => {
-  const [recordings, setRecordings] = useState([]);
-
-  // useEffect(() => {
-  //   const receivedRecordings = api.room.getRecordings.useQuery()
-  //   setRecordings(receivedRecordings)
-  // }, [])
-  return (
-    <Dialog>
-      <DialogTrigger asChild>
-        <Button variant="outline">Your Recordings</Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Recordings</DialogTitle>
-        </DialogHeader>
-        {/* {recordings.map((el: any) => (
-          <ul>
-            <li>
-              {el.start_time}
-            </li>
-            <li>
-              {el.duration}
-            </li>
-            <li>
-              {el.recording_files.map((files: any) => (
-                <li>
-                  {files.id}
-                </li>
-              ))}
-            </li>
-            <li>
-              {el.download_url}
-            </li>
-          </ul>
-        ))} */}
         <DialogFooter>
           <DialogClose asChild>
             <Button type="button">Close</Button>
@@ -329,21 +276,21 @@ const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) 
     if (mediaStream) {
       await mediaStream.switchCamera(camera.deviceId);
     }
-  }
+  };
 
   const setMicDevice = async (mic: device) => {
     const mediaStream = props.client.current.getMediaStream();
     if (mediaStream) {
       await mediaStream.switchMicrophone(mic.deviceId);
     }
-  }
+  };
 
   const setSpeakerDevice = async (speaker: device) => {
     const mediaStream = props.client.current.getMediaStream();
     if (mediaStream) {
       await mediaStream.switchSpeaker(speaker.deviceId);
     }
-  }
+  };
 
   console.log("camera", micList);
 
