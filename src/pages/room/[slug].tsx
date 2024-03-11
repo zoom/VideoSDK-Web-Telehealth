@@ -8,7 +8,7 @@ import { ViewPatient } from "../viewPatient/[userId]";
 import { ViewNotes } from "../viewNotes/[roomId]";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
-const Videocall = dynamic<{ jwt: string; session: string }>(() => import("../../components/Videocall"), { ssr: false });
+const Videocall = dynamic<{ jwt: string; session: string; isCreator: boolean }>(() => import("../../components/Videocall"), { ssr: false });
 
 export default function Home() {
   const { status } = useSession();
@@ -42,7 +42,7 @@ export default function Home() {
       <div className="m-0 flex min-h-screen w-screen flex-1 flex-col overflow-y-scroll bg-gray-100 px-0 pb-8">
         <div className="flex w-full flex-1 flex-col items-center self-center lg:flex-row lg:justify-around">
           <div className="flex flex-[4] flex-col items-center">
-            <Videocall jwt={data.jwt} session={data.room.id} />
+            <Videocall jwt={data.jwt} session={data.room.id} isCreator={data.room.User_CreatedBy.id === userData?.user.id} />
           </div>
           {userData?.user.role === "doctor" ? (
             <Tabs defaultValue="account" className="mr-8 mt-16 flex flex-1 flex-col self-start">

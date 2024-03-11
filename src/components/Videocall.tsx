@@ -1,7 +1,7 @@
 import uitoolkit from "@zoom/videosdk-ui-toolkit";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { type MutableRefObject, useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 import { useToast } from "./ui/use-toast";
@@ -12,11 +12,19 @@ import ZoomVideo, {
   type RecordingClient,
   type LiveTranscriptionClient,
   type LiveTranscriptionMessage,
+  type VideoClient,
 } from "@zoom/videosdk";
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
+import { Label } from "~/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { api } from "~/utils/api";
+import Link from "next/link";
+import { Upload } from "lucide-react";
+import RecordingModal from "./RecordingModal";
 
-const Videocall = (props: { jwt: string; session: string }) => {
+const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) => {
+  const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
   const isRender = useRef(0);
   const [incall, setIncall] = useState(false);
   const previewContainer = useRef<HTMLDivElement>(null);
@@ -34,7 +42,6 @@ const Videocall = (props: { jwt: string; session: string }) => {
   const [isStartedLiveTranscription, setIsStartedLiveTranscription] = useState(false);
   const [transcriptionSubtitle, setTranscriptionSubtitle] = useState("");
   const [isRecording, setIsRecording] = useState(RecordingStatus.Stopped);
-  // const [receiveRecordings, setReceiveRecordings] = useState(false);
 
   useEffect(() => {
     if (isRender.current === 0) {
@@ -49,6 +56,9 @@ const Videocall = (props: { jwt: string; session: string }) => {
       await client.current.join(props.session, props.jwt, data?.user.name ?? "User").catch((e) => {
         console.log(e);
       });
+      if (props.isCreator) {
+        await writeZoomSessionID.mutateAsync({ zoomSessionsId: client.current.getSessionInfo().sessionId, roomId: props.session });
+      }
     } catch (e) {
       console.log(e);
     }
@@ -58,9 +68,10 @@ const Videocall = (props: { jwt: string; session: string }) => {
   };
 
   const startCall = async () => {
-    setIncall(true);
-    uitoolkit.closePreview(previewContainer.current!);
+    toast({ title: "Joining", description: "Please wait..." });
     await init();
+    uitoolkit.closePreview(previewContainer.current!);
+    setIncall(true);
   };
 
   const leaveCall = async () => {
@@ -135,11 +146,6 @@ const Videocall = (props: { jwt: string; session: string }) => {
     }
   };
 
-  // const onReceiveRecordings = (data: any) => {
-  //   const downloadLink = data.downloadLink;
-  //   const session = data.sessionId;
-  // };
-
   return (
     <>
       <div id="meeting" className={incall ? "mb-8 mt-8 flex flex-1" : "hidden"} ref={sessionContainer} />
@@ -177,12 +183,56 @@ const Videocall = (props: { jwt: string; session: string }) => {
         </div>
       )}
       <br />
-      <SettingsModal />
+      {incall && <ActionModal client={client} />}
+      {incall && <SettingsModal client={client} />}
     </>
   );
 };
 
-const SettingsModal = () => {
+const ActionModal = (props: { client: MutableRefObject<typeof VideoClient> }) => {
+  const { toast } = useToast();
+  const { client } = props;
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button variant="outline">Action Menu</Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Customize As You See Fit</DialogTitle>
+        </DialogHeader>
+        <RecordingModal roomId={client.current.getSessionInfo().topic} buttonVariant="default" />
+        <p>{client.current.getSessionInfo().topic}</p>
+        <Button
+          variant={"outline"}
+          className="flex flex-1"
+          onClick={async () => {
+            const link = `${window.location.toString()}`;
+            await navigator.clipboard.writeText(link);
+            toast({ title: "Copied link to clipoard", description: link });
+          }}
+        >
+          Invite Others
+          <LinkIcon height={16} />
+        </Button>
+        <Link href={"/upload"} className="m-2 flex flex-row justify-around">
+          <Button>
+            <Upload size={18} className="mr-2" />
+            Upload Document
+          </Button>
+        </Link>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button type="button">Close</Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) => {
   const [cameraList, setCameraList] = useState<device[]>();
   const [micList, setMicList] = useState<device[]>();
   const [speakerList, setSpeakerList] = useState<device[]>();
@@ -221,6 +271,27 @@ const SettingsModal = () => {
     });
   }, []);
 
+  const setCameraDevice = async (camera: device) => {
+    const mediaStream = props.client.current.getMediaStream();
+    if (mediaStream) {
+      await mediaStream.switchCamera(camera.deviceId);
+    }
+  };
+
+  const setMicDevice = async (mic: device) => {
+    const mediaStream = props.client.current.getMediaStream();
+    if (mediaStream) {
+      await mediaStream.switchMicrophone(mic.deviceId);
+    }
+  };
+
+  const setSpeakerDevice = async (speaker: device) => {
+    const mediaStream = props.client.current.getMediaStream();
+    if (mediaStream) {
+      await mediaStream.switchSpeaker(speaker.deviceId);
+    }
+  };
+
   console.log("camera", micList);
 
   return (
@@ -230,8 +301,7 @@ const SettingsModal = () => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Heading</DialogTitle>
-          <DialogDescription>Desc</DialogDescription>
+          <DialogTitle>Select Your Preferred Device</DialogTitle>
         </DialogHeader>
         <Tabs defaultValue="t1" className="mt-2 flex w-full flex-col self-center">
           <TabsList>
@@ -240,12 +310,35 @@ const SettingsModal = () => {
             <TabsTrigger value="t3">Speaker Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="t1">
-            {/* {cameraList?.map((camera) => {
-              <p>{camera.label}</p>
-            })} */}
-            select camera
+            <RadioGroup className="my-4 flex flex-row">
+              {cameraList?.map((device) => (
+                <div className="flex items-center space-x-2" key={device.deviceId}>
+                  <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setCameraDevice(device)} />
+                  <Label htmlFor={device.deviceId}>{device.label}</Label>
+                </div>
+              ))}
+            </RadioGroup>
           </TabsContent>
-          <TabsContent value="t2">Select Microphone</TabsContent>
+          <TabsContent value="t2">
+            <RadioGroup className="my-4 flex flex-row">
+              {micList?.map((device) => (
+                <div className="flex items-center space-x-2" key={device.deviceId}>
+                  <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setMicDevice(device)} />
+                  <Label htmlFor={device.deviceId}>{device.label}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </TabsContent>
+          <TabsContent value="t3">
+            <RadioGroup className="my-4 flex flex-row">
+              {speakerList?.map((device) => (
+                <div className="flex items-center space-x-2" key={device.deviceId}>
+                  <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setSpeakerDevice(device)} />
+                  <Label htmlFor={device.deviceId}>{device.label}</Label>
+                </div>
+              ))}
+            </RadioGroup>
+          </TabsContent>
         </Tabs>
         <DialogFooter>
           <DialogClose asChild>

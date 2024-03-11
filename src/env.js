@@ -28,6 +28,8 @@ export const env = createEnv({
     S3_SECRET_ACCESS_KEY: z.string(),
     ZOOM_SDK_KEY: z.string(),
     ZOOM_SDK_SECRET: z.string(),
+    ZOOM_API_KEY: z.string(),
+    ZOOM_API_SECRET: z.string(),
   },
 
   /**
@@ -58,6 +60,8 @@ export const env = createEnv({
     S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
     ZOOM_SDK_KEY: process.env.ZOOM_SDK_KEY,
     ZOOM_SDK_SECRET: process.env.ZOOM_SDK_SECRET,
+    ZOOM_API_KEY: process.env.ZOOM_API_KEY,
+    ZOOM_API_SECRET: process.env.ZOOM_API_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
