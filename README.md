@@ -44,6 +44,11 @@ bun dev # or npm run dev
 
 5. Open [http://localhost:3000](http://localhost:3000) with your browser.
 
+## Customisation
+
+You can edit the colors for the app in `src/styles/globals.css`.
+You can change the favicon and logo by replacing the files in `public/`.
+
 ### Disclaimers
 
 Use of this sample app is subject to our [Terms of Use](https://explore.zoom.us/en/video-sdk-terms/).
