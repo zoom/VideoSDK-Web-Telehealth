@@ -76,16 +76,16 @@ export const userRouter = createTRPCRouter({
     medications: z.string(),
     DOB: z.date(),
   })).mutation(async ({ ctx, input }) => {
-    const user = await ctx.db.user.update({
-      where: { id: ctx.session.user.id },
-      data: { role: 'patient' }
-    });
     const patient = await ctx.db.patient.create({
       data: {
         userId: ctx.session.user.id, height: input.height, weight: input.weight,
         bloodType: input.bloodType, allergies: input.allergies,
         medications: input.medications, DOB: input.DOB
       }
+    });
+    const user = await ctx.db.user.update({
+      where: { id: ctx.session.user.id },
+      data: { role: 'patient', patientId: patient.id }
     });
     if (user) {
       return { user, patient };
