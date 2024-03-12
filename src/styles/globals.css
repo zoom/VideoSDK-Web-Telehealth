@@ -102,3 +102,9 @@ video-player-container:has(> :nth-child(2)) {
 video-player-container:has(> :nth-child(5)) {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+
+video-player {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+}

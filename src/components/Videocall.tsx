@@ -51,7 +51,7 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
   }, []);
 
   const init = async () => {
-    await client.current.init("en-US", "CDN");
+    await client.current.init("en-US", "CDN", {enforceMultipleVideos: true});
     try {
       await client.current.join(props.session, props.jwt, data?.user.name ?? "User").catch((e) => {
         console.log(e);
@@ -65,12 +65,24 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
     recordingClient.current = client.current.getRecordingClient();
     transcriptionClient.current = client.current.getLiveTranscriptionClient();
     console.log("recording status", isRecording);
+    client.current.on('peer-video-state-change', renderVideo)
   };
-
+  const renderVideo = async() => {
+    console.log('RENDERING VIDEO')
+    const mediaStream = client.current.getMediaStream();
+    console.log('multiple', mediaStream.isSupportMultipleVideos())
+    for (const user of client.current.getAllUser()) {
+      if (user.bVideoOn) {
+        const userVideo = await mediaStream.attachVideo(user.userId, 1);
+        if (userVideo) document.querySelector("video-player-container")?.appendChild(userVideo as VideoPlayer);
+      }
+    }
+  }
   const startCall = async () => {
     toast({ title: "Joining", description: "Please wait..." });
     await init();
     uitoolkit.closePreview(previewContainer.current!);
+    renderVideo();
     setIncall(true);
   };
 
@@ -85,15 +97,12 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
     const mediaStream = client.current.getMediaStream();
     if (videoStarted) {
       await mediaStream.stopVideo();
+      await mediaStream.stopRenderVideo('video-player-container', user.userId);
       setVideoStarted(false);
     } else {
-      await mediaStream.startVideo();
-      for (const user of client.current.getAllUser()) {
-        if (user.bVideoOn) {
-          const userVideo = await mediaStream.attachVideo(user.userId, 3);
-          if (userVideo) document.querySelector("video-player-container")?.appendChild(userVideo as VideoPlayer);
-        }
-      }
+      await mediaStream.startVideo().then(() => {
+        renderVideo();
+      });
       setVideoStarted(true);
     }
   };
