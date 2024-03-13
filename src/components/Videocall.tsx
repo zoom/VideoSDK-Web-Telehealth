@@ -51,6 +51,7 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
   }, []);
 
   const init = async () => {
+    //will need to set enforceMultipleVideos dynamically based on isSupportMultipleVideos
     await client.current.init("en-US", "CDN", {enforceMultipleVideos: true});
     try {
       await client.current.join(props.session, props.jwt, data?.user.name ?? "User").catch((e) => {
@@ -78,6 +79,16 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
       }
     }
   }
+
+  const removeVideo = async() => {
+    const mediaStream = client.current.getMediaStream();
+    for (const user of client.current.getAllUser()) {
+      if (!user.bVideoOn) {
+        const userVideo = await mediaStream.detachVideo(user.userId);
+        // if (userVideo) document.querySelector("video-player-container")?.removeChild(userVideo as VideoPlayer);
+      }
+    }
+  }
   const startCall = async () => {
     toast({ title: "Joining", description: "Please wait..." });
     await init();
@@ -97,7 +108,8 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
     const mediaStream = client.current.getMediaStream();
     if (videoStarted) {
       await mediaStream.stopVideo();
-      await mediaStream.stopRenderVideo('video-player-container', user.userId);
+      // await mediaStream.stopRenderVideo('video-player-container', user.userId);
+      removeVideo();
       setVideoStarted(false);
     } else {
       await mediaStream.startVideo().then(() => {
