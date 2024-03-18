@@ -7,6 +7,7 @@ import {
   type NextAuthOptions,
 } from "next-auth";
 import GithubProvider from "next-auth/providers/github";
+// import config from "tailwind.config";
 import { env } from "~/env";
 import { db } from "~/server/db";
 
@@ -47,13 +48,18 @@ export const authOptions: NextAuthOptions = {
       },
     }),
     redirect: async ({ url, baseUrl }) => {
-      console.log("redirect", url, baseUrl);
       if (url.startsWith("/")) return `${baseUrl}${url}`
       else if (new URL(url).origin === baseUrl) return url
       return baseUrl
     },
   },
   adapter: PrismaAdapter(db),
+  theme: {
+    // brandColor: config.theme.extend.colors.primary.DEFAULT,
+    // buttonText: config.theme.extend.colors.primary.foreground,
+    colorScheme: "light",
+    logo: "/logo.svg",
+  },
   providers: [
     GithubProvider({
       clientId: env.GITHUB_CLIENT_ID,
