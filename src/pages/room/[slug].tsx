@@ -61,9 +61,6 @@ export default function Home() {
             <></>
           )}
         </div>
-        <Button onClick={() => void router.push("/")} className="mx-auto flex w-48" variant={"link"}>
-          back
-        </Button>
         <ConfidnetialDialog />
       </div>
     );
