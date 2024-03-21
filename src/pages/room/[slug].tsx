@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import Header from "~/components/ui/header";
 import Footer from "~/components/ui/footer";
 
-const Videocall = dynamic<{ jwt: string; session: string; isCreator: boolean }>(() => import("../../components/Videocall"), { ssr: false });
+const Videocall = dynamic<{ jwt: string; session: string; isCreator: boolean }>(() => import("../../components/videocall/Videocall"), { ssr: false });
 
 export default function Home() {
   const { status } = useSession();

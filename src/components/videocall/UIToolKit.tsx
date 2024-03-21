@@ -9,7 +9,11 @@ const UIToolKit = () => {
     const preview = previewContainerRef;
     uitoolkit.openPreview(preview.current!);
     return () => {
-      uitoolkit.closePreview(preview.current!);
+      try {
+        uitoolkit.closePreview(preview.current!);
+      } catch (e) {
+        console.log("Failed to close preview", e);
+      }
     };
   }, []);
   return <div id="preview" className="mb-8 mt-8 flex flex-1 self-center" ref={previewContainerRef} />;
