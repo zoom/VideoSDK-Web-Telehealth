@@ -72,35 +72,30 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
     await router.push("/", undefined, { shallow: false });
   };
 
-  //create menu button to include access to previous recordings
+  const copyLink = async () => {
+    const link = `${window.location.toString()}`;
+    await navigator.clipboard.writeText(link);
+    toast({ title: "Copied link to clipoard", description: link });
+  };
+
   return (
     <>
       <div id="meeting" className={incall ? "mb-8 mt-8 flex flex-1" : "hidden"} />
       <div className="flex h-full w-full flex-1 flex-col p-8">
         {/* @ts-expect-error html component */}
-        <video-player-container ref={videoContainerRef}></video-player-container>
+        <video-player-container ref={videoContainerRef} />
         {!incall ? (
-          <>
-            <div className="mx-auto flex w-64 self-center">
-              <UIToolKit />
-              <Button className="flex flex-1" onClick={startCall}>
-                Join
-              </Button>
-              <div className="w-4"></div>
-              <Button
-                variant={"outline"}
-                className="flex flex-1"
-                onClick={async () => {
-                  const link = `${window.location.toString()}`;
-                  await navigator.clipboard.writeText(link);
-                  toast({ title: "Copied link to clipoard", description: link });
-                }}
-              >
-                Copy Link
-                <LinkIcon height={16} />
-              </Button>
-            </div>
-          </>
+          <div className="mx-auto flex w-64 self-center">
+            <UIToolKit />
+            <Button className="flex flex-1" onClick={startCall}>
+              Join
+            </Button>
+            <div className="w-4" />
+            <Button variant={"outline"} className="flex flex-1" onClick={copyLink}>
+              Copy Link
+              <LinkIcon height={16} />
+            </Button>
+          </div>
         ) : (
           <div className="flex w-full flex-1 flex-col justify-around self-center">
             <div className="mt-8 flex w-[50%] flex-1 justify-around self-center">
@@ -113,12 +108,11 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
               </Button>
             </div>
             <Transcipt transcriptionSubtitle={transcriptionSubtitle} />
+            <ActionModal client={client} />
+            <SettingsModal client={client} />
           </div>
         )}
       </div>
-      <br />
-      {incall ? <ActionModal client={client} /> : <></>}
-      {incall ? <SettingsModal client={client} /> : <></>}
     </>
   );
 };

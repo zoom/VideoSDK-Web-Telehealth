@@ -2,6 +2,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
+import Footer from "~/components/ui/footer";
+import Header from "~/components/ui/header";
 import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/utils/api";
 
@@ -23,15 +25,19 @@ const Uploaded = () => {
     );
   }
   return (
-    <div className="flex h-screen w-screen flex-col items-center overflow-y-scroll bg-gray-100">
-      <h1 className="mb-2 mt-8 flex text-3xl font-bold leading-none text-gray-700">Patient Details</h1>
-      <ViewPatient userId={userId as string} />
-      <Link href="/">
-        <Button variant={"link"} className="mx-auto flex">
-          back
-        </Button>
-      </Link>
-    </div>
+    <>
+      <Header />
+      <div className="flex h-screen w-screen flex-col items-center overflow-y-scroll bg-gray-100">
+        <h1 className="mb-2 mt-8 flex text-3xl font-bold leading-none text-gray-700">Patient Details</h1>
+        <ViewPatient userId={userId as string} />
+        <Link href="/">
+          <Button variant={"link"} className="mx-auto flex">
+            back
+          </Button>
+        </Link>
+      </div>
+      <Footer />
+    </>
   );
 };
 
