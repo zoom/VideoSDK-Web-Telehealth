@@ -56,7 +56,6 @@ const LandingPage = () => {
       //     Disclaimer.
       //   </Button> */}
 
-      {/* Hero cards sections */}
       <div className="z-10">
         <div className="hidden lg:flex flex-row flex-wrap gap-8 relative w-[700px] h-[500px]">
           <Card className="absolute top-[150px] left-[50px] w-72  drop-shadow-xl shadow-black/10 dark:shadow-white/10">
@@ -64,9 +63,9 @@ const LandingPage = () => {
                 <Avatar>
                   <AvatarImage
                     alt=""
-                    src="https://github.com/shadcn.png"
+                    src=""
                   />
-                  <AvatarFallback>SH</AvatarFallback>
+                  <AvatarFallback>DV</AvatarFallback>
                 </Avatar>
 
                 <div className="flex flex-col">
@@ -82,9 +81,9 @@ const LandingPage = () => {
               <Avatar>
                 <AvatarImage
                   alt=""
-                  src="https://github.com/shadcn.png"
+                  src=""
                 />
-                <AvatarFallback>SH</AvatarFallback>
+                <AvatarFallback>PV</AvatarFallback>
               </Avatar>
 
               <div className="flex flex-col">
