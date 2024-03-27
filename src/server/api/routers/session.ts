@@ -202,4 +202,28 @@ export const sessionRouter = createTRPCRouter({
     await ctx.db.room.delete({ where: { id: input.id } });
     return true;
   }),
+  addZoomSessionId: protectedProcedure
+    .input(z.object({ roomId: z.string(), zoomSessionsId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const room = await ctx.db.room.findFirstOrThrow({
+        where: { id: input.roomId },
+      });
+      if (room.createByUserId !== ctx.session.user.id) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "You are not allowed to add zoom session id to this room",
+        });
+      }
+      if (room.zoomSessionsIds.find(e => e === input.zoomSessionsId)) {
+        return true;
+      } else {
+        await ctx.db.room.update({
+          where: { id: input.roomId },
+          data: {
+            zoomSessionsIds: { push: input.zoomSessionsId }
+          }
+        });
+        return true;
+      }
+    }),
 });
