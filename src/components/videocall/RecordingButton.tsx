@@ -3,6 +3,7 @@ import { Button } from "~/components/ui/button";
 import { RecordingStatus } from "@zoom/videosdk";
 import type { RecordingClient, VideoClient } from "@zoom/videosdk";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
+import { CircleDotIcon, CircleSlash2, LucideFileVideo } from "lucide-react";
 
 const RecordingButton = (props: { client: MutableRefObject<typeof VideoClient> }) => {
   const { client } = props;
@@ -19,7 +20,11 @@ const RecordingButton = (props: { client: MutableRefObject<typeof VideoClient> }
     setIsRecording(recordingClient.current.getCloudRecordingStatus());
   };
 
-  return <Button onClick={onRecordingClick}>{`${isRecording === RecordingStatus.Recording ? "Stop Recording" : "Start Recording"}`}</Button>;
+  return (
+    <Button onClick={onRecordingClick} variant={isRecording === RecordingStatus.Recording ? "destructive" : "outline"}>
+      {isRecording === RecordingStatus.Recording ? <CircleSlash2 /> : <CircleDotIcon />}
+    </Button>
+  );
 };
 
 export default RecordingButton;

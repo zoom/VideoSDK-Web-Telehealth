@@ -2,6 +2,7 @@ import { type Dispatch, type MutableRefObject, type SetStateAction, useRef, useS
 import { Button } from "~/components/ui/button";
 import type { LiveTranscriptionClient, LiveTranscriptionMessage, VideoClient } from "@zoom/videosdk";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
+import { LucideNotebookText, LucideSplitSquareHorizontal, NotebookPen } from "lucide-react";
 
 const TranscriptionButton = (props: {
   setTranscriptionSubtitle: Dispatch<
@@ -45,6 +46,10 @@ const TranscriptionButton = (props: {
     }
   };
 
-  return <Button onClick={onTranscriptionClick}>{`${isStartedLiveTranscription ? "Stop Transcription" : "Start Transcription"}`}</Button>;
+  return (
+    <Button onClick={onTranscriptionClick} variant={isStartedLiveTranscription ? "default" : "outline"}>
+      {isStartedLiveTranscription ? <LucideSplitSquareHorizontal /> : <LucideNotebookText />}
+    </Button>
+  );
 };
 export default TranscriptionButton;

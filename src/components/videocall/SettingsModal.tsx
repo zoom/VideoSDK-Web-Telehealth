@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ZoomVideo from "@zoom/videosdk";
 import type { VideoClient } from "@zoom/videosdk";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
+import { Settings } from "lucide-react";
 
 const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) => {
   const [cameraList, setCameraList] = useState<device[]>();
@@ -71,7 +72,9 @@ const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">SettingsModal</Button>
+        <Button variant="outline">
+          <Settings />
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

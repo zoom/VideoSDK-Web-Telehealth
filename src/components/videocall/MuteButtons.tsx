@@ -2,6 +2,7 @@ import { type Dispatch, type MutableRefObject, type SetStateAction } from "react
 import { Button } from "~/components/ui/button";
 import type { VideoClient } from "@zoom/videosdk";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
+import { Mic, MicOff, Video, VideoOff } from "lucide-react";
 
 const MicButton = (props: { client: MutableRefObject<typeof VideoClient>; isAudioMuted: boolean; setIsAudioMuted: Dispatch<SetStateAction<boolean>> }) => {
   const { client, isAudioMuted, setIsAudioMuted } = props;
@@ -10,7 +11,11 @@ const MicButton = (props: { client: MutableRefObject<typeof VideoClient>; isAudi
     isAudioMuted ? await mediaStream?.unmuteAudio() : await mediaStream?.muteAudio();
     setIsAudioMuted(client.current.getCurrentUserInfo().muted ?? true);
   };
-  return <Button onClick={onMicrophoneClick}>{`${isAudioMuted ? "Unmute Mic" : "Mute Mic"}`}</Button>;
+  return (
+    <Button onClick={onMicrophoneClick} variant={"outline"}>
+      {isAudioMuted ? <MicOff /> : <Mic />}
+    </Button>
+  );
 };
 
 const CameraButton = (props: {
@@ -34,7 +39,11 @@ const CameraButton = (props: {
     }
   };
 
-  return <Button onClick={onCameraClick}>{`${isVideoMuted ? "Unmute Camera" : "Mute Camera"}`}</Button>;
+  return (
+    <Button onClick={onCameraClick} variant={"outline"}>
+      {isVideoMuted ? <Video /> : <VideoOff />}
+    </Button>
+  );
 };
 
 export { MicButton, CameraButton };

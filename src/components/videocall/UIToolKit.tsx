@@ -1,18 +1,18 @@
 import uitoolkit from "@zoom/videosdk-ui-toolkit";
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 
 const UIToolKit = () => {
   const previewContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const preview = previewContainerRef;
     uitoolkit.openPreview(preview.current!);
     return () => {
       try {
         uitoolkit.closePreview(preview.current!);
       } catch (e) {
-        console.log("Failed to close preview", e);
+        console.log("Error closing uitoolkit preview", e);
       }
     };
   }, []);

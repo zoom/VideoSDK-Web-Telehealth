@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { useToast } from "../ui/use-toast";
-import { LinkIcon } from "lucide-react";
+import { LinkIcon, PhoneOff } from "lucide-react";
 import { api } from "~/utils/api";
 import { WorkAroundForSafari } from "~/utils/safari";
 import ZoomVideo, { VideoQuality, type VideoPlayer } from "@zoom/videosdk";
@@ -72,48 +72,40 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
     await router.push("/", undefined, { shallow: false });
   };
 
-  const copyLink = async () => {
-    const link = `${window.location.toString()}`;
-    await navigator.clipboard.writeText(link);
-    toast({ title: "Copied link to clipoard", description: link });
-  };
-
   return (
-    <>
-      <div id="meeting" className={incall ? "mb-8 mt-8 flex flex-1" : "hidden"} />
-      <div className="flex h-full w-full flex-1 flex-col p-8">
+    <div className="flex h-full w-full flex-1 flex-col rounded-md px-4">
+      <div className="flex w-full flex-1" style={incall ? {} : { display: "none" }}>
         {/* @ts-expect-error html component */}
-        <video-player-container ref={videoContainerRef} />
-        {!incall ? (
-          <div className="mx-auto flex w-64 self-center">
-            <UIToolKit />
-            <Button className="flex flex-1" onClick={startCall}>
-              Join
-            </Button>
-            <div className="w-4" />
-            <Button variant={"outline"} className="flex flex-1" onClick={copyLink}>
-              Copy Link
-              <LinkIcon height={16} />
-            </Button>
-          </div>
-        ) : (
-          <div className="flex w-full flex-1 flex-col justify-around self-center">
-            <div className="mt-8 flex w-[50%] flex-1 justify-around self-center">
-              <CameraButton client={client} isVideoMuted={isVideoMuted} setIsVideoMuted={setIsVideoMuted} renderVideo={renderVideo} />
-              <MicButton isAudioMuted={isAudioMuted} client={client} setIsAudioMuted={setIsAudioMuted} />
-              <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
-              <RecordingButton client={client} />
-              <Button variant={"outline"} onClick={leaveCall}>
-                Leave
-              </Button>
-            </div>
-            <Transcipt transcriptionSubtitle={transcriptionSubtitle} />
-            <ActionModal client={client} />
-            <SettingsModal client={client} />
-          </div>
-        )}
+        <video-player-container
+          ref={videoContainerRef}
+          style={{ height: "75vh", marginTop: "1.5rem", alignContent: "center", borderRadius: "10px", overflow: "hidden" }}
+        />
       </div>
-    </>
+      {!incall ? (
+        <div className="mx-auto flex w-64 flex-col self-center">
+          <UIToolKit />
+          <div className="w-4" />
+          <Button className="flex flex-1" onClick={startCall}>
+            Join
+          </Button>
+        </div>
+      ) : (
+        <div className="flex w-full flex-col justify-around self-center">
+          <div className="mt-4 flex w-[30rem] flex-1 justify-around self-center rounded-md bg-white p-4">
+            <CameraButton client={client} isVideoMuted={isVideoMuted} setIsVideoMuted={setIsVideoMuted} renderVideo={renderVideo} />
+            <MicButton isAudioMuted={isAudioMuted} client={client} setIsAudioMuted={setIsAudioMuted} />
+            <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
+            <RecordingButton client={client} />
+            <SettingsModal client={client} />
+            <Button variant={"destructive"} onClick={leaveCall}>
+              <PhoneOff />
+            </Button>
+          </div>
+          {/* <Transcipt transcriptionSubtitle={transcriptionSubtitle} /> */}
+          {/* <ActionModal client={client} /> */}
+        </div>
+      )}
+    </div>
   );
 };
 
