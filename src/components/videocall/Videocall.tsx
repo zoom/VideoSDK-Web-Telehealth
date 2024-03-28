@@ -3,50 +3,39 @@ import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { useToast } from "../ui/use-toast";
-import { LinkIcon, PhoneOff } from "lucide-react";
+import { PhoneOff } from "lucide-react";
 import { api } from "~/utils/api";
 import { WorkAroundForSafari } from "~/utils/safari";
 import ZoomVideo, { VideoQuality, type VideoPlayer } from "@zoom/videosdk";
 import SettingsModal from "./SettingsModal";
 import ActionModal from "./ActionModal";
-import Transcipt, { type TranscriptEleType } from "./Transcript";
+import { type setTranscriptionType } from "./Transcript";
 import UIToolKit from "./UIToolKit";
 import TranscriptionButton from "./TranscriptionButton";
 import RecordingButton from "./RecordingButton";
 import { CameraButton, MicButton } from "./MuteButtons";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 
-const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) => {
+const Videocall = (props: { jwt: string; session: string; isCreator: boolean; setTranscriptionSubtitle: setTranscriptionType }) => {
+  const { setTranscriptionSubtitle, isCreator, jwt, session } = props;
+  const client = useRef(ZoomVideo.createClient());
+  const [isVideoMuted, setIsVideoMuted] = useState(!client.current.getCurrentUserInfo()?.bVideoOn);
+  const [isAudioMuted, setIsAudioMuted] = useState(client.current.getCurrentUserInfo()?.muted ?? true);
+  const [incall, setIncall] = useState(false);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
+  const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
   const router = useRouter();
   const { data } = useSession();
   const { toast } = useToast();
-  const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
-  const videoContainerRef = useRef<HTMLDivElement>(null);
-  const client = useRef(ZoomVideo.createClient());
-  const [incall, setIncall] = useState(false);
-  const [isVideoMuted, setIsVideoMuted] = useState(!client.current.getCurrentUserInfo()?.bVideoOn);
-  const [isAudioMuted, setIsAudioMuted] = useState(client.current.getCurrentUserInfo()?.muted ?? true);
-  const [transcriptionSubtitle, setTranscriptionSubtitle] = useState<TranscriptEleType>({});
 
   const init = async () => {
     await client.current.init("en-US", "Global", { patchJsMedia: true });
     client.current.on("peer-video-state-change", (payload) => void renderVideo(payload));
-    await client.current.join(props.session, props.jwt, data?.user.name ?? "User").catch((e) => {
+    await client.current.join(session, jwt, data?.user.name ?? "User").catch((e) => {
       console.log(e);
     });
-    if (props.isCreator) {
-      await writeZoomSessionID.mutateAsync({ zoomSessionsId: client.current.getSessionInfo().sessionId, roomId: props.session });
-    }
-  };
-
-  const renderVideo = async (event: { action: "Start" | "Stop"; userId: number }) => {
-    const mediaStream = client.current.getMediaStream();
-    if (event.action === "Stop") {
-      const element = await mediaStream.detachVideo(event.userId);
-      Array.isArray(element) ? element.forEach((el) => el.remove()) : element.remove();
-    } else {
-      const userVideo = await mediaStream.attachVideo(event.userId, VideoQuality.Video_360P);
-      videoContainerRef.current!.appendChild(userVideo as VideoPlayer);
+    if (isCreator) {
+      await writeZoomSessionID.mutateAsync({ zoomSessionsId: client.current.getSessionInfo().sessionId, roomId: session });
     }
   };
 
@@ -61,6 +50,17 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
     await mediaStream.startVideo();
     setIsVideoMuted(!client.current.getCurrentUserInfo().bVideoOn);
     await renderVideo({ action: "Start", userId: client.current.getCurrentUserInfo().userId });
+  };
+
+  const renderVideo = async (event: { action: "Start" | "Stop"; userId: number }) => {
+    const mediaStream = client.current.getMediaStream();
+    if (event.action === "Stop") {
+      const element = await mediaStream.detachVideo(event.userId);
+      Array.isArray(element) ? element.forEach((el) => el.remove()) : element.remove();
+    } else {
+      const userVideo = await mediaStream.attachVideo(event.userId, VideoQuality.Video_360P);
+      videoContainerRef.current!.appendChild(userVideo as VideoPlayer);
+    }
   };
 
   // not sure about this yet
@@ -97,12 +97,11 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean }) 
             <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
             <RecordingButton client={client} />
             <SettingsModal client={client} />
+            <ActionModal client={client} />
             <Button variant={"destructive"} onClick={leaveCall}>
               <PhoneOff />
             </Button>
           </div>
-          {/* <Transcipt transcriptionSubtitle={transcriptionSubtitle} /> */}
-          {/* <ActionModal client={client} /> */}
         </div>
       )}
     </div>

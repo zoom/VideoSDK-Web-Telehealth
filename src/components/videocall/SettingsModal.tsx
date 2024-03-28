@@ -6,7 +6,6 @@ import { Label } from "~/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ZoomVideo from "@zoom/videosdk";
 import type { VideoClient } from "@zoom/videosdk";
-import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 import { Settings } from "lucide-react";
 
 const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) => {
