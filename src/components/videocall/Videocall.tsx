@@ -15,6 +15,7 @@ import TranscriptionButton from "./TranscriptionButton";
 import RecordingButton from "./RecordingButton";
 import { CameraButton, MicButton } from "./MuteButtons";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
+import { videoCallStyle } from "~/lib/utils";
 
 const Videocall = (props: { jwt: string; session: string; isCreator: boolean; setTranscriptionSubtitle: setTranscriptionType }) => {
   const { setTranscriptionSubtitle, isCreator, jwt, session } = props;
@@ -76,10 +77,7 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean; se
     <div className="flex h-full w-full flex-1 flex-col rounded-md px-4">
       <div className="flex w-full flex-1" style={incall ? {} : { display: "none" }}>
         {/* @ts-expect-error html component */}
-        <video-player-container
-          ref={videoContainerRef}
-          style={{ height: "75vh", marginTop: "1.5rem", alignContent: "center", borderRadius: "10px", overflow: "hidden" }}
-        />
+        <video-player-container ref={videoContainerRef} style={videoCallStyle} />
       </div>
       {!incall ? (
         <div className="mx-auto flex w-64 flex-col self-center">
@@ -97,7 +95,7 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean; se
             <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
             <RecordingButton client={client} />
             <SettingsModal client={client} />
-            <ActionModal client={client} />
+            <ActionModal />
             <Button variant={"destructive"} onClick={leaveCall}>
               <PhoneOff />
             </Button>

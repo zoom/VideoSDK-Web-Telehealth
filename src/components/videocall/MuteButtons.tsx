@@ -40,7 +40,7 @@ const CameraButton = (props: {
 
   return (
     <Button onClick={onCameraClick} variant={"outline"}>
-      {isVideoMuted ? <Video /> : <VideoOff />}
+      {isVideoMuted ? <VideoOff /> : <Video />}
     </Button>
   );
 };

@@ -5,7 +5,7 @@ export default function Document() {
   return (
     <Html>
       <Head />
-      <body>
+      <body className="overflow-x-hidden">
         <Main />
         <NextScript />
         <Script src="/coi-serviceworker.js" strategy="beforeInteractive" />
