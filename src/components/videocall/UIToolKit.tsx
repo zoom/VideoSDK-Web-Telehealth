@@ -1,11 +1,10 @@
 import uitoolkit from "@zoom/videosdk-ui-toolkit";
-import { useLayoutEffect, useRef } from "react";
-import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
+import { useEffect, useRef } from "react";
 
 const UIToolKit = () => {
   const previewContainerRef = useRef<HTMLDivElement>(null);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const preview = previewContainerRef;
     uitoolkit.openPreview(preview.current!);
     return () => {
