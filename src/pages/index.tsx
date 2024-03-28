@@ -4,8 +4,9 @@ import { useRouter } from "next/router";
 import DoctorView from "~/components/Doctor";
 import PatientView from "~/components/Patient";
 import { Button } from "~/components/ui/button";
-import LandingPage from "~/components/LandingPage";
-import InfoPanel from "~/components/InfoPanel";
+import LandingPage from "~/components/homepage/LandingPage";
+import InfoPanel from "~/components/homepage/InfoPanel";
+import About from "~/components/homepage/About";
 import Footer from "~/components/ui/footer";
 import Header from "~/components/ui/header";
 
@@ -24,8 +25,11 @@ export default function Home() {
   if (status === "unauthenticated") {
     return (
       <div>
+        <Header/>
         <LandingPage />
         <InfoPanel />
+        <About/>
+        <Footer/>
       </div>
       // <>
       //   <Header />

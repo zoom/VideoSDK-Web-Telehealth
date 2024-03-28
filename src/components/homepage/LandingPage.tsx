@@ -5,11 +5,10 @@ import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
-import InfoPanel from "./InfoPanel";
 
 const LandingPage = () => {
   return (
-    <section className="container grid place-items-center gap-10 py-20 md:py-32 lg:grid-cols-2">
+    <section className="container grid place-items-center gap-10 py-20 md:py-1 lg:grid-cols-2">
       <div className="space-y-6 text-center lg:text-start">
         <main className="text-5xl font-bold md:text-6xl">
           <h1 className="inline">
@@ -81,6 +80,8 @@ const LandingPage = () => {
       </div>
       <div className="shadow"></div>
     </section>
+  
+    
   );
 };
 

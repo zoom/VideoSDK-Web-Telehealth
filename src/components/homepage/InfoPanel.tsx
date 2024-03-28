@@ -25,10 +25,10 @@ const features: FeatureProps[] = [
 ];
 const InfoPanel = () => {
   return (
-    <section id="howItWorks" className="container py-24 text-center sm:py-32">
+    <section id="howItWorks" className="container py-24 text-center sm:py-1">
       <h2 className="text-3xl font-bold md:text-4xl ">
-        How It <span className="bg-gradient-to-b from-primary/60 to-primary bg-clip-text text-transparent">Works </span>
-        Step-by-Step Guide
+        How It <span className="bg-gradient-to-b from-primary/60 to-primary bg-clip-text text-transparent">Works: </span>
+        Using The Application
       </h2>
       <p className="mx-auto mb-8 mt-4 text-xl text-muted-foreground md:w-3/4">Experience The Power Zoom&apos;s Video SDK Offers</p>
 
