@@ -13,10 +13,11 @@ const DoctorView = () => {
 
   return (
     <>
-      <span className='py-20'>
-        <h2 className="mb-8 self-center text-2xl font-bold text-gray-700">Welcome Dr. {userData?.user.name}</h2>      
-        <h3 className="text-sm text-gray-700">Welcome to your dashboard, where you can view upcoming apointments, 
-      join scheduled</h3> <h3 className="text-sm text-gray-700">sessions, and view active users</h3>
+      <span className="py-8">
+        <h2 className="mb-8 self-center text-2xl font-bold text-gray-700">Welcome Dr. {userData?.user.name}</h2>
+        <h3 className="text-sm text-gray-700">
+          Welcome to your dashboard, where you can view upcoming apointments, join scheduled sessions, and view active users
+        </h3>
       </span>
       <div className="flex flex-1 flex-row justify-around">
         <div className="flex flex-1 flex-col">

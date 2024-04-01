@@ -1,5 +1,4 @@
-import { signIn, signOut, useSession } from "next-auth/react";
-import Image from "next/image";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import DoctorView from "~/components/Doctor";
 import PatientView from "~/components/Patient";
@@ -25,11 +24,11 @@ export default function Home() {
   if (status === "unauthenticated") {
     return (
       <div>
-        <Header/>
+        <Header />
         <LandingPage />
         <InfoPanel />
-        <About/>
-        <Footer/>
+        <About />
+        <Footer />
       </div>
     );
   }
@@ -44,9 +43,9 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
+      <div className="flex w-screen flex-col items-center bg-gray-100">
         <div className="mt-2 flex flex-col justify-center">{data?.user.role === "doctor" ? <DoctorView /> : <PatientView />}</div>
-        <Button variant={"outline"} className="mt-8 w-48 self-center" onClick={() => void signOut()}>
+        <Button variant={"outline"} className="my-8 w-48 self-center" onClick={() => void signOut()}>
           Sign Out
         </Button>
       </div>
