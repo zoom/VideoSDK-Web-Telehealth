@@ -13,31 +13,19 @@ export default function Footer() {
         <nav className="flex items-center gap-4 sm:gap-8 lg:gap-6">
           <Link
             className="flex items-center gap-2 text-sm font-medium uppercase tracking-wide text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            href="#"
+            href="/"
           >
             Home
           </Link>
           <Link
             className="flex items-center gap-2 text-sm font-medium uppercase tracking-wide text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            href="#"
-          >
-            Services
-          </Link>
-          <Link
-            className="flex items-center gap-2 text-sm font-medium uppercase tracking-wide text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            href="#"
+            href="/viewDoctors"
           >
             Doctors
           </Link>
           <Link
             className="flex items-center gap-2 text-sm font-medium uppercase tracking-wide text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            href="#"
-          >
-            Appointments
-          </Link>
-          <Link
-            className="flex items-center gap-2 text-sm font-medium uppercase tracking-wide text-gray-500 transition-colors hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-50"
-            href="#"
+            href="mailto:test@example.com"
           >
             Contact
           </Link>

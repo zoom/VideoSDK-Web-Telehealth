@@ -65,14 +65,14 @@ const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => 
   return (
     <div className="mb-4 flex flex-wrap justify-center">
       {isLoading ? (
-        <Card className="m-4 flex min-h-64 w-64 flex-col justify-center self-center rounded-lg bg-white p-5 text-center shadow-lg">
-          <Skeleton className="h-56 w-56 animate-pulse" />
+        <Card className="m-8 flex h-[28rem] w-80 flex-col justify-center self-center rounded-lg bg-white p-5 text-center shadow-lg">
+          <Skeleton className="h-96 w-full animate-pulse" />
         </Card>
       ) : rooms?.length === 0 ? (
         <Card className="m-4 flex min-h-64 w-64 flex-col justify-center self-center rounded-lg bg-white p-5 text-center shadow-lg">No Rooms</Card>
       ) : (
         rooms?.map((room) => (
-          <Card key={room.id} className="m-4 flex min-h-64 w-64 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
+          <Card key={room.id} className="mx-6 my-4 flex h-[28rem] w-80 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
             <UpcomingSession data={room} isDoctor={data?.user.role === "doctor"} key={room.id} />
           </Card>
         ))
