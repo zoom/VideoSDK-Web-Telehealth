@@ -7,9 +7,11 @@ import { generateSignature } from "~/utils/signJwt";
 export const sessionRouter = createTRPCRouter({
   create: protectedProcedure
     .input(z.object({
-      title: z.string().min(3), content: z.string(),
+      title: z.string().min(3),
+      content: z.string(),
       emails: z.array(z.string().email()).min(1),
-      time: z.date(), duration: z.number()
+      time: z.date().refine((date) => date.getTime() > Date.now()),
+      duration: z.number()
     }))
     .mutation(async ({ ctx, input }) => {
       const { title, content, emails, time, duration } = input;
