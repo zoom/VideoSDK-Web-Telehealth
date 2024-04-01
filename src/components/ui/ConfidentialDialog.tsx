@@ -7,25 +7,25 @@ const ConfidentialDialog = () => {
   const { data: userData } = useSession();
   const router = useRouter();
 
-  return userData?.user?.role === "patient" ? (
+  return (
     <Dialog defaultOpen>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Confidentiality Agreement</DialogTitle>
-          <DialogDescription>Some jargon goes here...</DialogDescription>
+          <DialogTitle>Notice</DialogTitle>
+          <DialogDescription>
+            {userData?.user?.role === "patient" ? "Patient Agreement: Confidentiality Clause" : "Doctor Info: captions are not medical grade"}
+          </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button type="button" variant="secondary" onClick={() => router.push("/")}>
             Back
           </Button>
           <DialogClose asChild>
-            <Button type="button">I agree</Button>
+            <Button type="button">{userData?.user?.role === "patient" ? "I agree" : "Okay"}</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  ) : (
-    <></>
   );
 };
 
