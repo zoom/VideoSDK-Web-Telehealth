@@ -44,7 +44,7 @@ export default function Home() {
     <>
       <Header />
       <div className="flex w-screen flex-col items-center bg-gray-100">
-        <div className="mt-2 flex flex-col justify-center">{data?.user.role === "doctor" ? <DoctorView /> : <PatientView />}</div>
+        <div className="mt-2 flex min-h-[70vh] flex-col justify-center">{data?.user.role === "doctor" ? <DoctorView /> : <PatientView />}</div>
         <Button variant={"outline"} className="my-8 w-48 self-center" onClick={() => void signOut()}>
           Sign Out
         </Button>
