@@ -20,7 +20,7 @@ const EmailInput = ({
   return (
     <>
       <Label htmlFor="email" className="mb-2">
-        Emails
+        Attendee Email
       </Label>
       {emails.map((email, index) => (
         <p className="my-2" key={index}>

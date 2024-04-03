@@ -2,8 +2,7 @@ import { type MutableRefObject, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { RecordingStatus } from "@zoom/videosdk";
 import type { RecordingClient, VideoClient } from "@zoom/videosdk";
-import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
-import { CircleDotIcon, CircleSlash2, LucideFileVideo } from "lucide-react";
+import { CircleDotIcon, CircleSlash2 } from "lucide-react";
 
 const RecordingButton = (props: { client: MutableRefObject<typeof VideoClient> }) => {
   const { client } = props;

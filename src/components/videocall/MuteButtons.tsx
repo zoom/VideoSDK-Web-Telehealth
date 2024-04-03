@@ -1,7 +1,6 @@
 import { type Dispatch, type MutableRefObject, type SetStateAction } from "react";
 import { Button } from "~/components/ui/button";
 import type { VideoClient } from "@zoom/videosdk";
-import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 import { Mic, MicOff, Video, VideoOff } from "lucide-react";
 
 const MicButton = (props: { client: MutableRefObject<typeof VideoClient>; isAudioMuted: boolean; setIsAudioMuted: Dispatch<SetStateAction<boolean>> }) => {
@@ -41,7 +40,7 @@ const CameraButton = (props: {
 
   return (
     <Button onClick={onCameraClick} variant={"outline"}>
-      {isVideoMuted ? <Video /> : <VideoOff />}
+      {isVideoMuted ? <VideoOff /> : <Video />}
     </Button>
   );
 };

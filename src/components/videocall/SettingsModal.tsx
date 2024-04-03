@@ -6,7 +6,6 @@ import { Label } from "~/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import ZoomVideo from "@zoom/videosdk";
 import type { VideoClient } from "@zoom/videosdk";
-import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 import { Settings } from "lucide-react";
 
 const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) => {
@@ -80,14 +79,14 @@ const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) 
         <DialogHeader>
           <DialogTitle>Select Your Preferred Device</DialogTitle>
         </DialogHeader>
-        <Tabs defaultValue="t1" className="mt-2 flex w-full flex-col self-center">
+        <Tabs defaultValue="t1" className="mt-2 flex w-[28rem] flex-col self-center ">
           <TabsList>
-            <TabsTrigger value="t1">Camera Settings</TabsTrigger>
-            <TabsTrigger value="t2">Audio Settings</TabsTrigger>
-            <TabsTrigger value="t3">Speaker Settings</TabsTrigger>
+            <TabsTrigger value="t1">Cameras</TabsTrigger>
+            <TabsTrigger value="t2">Microphones</TabsTrigger>
+            <TabsTrigger value="t3">Speakers</TabsTrigger>
           </TabsList>
           <TabsContent value="t1">
-            <RadioGroup className="my-4 flex flex-row">
+            <RadioGroup className="my-4 flex h-24 flex-row overflow-y-hidden overflow-x-scroll">
               {cameraList?.map((device) => (
                 <div className="flex items-center space-x-2" key={device.deviceId}>
                   <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setCameraDevice(device)} />
@@ -97,7 +96,7 @@ const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) 
             </RadioGroup>
           </TabsContent>
           <TabsContent value="t2">
-            <RadioGroup className="my-4 flex flex-row">
+            <RadioGroup className="my-4 flex h-24 flex-row overflow-y-hidden overflow-x-scroll">
               {micList?.map((device) => (
                 <div className="flex items-center space-x-2" key={device.deviceId}>
                   <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setMicDevice(device)} />
@@ -107,7 +106,7 @@ const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) 
             </RadioGroup>
           </TabsContent>
           <TabsContent value="t3">
-            <RadioGroup className="my-4 flex flex-row">
+            <RadioGroup className="my-4 flex h-24 flex-row overflow-y-hidden overflow-x-scroll">
               {speakerList?.map((device) => (
                 <div className="flex items-center space-x-2" key={device.deviceId}>
                   <RadioGroupItem value={device.label} id={device.deviceId} onClick={() => setSpeakerDevice(device)} />

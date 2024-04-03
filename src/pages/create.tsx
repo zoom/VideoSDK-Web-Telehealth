@@ -16,16 +16,18 @@ export default function Home() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [duration, setDuration] = useState<number>(1);
-  const [time, setTime] = useState<string>(new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60).toISOString().slice(0, 16));
   const [email, setEmail] = useState<string>("");
   const [emails, setEmails] = useState<string[]>([]);
+  // const timeNow = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60).toISOString().slice(0, 16);
+  const timeNowPlusOneHour = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60 + 60 * 60 * 1000).toISOString().slice(0, 16);
+  const [time, setTime] = useState<string>(timeNowPlusOneHour);
 
   return (
     <>
       <Header />
-      <div className="flex h-screen w-screen flex-col items-center bg-gray-100">
-        <h1 className="my-10 flex text-center text-3xl font-bold leading-none text-gray-700">Schedule Session</h1>
-        <Card className="mb-8 flex w-96 flex-col flex-wrap justify-center p-4 shadow-lg">
+      <div className="flex w-screen flex-col items-center bg-gray-100">
+        <h1 className="my-10 flex text-center text-3xl font-bold leading-none text-gray-700">Schedule Appointment</h1>
+        <Card className="mb-8 flex w-[32rem] flex-col flex-wrap justify-center p-8 shadow-lg">
           <form
             className="flex w-full flex-col"
             onSubmit={async (e) => {
@@ -44,7 +46,7 @@ export default function Home() {
               }}
             />
             <Label htmlFor="content" className="mb-2">
-              Content
+              Description
             </Label>
             <Input
               id="content"
@@ -118,7 +120,9 @@ export default function Home() {
           </form>
         </Card>
         <Link href="/">
-          <Button variant={"link"}>back</Button>
+          <Button variant={"link"} className="mb-8">
+            back
+          </Button>
         </Link>
       </div>
       <Footer />
