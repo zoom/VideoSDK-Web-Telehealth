@@ -1,6 +1,6 @@
 import { Button } from "~/components/ui/button";
 import { useToast } from "../ui/use-toast";
-import { LinkIcon, Sparkles } from "lucide-react";
+import { LinkIcon, Wand } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +17,7 @@ const ActionModal = () => {
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Button variant="outline">
-          <Sparkles />
+          <Wand />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
