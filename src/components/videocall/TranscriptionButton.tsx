@@ -1,7 +1,7 @@
 import { Button } from "~/components/ui/button";
 import { type Dispatch, type MutableRefObject, type SetStateAction, useRef, useState } from "react";
 import type { LiveTranscriptionClient, LiveTranscriptionMessage, VideoClient } from "@zoom/videosdk";
-import { MessageCircleMore, MessageCircleOff } from 'lucide-react';
+import { MessageSquareQuote, MessageSquareOff } from 'lucide-react';
 import { useToast } from "../ui/use-toast";
 
 const TranscriptionButton = (props: { setTranscriptionSubtitle: setTranscriptionSubtitle; client: MutableRefObject<typeof VideoClient> }) => {
@@ -37,7 +37,7 @@ const TranscriptionButton = (props: { setTranscriptionSubtitle: setTranscription
 
   return (
     <Button onClick={onTranscriptionClick} variant={isStartedLiveTranscription ? "default" : "outline"}>
-      {isStartedLiveTranscription ? <MessageCircleOff /> : <MessageCircleMore />}
+      {isStartedLiveTranscription ? <MessageSquareOff /> : <MessageSquareQuote />}
     </Button>
   );
 };
