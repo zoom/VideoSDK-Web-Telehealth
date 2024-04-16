@@ -16,7 +16,7 @@ import RecordingButton from "./RecordingButton";
 import { CameraButton, MicButton } from "./MuteButtons";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 import { videoCallStyle } from "~/lib/utils";
-import Chat from "./Chat";
+// import Chat from "./Chat";
 
 const Videocall = (props: { jwt: string; session: string; isCreator: boolean; setTranscriptionSubtitle: setTranscriptionType }) => {
   const { setTranscriptionSubtitle, isCreator, jwt, session } = props;
@@ -96,7 +96,7 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean; se
             <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
             <RecordingButton client={client} />
             <SettingsModal client={client} />
-            <Chat client={client}></Chat>
+            {/* <Chat client={client}></Chat> */}
             <ActionModal />
             <Button variant={"destructive"} onClick={leaveCall}>
               <PhoneOff />
