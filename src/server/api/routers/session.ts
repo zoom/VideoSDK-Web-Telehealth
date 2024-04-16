@@ -156,7 +156,10 @@ export const sessionRouter = createTRPCRouter({
     }),
   addNote: protectedProcedure.input(z.object({
     roomId: z.string(),
-    content: z.string(),
+    contentS: z.string(),
+    contentO: z.string(),
+    contentA: z.string(),
+    contentP: z.string(),
   })).mutation(async ({ ctx, input }) => {
     if (ctx.session.user.role !== "doctor") {
       throw new TRPCError({
@@ -166,7 +169,10 @@ export const sessionRouter = createTRPCRouter({
     }
     const note = await ctx.db.notes.create({
       data: {
-        content: input.content,
+        contentS: input.contentS,
+        contentO: input.contentO,
+        contentA: input.contentA,
+        contentP: input.contentP,
         roomId: input.roomId,
       }
     });

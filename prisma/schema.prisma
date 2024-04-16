@@ -94,7 +94,10 @@ model File {
 
 model Notes {
     id        String   @id @default(cuid())
-    content   String // @db.Text
+    contentS  String
+    contentO  String
+    contentA  String
+    contentP  String
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
     Room      Room     @relation(fields: [roomId], references: [id], onDelete: Cascade)
