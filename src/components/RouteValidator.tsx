@@ -18,8 +18,8 @@ const RouteValidator = ({ children }: { children: React.ReactNode }) => {
   }
 
   if (status === "unauthenticated") {
-    const route = router.asPath;
-    void signIn("github", { callbackUrl: route });
+    // const route = router.pathname;
+    void signIn();
     return (
       <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
         <h1>Loading...</h1>
