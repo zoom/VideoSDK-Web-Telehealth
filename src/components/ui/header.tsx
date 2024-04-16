@@ -3,14 +3,13 @@ import { Button } from "./button";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { Avatar } from "./avatar";
-import { AvatarFallback, AvatarImage } from "@radix-ui/react-avatar";
+import { AvatarImage } from "@radix-ui/react-avatar";
 
 function Header() {
   const { status, data } = useSession();
 
   return (
     <div className="w-screen bg-white px-4 lg:px-8">
-      
       <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
         <Image className="inline" src={"/logo.svg"} height={34} width={120} alt="product logo" />
         <div className="ml-auto flex gap-2">
@@ -37,11 +36,10 @@ function Header() {
               Sign Out
             </Button>
           ) : (
-            <Button onClick={() => void signIn("github")}>Sign in</Button>
+            <Button onClick={() => void signIn()}>Sign in</Button>
           )}
           <Avatar className="ml-4">
             <AvatarImage src={data?.user.image as string | undefined} alt="User Avatar" />
-            {/* <AvatarFallback>{data?.user.name?.toString()[0]}</AvatarFallback> */}
           </Avatar>
         </div>
       </header>
