@@ -36,7 +36,7 @@ const TranscriptionButton = (props: { setTranscriptionSubtitle: setTranscription
   };
 
   return (
-    <Button onClick={onTranscriptionClick} variant={isStartedLiveTranscription ? "default" : "outline"}>
+    <Button onClick={onTranscriptionClick} variant={isStartedLiveTranscription ? "default" : "outline"} title='transcription'>
       {isStartedLiveTranscription ? <MessageCircleOff /> : <MessageCircleMore />}
     </Button>
   );

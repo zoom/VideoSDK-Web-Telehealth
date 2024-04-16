@@ -11,7 +11,7 @@ const MicButton = (props: { client: MutableRefObject<typeof VideoClient>; isAudi
     setIsAudioMuted(client.current.getCurrentUserInfo().muted ?? true);
   };
   return (
-    <Button onClick={onMicrophoneClick} variant={"outline"}>
+    <Button onClick={onMicrophoneClick} variant={"outline"} title='microphone'>
       {isAudioMuted ? <MicOff /> : <Mic />}
     </Button>
   );
@@ -39,7 +39,7 @@ const CameraButton = (props: {
   };
 
   return (
-    <Button onClick={onCameraClick} variant={"outline"}>
+    <Button onClick={onCameraClick} variant={"outline"} title="camera">
       {isVideoMuted ? <VideoOff /> : <Video />}
     </Button>
   );

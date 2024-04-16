@@ -98,7 +98,7 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean; se
             <SettingsModal client={client} />
             {/* <Chat client={client}></Chat> */}
             <ActionModal />
-            <Button variant={"destructive"} onClick={leaveCall}>
+            <Button variant={"destructive"} onClick={leaveCall} title="leave call">
               <PhoneOff />
             </Button>
           </div>

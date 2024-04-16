@@ -71,7 +71,7 @@ const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button variant="outline" title='settings'>
           <Settings />
         </Button>
       </DialogTrigger>
