@@ -10,6 +10,7 @@ function Header() {
 
   return (
     <div className="w-screen bg-white px-4 lg:px-8">
+      
       <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
         <Image className="inline" src={"/logo.svg"} height={34} width={120} alt="product logo" />
         <div className="ml-auto flex gap-2">

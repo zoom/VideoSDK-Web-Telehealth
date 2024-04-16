@@ -54,7 +54,7 @@ export default function Home() {
               </span>
             </div>
             <div className=" h-full justify-center rounded-r-md bg-white p-4">
-              <RightBar data={data} transcriptionSubtitle={transcriptionSubtitle} />
+              <RightBar data={data} transcriptionSubtitle={transcriptionSubtitle}/>
             </div>
           </div>
           <Videocall
