@@ -59,7 +59,7 @@ export const S3Router = createTRPCRouter({
     }),
   getDownloadLink: protectedProcedure
     .input(z.object({ filename: z.string() }))
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       // if (ctx.session.user.role !== "doctor" || ctx.session.user.id !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
       const url = await getSignedUrl(S3, new GetObjectCommand({ Bucket: env.S3_BUCKET, Key: input.filename }), { expiresIn: 3600 })
       return url

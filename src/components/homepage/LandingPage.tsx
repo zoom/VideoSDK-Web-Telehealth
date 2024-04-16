@@ -3,7 +3,7 @@ import Image from "next/image";
 import { buttonVariants } from "~/components/ui/button";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { Button } from "~/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "~/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 const LandingPage = () => {
@@ -80,8 +80,6 @@ const LandingPage = () => {
       </div>
       <div className="shadow"></div>
     </section>
-  
-    
   );
 };
 
