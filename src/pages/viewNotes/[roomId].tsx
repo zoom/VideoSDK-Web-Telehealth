@@ -42,7 +42,13 @@ const ViewNotes = ({ roomId }: { roomId: string }) => {
   const { data, isLoading } = api.room.getNotesFromRoom.useQuery({ id: roomId });
   const addNote = api.room.addNote.useMutation();
   const { room } = api.useUtils();
-  const [note, setNote] = useState("");
+  const [S, setS] = useState("");
+  const [O, setO] = useState("");
+  const [A, setA] = useState("");
+  const [P, setP] = useState("");
+
+
+
 
   return (
     <>
@@ -63,9 +69,27 @@ const ViewNotes = ({ roomId }: { roomId: string }) => {
       <Card className="my-2 min-w-96 p-8">
         <div className="mb-4 flex flex-col">
           <Label htmlFor="note" className="font-bold">
-            Note
+            Subjective - Patient's Perspective
           </Label>
-          <textarea className="min-h-32 rounded-sm border-2 p-1" value={note} onChange={(e) => setNote(e.target.value)} />
+          <textarea className="min-h-8 rounded-sm border-2 p-1" value={S} onChange={(e) => setS(e.target.value)} />
+        </div>
+        <div className="mb-4 flex flex-col">
+          <Label htmlFor="note" className="font-bold">
+            Objective - Observed Objective Data
+          </Label>
+          <textarea className="min-h-8 rounded-sm border-2 p-1" value={O} onChange={(e) => setO(e.target.value)} />
+        </div>
+        <div className="mb-4 flex flex-col">
+          <Label htmlFor="note" className="font-bold">
+            Assessment - Summary of Patient's Status and Progress
+          </Label>
+          <textarea className="min-h-8 rounded-sm border-2 p-1" value={A} onChange={(e) => setA(e.target.value)} />
+        </div>
+        <div className="mb-4 flex flex-col">
+          <Label htmlFor="note" className="font-bold">
+            Planning - Actions Taken, Referrals, etc.
+          </Label>
+          <textarea className="min-h-8 rounded-sm border-2 p-1" value={P} onChange={(e) => setP(e.target.value)} />
         </div>
         {addNote.status !== "idle" ? <p>{addNote.status}</p> : <></>}
         <Button
