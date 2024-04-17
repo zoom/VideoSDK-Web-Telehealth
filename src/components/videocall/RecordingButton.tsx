@@ -20,7 +20,7 @@ const RecordingButton = (props: { client: MutableRefObject<typeof VideoClient> }
   };
 
   return (
-    <Button onClick={onRecordingClick} variant={isRecording === RecordingStatus.Recording ? "destructive" : "outline"} title='recording'>
+    <Button onClick={onRecordingClick} variant={isRecording === RecordingStatus.Recording ? "destructive" : "outline"} title="recording">
       {isRecording === RecordingStatus.Recording ? <CircleSlash2 /> : <CircleDotIcon />}
     </Button>
   );
