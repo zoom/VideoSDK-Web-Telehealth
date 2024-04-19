@@ -1,14 +1,13 @@
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import { type MutableRefObject, useRef, useState } from "react";
-import { type VideoClient, VideoQuality, type VideoPlayer } from "@zoom/videosdk";
+import { type VideoClient, VideoQuality, type VideoPlayer, type ChatMessage } from "@zoom/videosdk";
 import { PhoneOff } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { useToast } from "~/components/ui/use-toast";
+import { type ChatRecord } from "~/components/chat/Chat";
 import { api } from "~/utils/api";
 import { WorkAroundForSafari } from "~/utils/safari";
 import { videoCallStyle } from "~/lib/utils";
-import { type ChatRecord } from "~/components/chat/Chat";
 import SettingsModal from "./SettingsModal";
 import ActionModal from "./ActionModal";
 import { type setTranscriptionType } from "./Transcript";
@@ -24,19 +23,13 @@ const Videocall = (props: VideoCallProps) => {
   const [isAudioMuted, setIsAudioMuted] = useState(client.current.getCurrentUserInfo()?.muted ?? true);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
-  const router = useRouter();
   const { data } = useSession();
   const { toast } = useToast();
 
   const init = async () => {
     await client.current.init("en-US", "Global", { patchJsMedia: true });
     client.current.on("peer-video-state-change", (payload) => void renderVideo(payload));
-    client.current.on("chat-on-message", (payload) => {
-      props.setRecords((previous) => [...previous, payload]);
-      if (payload.sender.userId !== client.current.getCurrentUserInfo().userId) {
-        toast({ title: `Chat from: ${payload.sender.name}`, description: payload.message, duration: 1000 });
-      }
-    });
+    client.current.on("chat-on-message", onChatMessage);
     await client.current.join(session, jwt, data?.user.name ?? "User").catch((e) => {
       console.log(e);
     });
@@ -69,14 +62,21 @@ const Videocall = (props: VideoCallProps) => {
     }
   };
 
-  // not sure about this yet
+  const onChatMessage = (payload: ChatMessage) => {
+    props.setRecords((previous) => [...previous, payload]);
+    if (payload.sender.userId !== client.current.getCurrentUserInfo().userId) {
+      toast({ title: `Chat from: ${payload.sender.name}`, description: payload.message, duration: 1000 });
+    }
+  };
+
   const leaveCall = async () => {
     toast({ title: "Leaving", description: "Please wait..." });
     client.current.off("peer-video-state-change", (payload: { action: "Start" | "Stop"; userId: number }) => void renderVideo(payload));
-    client.current.off("chat-on-message", (payload: ChatRecord) => props.setRecords((previous) => [...previous, payload]));
+    client.current.off("chat-on-message", onChatMessage);
     await client.current.leave().catch((e) => console.log("leave error", e));
-    setInCall(false);
-    await router.push("/", undefined, { shallow: false });
+    // hard refresh to reset the state
+    window.location.href = "/";
+    // setInCall(false);
   };
 
   return (
