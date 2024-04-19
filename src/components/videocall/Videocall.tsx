@@ -1,12 +1,14 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
-import { Button } from "~/components/ui/button";
-import { useToast } from "../ui/use-toast";
+import { type MutableRefObject, useRef, useState } from "react";
+import { type VideoClient, VideoQuality, type VideoPlayer } from "@zoom/videosdk";
 import { PhoneOff } from "lucide-react";
+import { Button } from "~/components/ui/button";
+import { useToast } from "~/components/ui/use-toast";
 import { api } from "~/utils/api";
 import { WorkAroundForSafari } from "~/utils/safari";
-import ZoomVideo, { VideoQuality, type VideoPlayer } from "@zoom/videosdk";
+import { videoCallStyle } from "~/lib/utils";
+import { type ChatRecord } from "~/components/chat/Chat";
 import SettingsModal from "./SettingsModal";
 import ActionModal from "./ActionModal";
 import { type setTranscriptionType } from "./Transcript";
@@ -15,12 +17,10 @@ import TranscriptionButton from "./TranscriptionButton";
 import RecordingButton from "./RecordingButton";
 import { CameraButton, MicButton } from "./MuteButtons";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
-import { videoCallStyle } from "~/lib/utils";
-// import Chat from "./Chat";
 
-const Videocall = (props: { jwt: string; session: string; isCreator: boolean; setTranscriptionSubtitle: setTranscriptionType }) => {
+const Videocall = (props: VideoCallProps) => {
   const { setTranscriptionSubtitle, isCreator, jwt, session } = props;
-  const client = useRef(ZoomVideo.createClient());
+  const client = props.client;
   const [isVideoMuted, setIsVideoMuted] = useState(!client.current.getCurrentUserInfo()?.bVideoOn);
   const [isAudioMuted, setIsAudioMuted] = useState(client.current.getCurrentUserInfo()?.muted ?? true);
   const [incall, setIncall] = useState(false);
@@ -33,6 +33,7 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean; se
   const init = async () => {
     await client.current.init("en-US", "Global", { patchJsMedia: true });
     client.current.on("peer-video-state-change", (payload) => void renderVideo(payload));
+    client.current.on("chat-on-message", (payload) => props.setRecords((previous) => [...previous, payload]));
     await client.current.join(session, jwt, data?.user.name ?? "User").catch((e) => {
       console.log(e);
     });
@@ -68,7 +69,8 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean; se
   // not sure about this yet
   const leaveCall = async () => {
     toast({ title: "Leaving", description: "Please wait..." });
-    client.current.off("peer-video-state-change", () => void renderVideo);
+    client.current.off("peer-video-state-change", (payload: { action: "Start" | "Stop"; userId: number }) => void renderVideo(payload));
+    client.current.off("chat-on-message", (payload: ChatRecord) => props.setRecords((previous) => [...previous, payload]));
     await client.current.leave().catch((e) => console.log("leave error", e));
     setIncall(false);
     await router.push("/", undefined, { shallow: false });
@@ -96,7 +98,6 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean; se
             <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
             <RecordingButton client={client} />
             <SettingsModal client={client} />
-            {/* <Chat client={client}></Chat> */}
             <ActionModal />
             <Button variant={"destructive"} onClick={leaveCall} title="leave call">
               <PhoneOff />
@@ -106,6 +107,15 @@ const Videocall = (props: { jwt: string; session: string; isCreator: boolean; se
       )}
     </div>
   );
+};
+
+type VideoCallProps = {
+  jwt: string;
+  session: string;
+  isCreator: boolean;
+  setTranscriptionSubtitle: setTranscriptionType;
+  setRecords: React.Dispatch<React.SetStateAction<ChatRecord[]>>;
+  client: MutableRefObject<typeof VideoClient>;
 };
 
 export default Videocall;
