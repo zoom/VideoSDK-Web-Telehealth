@@ -19,11 +19,9 @@ import { CameraButton, MicButton } from "./MuteButtons";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 
 const Videocall = (props: VideoCallProps) => {
-  const { setTranscriptionSubtitle, isCreator, jwt, session } = props;
-  const client = props.client;
+  const { setTranscriptionSubtitle, isCreator, jwt, session, client, inCall, setInCall } = props;
   const [isVideoMuted, setIsVideoMuted] = useState(!client.current.getCurrentUserInfo()?.bVideoOn);
   const [isAudioMuted, setIsAudioMuted] = useState(client.current.getCurrentUserInfo()?.muted ?? true);
-  const [incall, setIncall] = useState(false);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
   const router = useRouter();
@@ -33,7 +31,12 @@ const Videocall = (props: VideoCallProps) => {
   const init = async () => {
     await client.current.init("en-US", "Global", { patchJsMedia: true });
     client.current.on("peer-video-state-change", (payload) => void renderVideo(payload));
-    client.current.on("chat-on-message", (payload) => props.setRecords((previous) => [...previous, payload]));
+    client.current.on("chat-on-message", (payload) => {
+      props.setRecords((previous) => [...previous, payload]);
+      if (payload.sender.userId !== client.current.getCurrentUserInfo().userId) {
+        toast({ title: `Chat from: ${payload.sender.name}`, description: payload.message, duration: 1000 });
+      }
+    });
     await client.current.join(session, jwt, data?.user.name ?? "User").catch((e) => {
       console.log(e);
     });
@@ -45,7 +48,7 @@ const Videocall = (props: VideoCallProps) => {
   const startCall = async () => {
     toast({ title: "Joining", description: "Please wait..." });
     await init();
-    setIncall(true);
+    setInCall(true);
     const mediaStream = client.current.getMediaStream();
     // @ts-expect-error https://stackoverflow.com/questions/7944460/detect-safari-browser/42189492#42189492
     window.safari ? await WorkAroundForSafari(client.current) : await mediaStream.startAudio();
@@ -72,17 +75,17 @@ const Videocall = (props: VideoCallProps) => {
     client.current.off("peer-video-state-change", (payload: { action: "Start" | "Stop"; userId: number }) => void renderVideo(payload));
     client.current.off("chat-on-message", (payload: ChatRecord) => props.setRecords((previous) => [...previous, payload]));
     await client.current.leave().catch((e) => console.log("leave error", e));
-    setIncall(false);
+    setInCall(false);
     await router.push("/", undefined, { shallow: false });
   };
 
   return (
     <div className="flex h-full w-full flex-1 flex-col rounded-md px-4">
-      <div className="flex w-full flex-1" style={incall ? {} : { display: "none" }}>
+      <div className="flex w-full flex-1" style={inCall ? {} : { display: "none" }}>
         {/* @ts-expect-error html component */}
         <video-player-container ref={videoContainerRef} style={videoCallStyle} />
       </div>
-      {!incall ? (
+      {!inCall ? (
         <div className="mx-auto flex w-64 flex-col self-center">
           <UIToolKit />
           <div className="w-4" />
@@ -116,6 +119,8 @@ type VideoCallProps = {
   setTranscriptionSubtitle: setTranscriptionType;
   setRecords: React.Dispatch<React.SetStateAction<ChatRecord[]>>;
   client: MutableRefObject<typeof VideoClient>;
+  inCall: boolean;
+  setInCall: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 export default Videocall;

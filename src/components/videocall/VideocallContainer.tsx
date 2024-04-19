@@ -13,6 +13,7 @@ import Videocall from "~/components/videocall/Videocall";
 import { type ChatRecord } from "~/components/chat/Chat";
 
 const Home = () => {
+  const [inCall, setInCall] = useState(false);
   const router = useRouter();
   const { data, isLoading, isError, error } = api.room.getById.useQuery(
     { id: `${router.query.slug as string}` },
@@ -57,7 +58,7 @@ const Home = () => {
               </span>
             </div>
             <div className=" h-full justify-center rounded-r-md bg-white p-4">
-              <RightBar data={data} transcriptionSubtitle={transcriptionSubtitle} client={client} records={records} />
+              <RightBar data={data} transcriptionSubtitle={transcriptionSubtitle} client={client} records={records} inCall={inCall} />
             </div>
           </div>
           <Videocall
@@ -67,6 +68,8 @@ const Home = () => {
             setRecords={setRecords}
             isCreator={data.room.User_CreatedBy.id === userData?.user.id}
             setTranscriptionSubtitle={setTranscriptionSubtitle}
+            inCall={inCall}
+            setInCall={setInCall}
           />
         </div>
         <ConfidentialDialog />

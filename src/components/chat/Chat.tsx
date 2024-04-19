@@ -54,13 +54,11 @@ const ChatMessageItem = (props: { record: ChatRecord; currentUserId: number }) =
   return (
     <div className="mt-4">
       <div className="flex flex-row items-center justify-between text-sm">
-        <div className="px-1 font-bold" style={isCurrentUser ? { textAlign: "right", marginLeft: "auto" } : {}}>
-          {isCurrentUser ? "" : sender.name.split(" ")[0]}
-        </div>
+        <div className="px-1 font-bold">{isCurrentUser ? "" : sender.name.split(" ")[0]}</div>
       </div>
       <div
-        className="right-0 ml-auto w-max max-w-64 rounded-md bg-blue-500 px-2 py-1 text-right text-white"
-        style={!isCurrentUser ? { backgroundColor: "rgb(243 244 246)", textAlign: "left", color: "black", marginLeft: "inherit", marginRight: 10 } : {}}
+        className="right-0 ml-auto w-max max-w-64 rounded-md bg-blue-500 px-2 py-1 text-white"
+        style={!isCurrentUser ? { backgroundColor: "rgb(243 244 246)", color: "black", marginLeft: "inherit", marginRight: 10 } : {}}
       >
         <p className="text-md break-words leading-5">{message}</p>
         <div className="mt-1 text-[10px]">{new Date(timestamp).toLocaleTimeString()}</div>
