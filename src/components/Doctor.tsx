@@ -28,7 +28,14 @@ const DoctorView = () => {
             ) : data?.[0] ? (
               <UpcomingSession data={data[0]} isDoctor />
             ) : (
-              <div className="flex flex-1 flex-col justify-center text-lg">No Appointments</div>
+              <div className="flex flex-1 flex-col justify-center text-lg">
+                <p>No Appointments</p>
+                <Link href={"/create"}>
+                  <Button variant={"default"} className="m-4 mb-2 text-lg">
+                    Create an Appointment
+                  </Button>
+                </Link>
+              </div>
             )}
           </Card>
         </div>
@@ -39,7 +46,7 @@ const DoctorView = () => {
               <Link href={"/create"} className="m-2 flex flex-row justify-around">
                 <Button>
                   <CalendarPlus size={20} className="mr-2" />
-                  Schedule
+                  Create
                 </Button>
               </Link>
               <Link href={"/viewRooms"} className="m-2 flex flex-row justify-around">
