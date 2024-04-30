@@ -9,6 +9,8 @@ import moment from "moment";
 import Header from "~/components/ui/header";
 import Footer from "~/components/ui/footer";
 import EmailInput from "~/components/ui/emailInput";
+import { useRouter } from "next/router";
+import { useToast } from "~/components/ui/use-toast";
 
 export default function Home() {
   const createPost = api.room.create.useMutation();
@@ -18,6 +20,8 @@ export default function Home() {
   const [duration, setDuration] = useState<number>(1);
   const [email, setEmail] = useState<string>("");
   const [emails, setEmails] = useState<string[]>([]);
+  const router = useRouter();
+  const { toast } = useToast();
   // const timeNow = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60).toISOString().slice(0, 16);
   const timeNowPlusOneHour = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60 + 60 * 60 * 1000).toISOString().slice(0, 16);
   const [time, setTime] = useState<string>(timeNowPlusOneHour);
@@ -105,7 +109,12 @@ export default function Home() {
                 const utcTime = moment(time).utc().toDate();
                 try {
                   await createPost.mutateAsync({ title, content, emails, duration, time: utcTime });
+                  toast({
+                    title: "Success",
+                    description: "Appointment created, redirecting...",
+                  });
                   await utils.room.getCreatedUpcoming.invalidate();
+                  await router.push("/");
                 } catch (e) {
                   console.error(e);
                 }
