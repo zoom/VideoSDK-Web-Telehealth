@@ -28,7 +28,7 @@ export default function Home() {
         <div>
     
               <Rooms rooms={createdRoomsPast} isLoading={loading1} />
-
+ 
         </div>
         <h3 className="text-left text-xl font-sans text-gray-700">Past Appointments</h3>
         <div>
@@ -59,32 +59,32 @@ const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => 
         <Card className="m-4 flex min-h-64 w-64 flex-col justify-center self-center rounded-lg bg-white p-5 text-center shadow-lg">No Rooms</Card>
       ) : (
         rooms?.map((room) => (
-          // <Card key={room.id} classNameName="mx-6 my-4 flex h-[28rem] w-80 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
-          //           <div className="pr-4 bg-blue-200 p-2 rounded-lg text-center">
-          //             <p className="text-4xl font-bold text-white">18th</p>
-          //             <p className="text-sm text-white">November, 2023</p>
-          //           </div>
-          //   <UpcomingSession data={room} isDoctor={data?.user.role === "doctor"} key={room.id} />
+          // <Card key={room.id} className="mx-6 my-4 flex h-[28rem] w-80 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
+          <div className='items-start'>
+
+            <UpcomingSession data={room} isDoctor={data?.user.role === "doctor"} key={room.id} />
         
-          // </Card>
-          <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl m-5">
-          <div className="p-8 flex items-center">
-              <div className="pr-4 bg-blue-200 p-2 rounded-lg text-center">
-              <p className="text-4xl font-bold text-white">{room.time.toString().slice(4,11)}</p>
-              </div>
-              <div className="ml-4">
-              <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">{room.title}</div>
-              <p className="mt-2 text-gray-500">{room.time.toString().slice(16, 21)} - </p>
-              <p className="mt-2 text-gray-500">Dr. {room.User_CreatedBy?.name}, Cardiology Specialist</p>
-              <Avatar className="ml-4">
-                <AvatarImage src={data?.user.image as string | undefined} alt="User Avatar" />
-              </Avatar>              
-              <p className="mt-2 text-gray-500">Patient: {room.User_CreatedFor?.[0].name}</p>
-              {/* <img className="h-16 w-16 rounded-full mx-auto" src="https://randomuser.me/api/portraits/women/50.jpg" alt="Patient's Image"> */}
-              {/* <UpcomingSession data={room} isDoctor={data?.user.role === 'doctor'} key={room.id} /> */}
-              </div>
           </div>
-          </div>
+          
+          // <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl m-5">
+          // <div className="p-8 flex items-center">
+          //     <div className="pr-4 bg-blue-200 p-2 rounded-lg text-center">
+          //     <p className="text-4xl font-bold text-white">{room.time.toString().slice(4,11)}</p>
+          //     </div>
+          //     <div className="ml-4">
+          //     <div className="uppercase tracking-wide text-sm text-indigo-500 font-semibold">{room.title}</div>
+          //     <p className="mt-2 text-gray-500">{room.time.toString().slice(16, 21)} - </p>
+          //     <p className="mt-2 text-gray-500">Dr. {room.User_CreatedBy?.name}, Cardiology Specialist</p>
+          //     <Avatar className="ml-4">
+          //       <AvatarImage src={data?.user.image as string | undefined} alt="User Avatar" />
+          //     </Avatar>              
+          //     <p className="mt-2 text-gray-500">Patient: {room.User_CreatedFor?.[0].name}</p>
+          //     {/* <img className="h-16 w-16 rounded-full mx-auto" src="https://randomuser.me/api/portraits/women/50.jpg" alt="Patient's Image"> */}
+  
+          //     </div>
+          // </div>
+          
+          // </div>
         ))
       )}
     </div>
