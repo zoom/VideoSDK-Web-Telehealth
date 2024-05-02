@@ -2,11 +2,14 @@ import { signIn } from "next-auth/react";
 import Image from "next/image";
 import { buttonVariants } from "~/components/ui/button";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { useRouter } from "next/router";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 
 const LandingPage = () => {
+  const router = useRouter();
+
   return (
     <section className="container grid place-items-center gap-10 py-20 md:py-1 lg:grid-cols-2">
       <div className="space-y-6 text-center lg:text-start">

@@ -44,10 +44,10 @@ const DoctorView = () => {
               </Link>
             </div>
           </Card>
-          <h3 className="self-center text-xl font-bold text-gray-700">View Users</h3>
+          <h3 className="self-center text-xl font-bold text-gray-700">Your Patients</h3>
           <Card className="m-4 mx-8 flex h-full w-48 flex-col justify-around self-center rounded-lg bg-white p-4 text-center shadow-sm">
             <div className="flex flex-col justify-center">
-              <Link href={"/viewPatients"} className="m-2 flex flex-row justify-around">
+              {/* <Link href={"/viewPatients"} className="m-2 flex flex-row justify-around">
                 <Button variant={"outline"}>
                   <UserSearch size={18} className="mr-2" />
                   Patients
@@ -59,7 +59,10 @@ const DoctorView = () => {
                   <BadgePlus className="mr-2" />
                   Doctors
                 </Button>
-              </Link>
+              </Link> */}
+              <li className="hover:underline">
+                John Smith
+              </li>
             </div>
           </Card>
         </div>
