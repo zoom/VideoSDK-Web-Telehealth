@@ -103,6 +103,7 @@ export default function Home() {
               <></>
             )}
             <Button
+              disabled={createAppointment.status === "loading" || !(title && content && emails.length > 0 && duration && time)}
               onClick={async () => {
                 const utcTime = moment(time).utc().toDate();
                 try {
