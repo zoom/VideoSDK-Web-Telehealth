@@ -36,7 +36,13 @@ bun install # or npm install
 
 3. Copy the `.env.example` file to `.env` and fill in the required values
 
-4. Run the app
+4. Sync the database schema
+
+```bash
+bunx prisma db push
+```
+
+5. Run the app
 
 ```bash
 bun dev # or npm run dev
