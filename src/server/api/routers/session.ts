@@ -8,11 +8,11 @@ export const sessionRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        title: z.string().min(3),
-        content: z.string(),
-        emails: z.array(z.string().email()).min(1),
-        time: z.date().refine((date) => date.getTime() > Date.now()),
-        duration: z.number(),
+        title: z.string().refine((title) => title.length > 2, { message: "Please add a title of at least 3 characters" }),
+        content: z.string().refine((content) => content.length > 2, { message: "Please add description of at least 3 characters" }),
+        emails: z.array(z.string().email()).refine((emails) => emails.length > 0, { message: "Please add an email and click the add button" }),
+        time: z.date().refine((date) => date.getTime() > Date.now(), { message: "Time must be in the future" }),
+        duration: z.number().refine((duration) => duration > 0, { message: "Duration must be greater than 0" }),
       })
     )
     .mutation(async ({ ctx, input }) => {

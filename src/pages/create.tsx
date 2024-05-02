@@ -13,7 +13,7 @@ import { useRouter } from "next/router";
 import { useToast } from "~/components/ui/use-toast";
 
 export default function Home() {
-  const createPost = api.room.create.useMutation();
+  const createAppointment = api.room.create.useMutation();
   const utils = api.useUtils();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -22,7 +22,6 @@ export default function Home() {
   const [emails, setEmails] = useState<string[]>([]);
   const router = useRouter();
   const { toast } = useToast();
-  // const timeNow = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60).toISOString().slice(0, 16);
   const timeNowPlusOneHour = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60 + 60 * 60 * 1000).toISOString().slice(0, 16);
   const [time, setTime] = useState<string>(timeNowPlusOneHour);
 
@@ -92,13 +91,12 @@ export default function Home() {
                 }}
               />
             </div>
-            <p className="mb-4 text-center">{createPost.status !== "idle" ? createPost.status : ""}</p>
-            {createPost.error?.data?.zodError ? (
+            {createAppointment.status === "loading" ? <p className="mb-4 text-center">Loading...</p> : <></>}
+            {createAppointment.status === "error" ? <p className="mb-4 text-center text-sm">Uh-oh, we weren&apos;t able to create your appointment:</p> : <></>}
+            {createAppointment.error?.data?.zodError ? (
               <p className="mb-4 text-center text-sm">
-                {Object.entries(createPost.error.data.zodError.fieldErrors).map((fieldData, index) => (
-                  <p key={index}>
-                    {fieldData[0]}: {fieldData[1]}
-                  </p>
+                {Object.entries(createAppointment.error.data.zodError.fieldErrors).map((fieldData, index) => (
+                  <p key={index}>{fieldData[1]}</p>
                 ))}
               </p>
             ) : (
@@ -108,7 +106,7 @@ export default function Home() {
               onClick={async () => {
                 const utcTime = moment(time).utc().toDate();
                 try {
-                  await createPost.mutateAsync({ title, content, emails, duration, time: utcTime });
+                  await createAppointment.mutateAsync({ title, content, emails, duration, time: utcTime });
                   toast({
                     title: "Success",
                     description: "Appointment created, redirecting...",
