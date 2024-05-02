@@ -3,10 +3,10 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const userRouter = createTRPCRouter({
-  getUserByEmail: protectedProcedure
-    .input(z.object({ email: z.string().email() }))
+  getUserById: protectedProcedure
+    .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({ where: { email: input.email } });
+      const user = await ctx.db.user.findUnique({ where: { id: input.id } });
       if (user) {
         return user;
       } else {

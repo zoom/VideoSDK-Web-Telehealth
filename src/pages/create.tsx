@@ -8,7 +8,7 @@ import { api } from "~/utils/api";
 import moment from "moment";
 import Header from "~/components/ui/header";
 import Footer from "~/components/ui/footer";
-import EmailInput from "~/components/ui/emailInput";
+import IDInput from "~/components/ui/emailInput";
 
 export default function Home() {
   const createPost = api.room.create.useMutation();
@@ -16,8 +16,8 @@ export default function Home() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [duration, setDuration] = useState<number>(1);
-  const [email, setEmail] = useState<string>("");
-  const [emails, setEmails] = useState<string[]>([]);
+  const [ID, setID] = useState<string>("");
+  const [IDs, setIDs] = useState<string[]>([]);
   // const timeNow = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60).toISOString().slice(0, 16);
   const timeNowPlusOneHour = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60 + 60 * 60 * 1000).toISOString().slice(0, 16);
   const [time, setTime] = useState<string>(timeNowPlusOneHour);
@@ -56,8 +56,7 @@ export default function Home() {
                 setContent(e.target.value);
               }}
             />
-            <EmailInput email={email} emails={emails} setEmail={setEmail} setEmails={setEmails} />
-
+            <IDInput ID={ID} IDs={IDs} setID={setID} setIDs={setIDs} />
             <Label htmlFor="duration" className="mb-2">
               Duration
             </Label>
@@ -104,15 +103,15 @@ export default function Home() {
               onClick={async () => {
                 const utcTime = moment(time).utc().toDate();
                 try {
-                  await createPost.mutateAsync({ title, content, emails, duration, time: utcTime });
+                  await createPost.mutateAsync({ title, content, IDs, duration, time: utcTime });
                   await utils.room.getCreatedUpcoming.invalidate();
                 } catch (e) {
                   console.error(e);
                 }
                 setTitle("");
                 setContent("");
-                setEmail("");
-                setEmails([]);
+                setID("");
+                setIDs([]);
               }}
             >
               Create

@@ -1,66 +1,70 @@
+import { type User } from "@prisma/client";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { api } from "~/utils/api";
 
-const EmailInput = ({
-  email,
-  emails,
-  setEmail,
-  setEmails,
+const IDInput = ({
+  ID,
+  IDs,
+  setID,
+  setIDs,
 }: {
-  email: string;
-  emails: string[];
-  setEmail: React.Dispatch<React.SetStateAction<string>>;
-  setEmails: React.Dispatch<React.SetStateAction<string[]>>;
+  ID: string;
+  IDs: string[];
+  setID: React.Dispatch<React.SetStateAction<string>>;
+  setIDs: React.Dispatch<React.SetStateAction<string[]>>;
 }) => {
-  const getUser = api.user.getUserByEmail.useMutation();
-  const [emailError, setEmailError] = useState<string>("");
+  const getUser = api.user.getUserById.useMutation();
+  const [IDError, setIDError] = useState<string>("");
+  const [user, setUser] = useState<User>();
   return (
     <>
-      <Label htmlFor="email" className="mb-2">
-        Attendee Email
+      <Label htmlFor="ID" className="mb-2">
+        Attendee ID
       </Label>
-      {emails.map((email, index) => (
+      {IDs.map((id, index) => (
         <p className="my-2" key={index}>
-          - {email}
+          - {id}
+          <div>{user?.name}</div>
         </p>
       ))}
       <div>
-        <p className="mb-2 text-sm text-red-800">{emailError}</p>
+        <p className="mb-2 text-sm text-red-800">{IDError}</p>
       </div>
       {/* only allow one patient for now */}
-      {emails.length < 1 ? (
+      {IDs.length < 1 ? (
         <div className="flex">
           <Input
-            id="email"
+            id="ID"
             className="mb-4 mr-2"
-            value={email}
+            value={ID}
             onChange={(e) => {
-              setEmail(e.target.value);
+              setID(e.target.value);
             }}
           />
           <Button
             className="mb-4 ml-2"
             onClick={async () => {
-              if (!email) {
+              if (!ID) {
                 return;
               }
-              setEmailError("");
-              if (emails.includes(email)) {
-                setEmailError("Email already added");
+              setIDError("");
+              if (IDs.includes(ID)) {
+                setIDError("ID already added");
                 return;
               }
               let user;
               try {
-                user = await getUser.mutateAsync({ email });
+                user = await getUser.mutateAsync({ id: ID });
               } catch (e) {
-                setEmailError("User not found");
+                setIDError("User not found");
               }
               if (user) {
-                setEmails([...emails, email]);
-                setEmail("");
+                setUser(user);
+                setIDs([...IDs, ID]);
+                setID("");
               }
             }}
           >
@@ -74,4 +78,4 @@ const EmailInput = ({
   );
 };
 
-export default EmailInput;
+export default IDInput;

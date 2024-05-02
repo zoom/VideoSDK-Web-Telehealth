@@ -47,7 +47,7 @@ const ViewPatient = () => {
                 Date of Birth: <span className="font-bold">{patient?.DOB?.toDateString().split(" ").slice(1).join(" ")}</span>
               </p>
               <p>
-                Email: <span className="font-bold">{patient.User?.email}</span>
+                Invite ID: <span className="font-bold">{patient.userId}</span>
               </p>
               <Link href={`/viewPatient/${patient.userId}`} className="mt-4">
                 <Button variant={"secondary"}>View details</Button>
