@@ -114,21 +114,21 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
         <div className="max-w-md mx-auto bg-white rounded-xl shadow-md overflow-hidden md:max-w-2xl m-5">
            
                    <div className="mb-2 mt-4 flex flex-1 flex-row justify-center">
-                   <Link className="flex w-full flex-1 text-sm text-blue-500" href={`/room/${rooms.id}`}>
+                   <Link className="flex w-full flex-1 text-sm text-blue-500 hover:underline" href={`/room/${rooms.id}`}>
                      Join Session
                    </Link>
                      </div>
           <Button
-            variant={"destructive"}
+            // variant={"destructive"}
             className="absolute right"
             onClick={async () => {
               toast({ title: "Deleting Room", description: rooms.title });
               await deleteRoom.mutateAsync({ id: rooms.id });
               await utils.room.invalidate();              
             }}
-            title="delete appointment"
+            title="Cancel appointment"
           >
-            <X size={12} />
+           Cancel Session
           </Button>
           <div className="p-8 flex items-center">
               <div className="items-start">
@@ -162,7 +162,7 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
                 <AvatarImage src={data?.user.image as string | undefined} alt="User Avatar" />
               </Avatar>               */}
                 <Link href={`/viewPatient/${rooms.User_CreatedFor?.[0].id}`} className="mt-2 text-gray-500">
-                <p className="mt-2 text-blue-500" title='click for patient details'>Patient: {rooms.User_CreatedFor?.[0].name}</p>
+                <p className="mt-2 text-grey-500 hover:text-blue-500" title='click for patient details'>Patient: {rooms.User_CreatedFor?.[0].name}</p>
                 </Link>
               {/* <p className="mt-2 text-gray-500">Patient: {rooms.User_CreatedFor?.[0].name}</p> */}
                  {isDoctor && rooms.User_CreatedFor?.[0]?.id ? (

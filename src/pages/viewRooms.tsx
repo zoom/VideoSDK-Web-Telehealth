@@ -27,12 +27,12 @@ export default function Home() {
         <h3 className="gray text-left text-xl font-sans text-gray-700">Upcoming Appointments</h3>
         <div>
     
-              <Rooms rooms={createdRoomsPast} isLoading={loading1} />
+              <Rooms rooms={createdRoomsUpcoming} isLoading={loading1} />
  
         </div>
         <h3 className="text-left text-xl font-sans text-gray-700">Past Appointments</h3>
         <div>
-              <Rooms rooms={invitedRoomsPast} isLoading={loading3} />
+              <Rooms rooms={createdRoomsPast} isLoading={loading3} />
         </div>
     
         <Link href="/">
@@ -56,7 +56,7 @@ const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => 
           <Skeleton className="h-96 w-full animate-pulse" />
         </Card>
       ) : rooms?.length === 0 ? (
-        <Card className="m-4 flex min-h-64 w-64 flex-col justify-center self-center rounded-lg bg-white p-5 text-center shadow-lg">No Rooms</Card>
+        <Card className="m-4 flex min-h-64 w-64 flex-col justify-center self-center rounded-lg bg-white p-5 text-center shadow-lg">You have no upcoming appointments</Card>
       ) : (
         rooms?.map((room) => (
           // <Card key={room.id} className="mx-6 my-4 flex h-[28rem] w-80 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">

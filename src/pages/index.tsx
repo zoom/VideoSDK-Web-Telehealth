@@ -4,6 +4,7 @@ import DoctorView from "~/components/Doctor";
 import PatientView from "~/components/Patient";
 import { Button } from "~/components/ui/button";
 import LandingPage from "~/components/homepage/LandingPage";
+import Demopage from "~/components/homepage/demo";
 import InfoPanel from "~/components/homepage/InfoPanel";
 import About from "~/components/homepage/About";
 import Footer from "~/components/ui/footer";
