@@ -11,6 +11,7 @@ import Footer from "~/components/ui/footer";
 import EmailInput from "~/components/ui/emailInput";
 import { useRouter } from "next/router";
 import { useToast } from "~/components/ui/use-toast";
+import { type typeToFlattenedError } from "zod";
 
 export default function Home() {
   const createAppointment = api.room.create.useMutation();
@@ -40,6 +41,7 @@ export default function Home() {
             <Label htmlFor="title" className="mb-2">
               Title
             </Label>
+            <ErrorMessage fieldName="title" zodError={createAppointment.error?.data?.zodError} />
             <Input
               id="title"
               className="mb-4"
@@ -51,6 +53,7 @@ export default function Home() {
             <Label htmlFor="content" className="mb-2">
               Description
             </Label>
+            <ErrorMessage fieldName="content" zodError={createAppointment.error?.data?.zodError} />
             <Input
               id="content"
               className="mb-4"
@@ -64,6 +67,7 @@ export default function Home() {
             <Label htmlFor="duration" className="mb-2">
               Duration
             </Label>
+            <ErrorMessage fieldName="duration" zodError={createAppointment.error?.data?.zodError} />
             <div className="flex">
               <Input
                 id="duration"
@@ -79,6 +83,7 @@ export default function Home() {
             <Label htmlFor="time" className="mb-2">
               Time (GMT)
             </Label>
+            <ErrorMessage fieldName="time" zodError={createAppointment.error?.data?.zodError} />
             <div className="flex">
               <Input
                 id="time"
@@ -92,13 +97,8 @@ export default function Home() {
               />
             </div>
             {createAppointment.status === "loading" ? <p className="mb-4 text-center">Loading...</p> : <></>}
-            {createAppointment.status === "error" ? <p className="mb-4 text-center text-sm">Uh-oh, we weren&apos;t able to create your appointment:</p> : <></>}
-            {createAppointment.error?.data?.zodError ? (
-              <p className="mb-4 text-center text-sm">
-                {Object.entries(createAppointment.error.data.zodError.fieldErrors).map((fieldData, index) => (
-                  <p key={index}>{fieldData[1]}</p>
-                ))}
-              </p>
+            {createAppointment.status === "error" ? (
+              <p className="mb-4 text-left text-sm text-red-500">Uh-oh, we weren&apos;t able to create your appointment. Please fix the errors on screen.</p>
             ) : (
               <></>
             )}
@@ -117,10 +117,6 @@ export default function Home() {
                 } catch (e) {
                   console.error(e);
                 }
-                setTitle("");
-                setContent("");
-                setEmail("");
-                setEmails([]);
               }}
             >
               Create
@@ -137,3 +133,17 @@ export default function Home() {
     </>
   );
 }
+
+const ErrorMessage = ({ fieldName, zodError }: { fieldName: string; zodError: typeToFlattenedError<unknown, string> | null | undefined }) => {
+  return zodError ? (
+    Object.entries(zodError.fieldErrors)
+      .filter((fieldData) => fieldData[0] === fieldName)
+      .map((fieldData, index) => (
+        <p key={index} className="mb-2 text-left text-xs text-red-500">
+          {fieldData[1] as string}
+        </p>
+      ))
+  ) : (
+    <></>
+  );
+};

@@ -8,9 +8,9 @@ export const sessionRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        title: z.string().refine((title) => title.length > 2, { message: "Your title is at least three characters" }),
-        content: z.string().refine((content) => content.length > 2, { message: "Your description is at least three characters" }),
-        emails: z.array(z.string().email()).refine((emails) => emails.length > 0, { message: "You’ve added your email by clicking the ‘add’ button" }),
+        title: z.string().refine((title) => title.length > 2, { message: "Title must be at least three characters" }),
+        content: z.string().refine((content) => content.length > 2, { message: "Description must be at least three characters" }),
+        emails: z.array(z.string().email()).refine((emails) => emails.length > 0, { message: "Ensure you've added an email by clicking the 'add' button" }),
         time: z.date().refine((date) => date.getTime() > Date.now(), { message: "Appointment time must be in the future" }),
         duration: z.number().refine((duration) => duration > 0, { message: "Duration must be greater than 0" }),
       })
