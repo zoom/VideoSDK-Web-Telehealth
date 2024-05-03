@@ -65,6 +65,9 @@ const ViewPatient = (props: { userId: string }) => {
             Date of Birth: <span className="font-bold">{patientData?.DOB?.toLocaleDateString()}</span>
           </p>
           <p>
+            Invite ID: <span className="font-bold">{patientData?.userId}</span>
+          </p>
+          <p>
             Allergies: <span className="font-bold">{patientData?.allergies}</span>
           </p>
           <p>
