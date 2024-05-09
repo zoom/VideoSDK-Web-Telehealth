@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
+import { Input } from "~/components/ui/input";
 import Footer from "~/components/ui/footer";
 import Header from "~/components/ui/header";
 import { Skeleton } from "~/components/ui/skeleton";
@@ -27,35 +29,44 @@ const Doctors = () => {
 };
 
 const ViewDoctor = () => {
-  const { data, isLoading } = api.user.getDoctors.useQuery();
+  const [name, setName] = useState("");
+  const { data, isFetching } = api.user.getDoctors.useQuery({ name });
 
   return (
-    <>
-      {isLoading ? (
+    <div className="flex flex-col items-center">
+      <Input type="text" placeholder="Search Doctors" className="w-96" onChange={(e) => setName(e.target.value)} />
+      {isFetching ? (
         <Card className="m-2 flex w-96 flex-col justify-center self-center p-8">
           <Skeleton className="h-8 w-80 animate-pulse" />
           <Skeleton className="my-1 h-4 w-80 animate-pulse" />
           <Skeleton className="h-4 w-80 animate-pulse" />
         </Card>
       ) : (
-        <>
-          {data?.map((doctor) => (
-            <Card className="m-4 flex h-48 w-96 flex-col justify-center self-center p-8" key={doctor.id}>
-              <p className="text-xl font-bold">{doctor.User?.name}</p>
+        <div className="flex flex-wrap justify-center self-center">
+          {data?.length === 0 ? (
+            <Card className="m-4 flex h-48 w-96 flex-col justify-center self-center p-8 text-center">
+              <p className="text-xl font-bold">No Doctors found</p>
+            </Card>
+          ) : (
+            <></>
+          )}
+          {data?.map((user) => (
+            <Card className="m-4 flex h-48 w-96 flex-col justify-center self-center p-8" key={user.Doctor?.id}>
+              <p className="text-xl font-bold">{user?.name}</p>
               <p>
-                Department: <span className="font-bold">{doctor.department}</span>
+                Department: <span className="font-bold">{user.Doctor?.department}</span>
               </p>
               <p>
-                Title: <span className="font-bold">{doctor.position}</span>
+                Title: <span className="font-bold">{user.Doctor?.position}</span>
               </p>
-              <Link href={`/create?inviteID=${doctor.userId}`} className="mt-4">
+              <Link href={`/create?inviteID=${user.Doctor?.userId}`} className="mt-4">
                 <Button variant={"default"}>Schedule appointment</Button>
               </Link>
             </Card>
           ))}
-        </>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 export { ViewDoctor };
