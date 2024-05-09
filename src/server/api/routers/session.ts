@@ -10,13 +10,13 @@ export const sessionRouter = createTRPCRouter({
       z.object({
         title: z.string().refine((title) => title.length > 2, { message: "Title must be at least three characters" }),
         content: z.string().refine((content) => content.length > 2, { message: "Description must be at least three characters" }),
-        emails: z.array(z.string().email()).refine((emails) => emails.length > 0, { message: "Ensure you've added an email by clicking the 'add' button" }),
+        IDs: z.array(z.string()).min(1).refine((IDs) => IDs.length > 0, { message: "Ensure you've invited someone by clicking the 'add' button" }),
         time: z.date().refine((date) => date.getTime() > Date.now(), { message: "Appointment time must be in the future" }),
         duration: z.number().refine((duration) => duration > 0, { message: "Duration must be greater than 0" }),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { title, content, emails, time, duration } = input;
+      const { title, content, IDs, time, duration } = input;
       return ctx.db.room.create({
         data: {
           title,
@@ -24,7 +24,7 @@ export const sessionRouter = createTRPCRouter({
           User_CreatedBy: { connect: { id: ctx.session.user.id } },
           duration,
           time,
-          User_CreatedFor: { connect: emails.map((email) => ({ email })) },
+          User_CreatedFor: { connect: IDs.map((id) => ({ id })) },
         },
       });
     }),

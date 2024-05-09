@@ -49,7 +49,7 @@ const ViewDoctor = () => {
                 Title: <span className="font-bold">{doctor.position}</span>
               </p>
               <p>
-                Email: <span className="font-bold">{doctor.User?.email}</span>
+                Invite ID: <span className="font-bold">{doctor.userId}</span>
               </p>
             </Card>
           ))}
