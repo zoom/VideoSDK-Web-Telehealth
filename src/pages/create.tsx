@@ -11,7 +11,8 @@ import Footer from "~/components/ui/footer";
 import { useRouter } from "next/router";
 import { useToast } from "~/components/ui/use-toast";
 import { type typeToFlattenedError } from "zod";
-import IDInput from "~/components/ui/IDInput";
+import SearchUser from "~/components/ui/SearchUser";
+import { type User } from "@prisma/client";
 
 export default function Home() {
   const createAppointment = api.room.create.useMutation();
@@ -21,10 +22,9 @@ export default function Home() {
   const [duration, setDuration] = useState<number>(1);
   const router = useRouter();
   const { toast } = useToast();
-  const [ID, setID] = useState<string>("");
-  const [IDs, setIDs] = useState<string[]>([]);
   const timeNowPlusOneHour = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60 + 60 * 60 * 1000).toISOString().slice(0, 16);
   const [time, setTime] = useState<string>(timeNowPlusOneHour);
+  const [user, setUser] = useState<User>();
 
   return (
     <>
@@ -62,7 +62,7 @@ export default function Home() {
                 setContent(e.target.value);
               }}
             />
-            <IDInput ID={ID} IDs={IDs} setID={setID} setIDs={setIDs} />
+            <SearchUser setUser={setUser} user={user} />
             <Label htmlFor="duration" className="mb-2">
               Duration
             </Label>
@@ -102,15 +102,16 @@ export default function Home() {
               <></>
             )}
             <Button
-              disabled={createAppointment.status === "loading" || !(title && content && IDs.length > 0 && duration && time)}
+              disabled={createAppointment.status === "loading" || !(title && content && user && duration && time)}
               onClick={async () => {
+                if (!(title && content && user && duration && time)) return;
                 const utcTime = moment(time).utc().toDate();
                 try {
                   toast({
                     title: "Success",
                     description: "Appointment created, redirecting...",
                   });
-                  await createAppointment.mutateAsync({ title, content, IDs, duration, time: utcTime });
+                  await createAppointment.mutateAsync({ title, content, IDs: [user?.id], duration, time: utcTime });
                   await utils.room.getCreatedUpcoming.invalidate();
                   await router.push("/");
                 } catch (e) {
