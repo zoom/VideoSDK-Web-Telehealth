@@ -41,16 +41,16 @@ const ViewPatient = () => {
       ) : (
         <>
           {data?.map((patient) => (
-            <Card className="m-4 flex h-48 w-96 flex-col justify-center self-center p-8" key={patient.id}>
+            <Card className="m-4 flex h-64 w-96 flex-col justify-center self-center p-8" key={patient.id}>
               <p className="text-xl font-bold">{patient.User?.name}</p>
               <p>
                 Date of Birth: <span className="font-bold">{patient?.DOB?.toDateString().split(" ").slice(1).join(" ")}</span>
               </p>
-              <p>
-                Invite ID: <span className="font-bold">{patient.userId}</span>
-              </p>
               <Link href={`/viewPatient/${patient.userId}`} className="mt-4">
                 <Button variant={"secondary"}>View details</Button>
+              </Link>
+              <Link href={`/create?inviteID=${patient.userId}`} className="mt-4">
+                <Button variant={"default"}>Schedule appointment</Button>
               </Link>
             </Card>
           ))}

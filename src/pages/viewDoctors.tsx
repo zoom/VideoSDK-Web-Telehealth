@@ -48,9 +48,9 @@ const ViewDoctor = () => {
               <p>
                 Title: <span className="font-bold">{doctor.position}</span>
               </p>
-              <p>
-                Invite ID: <span className="font-bold">{doctor.userId}</span>
-              </p>
+              <Link href={`/create?inviteID=${doctor.userId}`} className="mt-4">
+                <Button variant={"default"}>Schedule appointment</Button>
+              </Link>
             </Card>
           ))}
         </>
