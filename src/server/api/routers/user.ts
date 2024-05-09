@@ -15,23 +15,10 @@ export const userRouter = createTRPCRouter({
         return [];
       }
     }),
-  getUserByIdQuery: protectedProcedure
+  getUserById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const user = await ctx.db.user.findUnique({ where: { id: input.id } });
-      if (user) {
-        return user;
-      } else {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "User not found",
-        });
-      }
-    }),
-  getUserById: protectedProcedure
-    .input(z.object({ id: z.string() }))
-    .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({ where: { id: input.id }, select: { id: true, name: true } });
       if (user) {
         return user;
       } else {
@@ -66,6 +53,7 @@ export const userRouter = createTRPCRouter({
           mode: "insensitive"
         }, role: "doctor"
       },
+      take: 20,
       include: { Doctor: true },
     });
     return doctors;

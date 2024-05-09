@@ -4,35 +4,18 @@ import { Input } from "./input";
 import { Label } from "./label";
 import { type User } from "@prisma/client";
 import { XIcon } from "lucide-react";
+import { useDebouncedCallback } from "~/lib/utils";
 
 function Search(props: { user: User | undefined; setUser: React.Dispatch<React.SetStateAction<User | undefined>> }) {
   const { user, setUser } = props;
   const router = useRouter();
   const name = stringOrNull(router.query.name)?.trim();
-  const query = api.user.searchUserByName.useQuery(
-    { name: name ?? "" },
-    {
-      enabled: !!name,
-      initialData: user ? [user] : undefined,
-    }
-  );
+  const query = api.user.searchUserByName.useQuery({ name: name ?? "" }, { enabled: !!name, initialData: user ? [user] : undefined });
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // debounce this using something like a `useDebouncedCallback`-hook
-    void router.push(
-      {
-        query: {
-          ...router.query,
-          name: e.target.value,
-        },
-      },
-      undefined,
-      {
-        shallow: true,
-        scroll: false,
-      }
-    );
-  };
+  const handleInput = useDebouncedCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    void router.push({ query: { ...router.query, name: e.target.value } }, undefined, { shallow: true, scroll: false });
+  }, 300);
+
   return (
     <>
       <Label htmlFor="user" className="mb-2">
