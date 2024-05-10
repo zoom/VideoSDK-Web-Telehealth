@@ -2,8 +2,7 @@ import Link from "next/link";
 import { Button } from "./button";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
-import { Avatar } from "./avatar";
-import { AvatarImage } from "@radix-ui/react-avatar";
+import { Avatar, AvatarImage } from "./avatar";
 
 function Header() {
   const { status, data } = useSession();
@@ -39,7 +38,7 @@ function Header() {
             <Button onClick={() => void signIn()}>Sign in</Button>
           )}
           <Avatar className="ml-4">
-            <AvatarImage src={data?.user.image as string | undefined} alt="User Avatar" />
+            <AvatarImage src={data?.user.image ?? undefined} alt="User Avatar" />
           </Avatar>
         </div>
       </header>

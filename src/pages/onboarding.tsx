@@ -23,7 +23,7 @@ const Onboarding = () => {
   }
 
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center overflow-y-scroll bg-gray-100 pt-8">
+    <div className="flex min-h-screen w-screen flex-col items-center justify-center overflow-y-scroll bg-gray-100 pt-8">
       <h1 className="my-10 flex text-5xl font-bold leading-none text-gray-700">Welcome {data?.user.name?.split(" ")[0]}</h1>
       <Card className="mb-8 flex w-96 flex-col flex-wrap justify-center p-4 shadow-lg">
         <Label htmlFor="r2">Account Type</Label>

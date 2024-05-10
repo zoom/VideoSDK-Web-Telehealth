@@ -9,7 +9,9 @@ import {
 import GithubProvider from "next-auth/providers/github";
 // import config from "tailwind.config";
 import { env } from "~/env";
+import { capitalize } from "~/lib/utils";
 import { db } from "~/server/db";
+import { animals, colors } from "~/utils/random";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -54,6 +56,20 @@ export const authOptions: NextAuthOptions = {
     },
   },
   adapter: PrismaAdapter(db),
+  events: {
+    createUser: async (message) => {
+      if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
+        const { user } = message;
+        const randomAnimal = animals[Math.floor(Math.random() * (animals.length - 1))];
+        const randomColor = colors[Math.floor(Math.random() * (colors.length - 1))];
+        const name = `${capitalize(randomColor!)} ${capitalize(randomAnimal!)}`;
+        await db.user.update({
+          where: { id: user.id },
+          data: { name: name, image: `https://source.boringavatars.com/marble/120/${name}?colors=264653,2a9d8f,e9c46a,f4a261,e76f51` },
+        });
+      }
+    },
+  },
   theme: {
     // brandColor: config.theme.extend.colors.primary.DEFAULT,
     // buttonText: config.theme.extend.colors.primary.foreground,
