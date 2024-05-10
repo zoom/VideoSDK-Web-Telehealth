@@ -28,21 +28,22 @@ const Onboarding = () => {
       <Card className="mb-8 flex w-96 flex-col flex-wrap justify-center p-4 shadow-lg">
         <Label htmlFor="r2">Account Type</Label>
         <RadioGroup defaultValue={defaultRole} className="my-4 flex flex-row">
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="Doctor" id="r2" onClick={() => setRoleState("doctor")} />
-            <Label htmlFor="r2">Doctor</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="Patient" id="r1" onClick={() => setRoleState("patient")} />
-            <Label htmlFor="r1">Patient</Label>
-          </div>
           {env.NEXT_PUBLIC_TESTMODE === "TESTING" ? (
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="null" id="r1" onClick={() => setRoleState("null")} />
               <Label htmlFor="r1">Demo</Label>
             </div>
           ) : (
-            <></>
+            <>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Doctor" id="r2" onClick={() => setRoleState("doctor")} />
+                <Label htmlFor="r2">Doctor</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="Patient" id="r1" onClick={() => setRoleState("patient")} />
+                <Label htmlFor="r1">Patient</Label>
+              </div>
+            </>
           )}
         </RadioGroup>
         {env.NEXT_PUBLIC_TESTMODE === "TESTING" && role === "null" ? <DoctorAndPatientFields /> : role === "doctor" ? <DoctorFields /> : <PatientFields />}
@@ -158,7 +159,7 @@ const DoctorAndPatientFields = () => {
 
   return (
     <>
-      <p className="text-sm">Demo accounts creates both a Doctor and Patient profile, only available in test mode.</p>
+      <p className="text-sm">Demo accounts creates both a Doctor and Patient profile, only available in demo mode.</p>
       <p className="py-4 font-bold">Patient:</p>
       <Label htmlFor="height" className="mb-2">
         Height
