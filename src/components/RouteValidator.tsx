@@ -1,6 +1,8 @@
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
+const forbiddenRoutesForPatient = ["/viewPatients", "/viewPatient"];
+
 const RouteValidator = ({ children }: { children: React.ReactNode }) => {
   const { status, data } = useSession();
   const router = useRouter();
@@ -32,6 +34,15 @@ const RouteValidator = ({ children }: { children: React.ReactNode }) => {
     <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
       <h1>Loading...</h1>
     </div>;
+  }
+
+  if (data?.user.role === "patient" && forbiddenRoutesForPatient.includes(router.pathname)) {
+    void router.push("/");
+    return (
+      <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
+        <h1>Redirecting...</h1>
+      </div>
+    );
   }
 
   return children;
