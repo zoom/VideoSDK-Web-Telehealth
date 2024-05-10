@@ -18,6 +18,7 @@ model Room {
     duration        Int
     User_CreatedBy  User         @relation("RoomByUser", fields: [createByUserId], references: [id], onDelete: Cascade)
     createByUserId  String
+    zoomSessionsIds String[]
     User_CreatedFor User[]       @relation("RoomForUser")
     Transcripts     Transcript[]
     Notes           Notes[]
