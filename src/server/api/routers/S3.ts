@@ -18,6 +18,10 @@ export const S3Router = createTRPCRouter({
   createPresignedUrl: protectedProcedure
     .input(z.object({ filename: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+
       const filename = `${ctx.session.user.id}_${new Date().getTime().toString().slice(8)}_${input.filename}`;
       const url = await getSignedUrl(S3, new PutObjectCommand({ Bucket: env.S3_BUCKET, Key: filename }), { expiresIn: 3600 });
       return { url, filename };
@@ -25,6 +29,10 @@ export const S3Router = createTRPCRouter({
   registerUpload: protectedProcedure
     .input(z.object({ filename: z.string() }))
     .mutation(async ({ input, ctx }) => {
+      if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+
       await ctx.db.patient.update({
         data: {
           files: { create: { name: input.filename, type: "PDF" } },
