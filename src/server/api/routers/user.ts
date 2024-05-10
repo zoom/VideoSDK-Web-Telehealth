@@ -1,52 +1,80 @@
-import { TRPCError } from "@trpc/server";
+import { TRPCError, type inferRouterOutputs } from "@trpc/server";
 import moment from "moment";
 import { z } from "zod";
 import { env } from "~/env";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const userRouter = createTRPCRouter({
-  getUserByEmail: protectedProcedure.input(z.object({ email: z.string().email() }))
-    .mutation(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({ where: { email: input.email } });
+  searchUserByName: protectedProcedure
+    .input(z.object({ name: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findMany({
+        where: { name: { contains: input.name, mode: "insensitive" } },
+        select: { id: true, name: true, role: true },
+      });
       if (user) {
         return user;
+      } else {
+        return [];
       }
-      else {
+    }),
+  getUserById: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({ where: { id: input.id }, select: { id: true, name: true, role: true }, });
+      if (user) {
+        return user;
+      } else {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User not found",
         });
       }
     }),
-  getPatientDetails: protectedProcedure.input(z.object({ userId: z.string() }))
+  getPatientDetails: protectedProcedure
+    .input(z.object({ userId: z.string() }))
     .query(async ({ ctx, input }) => {
-      if (ctx.session.user.role !== "doctor" && ctx.session.user.id !== input.userId)
-        throw new TRPCError({ code: "FORBIDDEN" });
+      if (ctx.session.user.role !== "doctor" && ctx.session.user.id !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
       const patient = await ctx.db.patient.findUnique({
         where: { userId: input.userId },
-        include: { User: true }
+        include: { User: { select: { id: true, name: true, role: true } } },
       });
       if (patient) {
         return patient;
-      }
-      else {
+      } else {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "Patient not found",
         });
       }
     }),
-  getDoctors: protectedProcedure.query(async ({ ctx }) => {
-    const doctors = await ctx.db.doctor.findMany({
-      include: { User: true }
+  getDoctors: protectedProcedure.input(z.object({ name: z.string().nullable() })).query(async ({ ctx, input }) => {
+    const doctors = await ctx.db.user.findMany({
+      where: {
+        name: {
+          contains: input.name ? input.name : "",
+          mode: "insensitive"
+        }, role: "doctor"
+      },
+      take: 20,
+      include: { Doctor: true },
     });
-    return doctors;
+    const doctorWithoutEmail = doctors.map((d) => ({ ...d, email: null, image: null }));
+    return doctorWithoutEmail;
   }),
-  getPatients: protectedProcedure.query(async ({ ctx }) => {
-    const patients = await ctx.db.patient.findMany({
-      include: { User: true }
+  getPatients: protectedProcedure.input(z.object({ name: z.string().nullable() })).query(async ({ ctx, input }) => {
+    const patients = await ctx.db.user.findMany({
+      where: {
+        name: {
+          contains: input.name ? input.name : "",
+          mode: "insensitive"
+        }, role: "patient"
+      },
+      take: 20,
+      include: { Patient: true },
     });
-    return patients;
+    const patientsWithoutEmail = patients.map((p) => ({ ...p, email: null, image: null }));
+    return patientsWithoutEmail;
   }),
   setDoctor: protectedProcedure.input(z.object({
     department: z.string(), position: z.string()
@@ -188,3 +216,5 @@ export const userRouter = createTRPCRouter({
     });
   }),
 });
+
+export type UserWithoutEmail = inferRouterOutputs<typeof userRouter>["searchUserByName"][0];
