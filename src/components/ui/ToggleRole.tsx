@@ -3,12 +3,13 @@ import { Button } from "~/components/ui/button";
 import { capitalize } from "~/lib/utils";
 import { api } from "~/utils/api";
 
-const ToggleRoleStickyBanner = () => {
+const ToggleRoleBanner = () => {
   const { data, update } = useSession();
   const toggleRole = api.user.toggleRole.useMutation();
   return (
-    <div className="fixed bottom-2 right-2 z-50 flex flex-col rounded-sm  bg-slate-300 bg-opacity-20 px-8 py-4 backdrop-blur-sm">
-      <p className="text-center text-xl">You are currently logged in as a {capitalize(data?.user.role as string)}.</p>
+    <div className="flex h-full w-full flex-col items-center justify-center bg-slate-200 py-4 ">
+      <p className="text-center text-xl font-bold">Demo Mode</p>
+      <p className="text-center">You are currently logged in as a {capitalize(data?.user.role as string)}.</p>
       <Button
         className="flex self-center"
         onClick={async () => {
@@ -22,4 +23,4 @@ const ToggleRoleStickyBanner = () => {
   );
 };
 
-export default ToggleRoleStickyBanner;
+export default ToggleRoleBanner;

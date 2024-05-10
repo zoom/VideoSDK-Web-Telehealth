@@ -7,6 +7,8 @@ import { Inter } from "next/font/google";
 import RouteValidator from "~/components/RouteValidator";
 import { Toaster } from "~/components/ui/toaster";
 import Head from "next/head";
+import ToggleRoleBanner from "~/components/ui/ToggleRole";
+import { env } from "~/env";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,6 +22,7 @@ const MyApp: AppType<{ session: Session | null }> = ({ Component, pageProps: { s
       <SessionProvider session={session}>
         <RouteValidator>
           <div className={inter.className}>
+            {env.NEXT_PUBLIC_TESTMODE === "TESTING" ? <ToggleRoleBanner /> : <></>}
             <Component {...pageProps} />
           </div>
         </RouteValidator>
