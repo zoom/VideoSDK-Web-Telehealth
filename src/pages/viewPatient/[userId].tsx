@@ -30,7 +30,7 @@ const Uploaded = () => {
       <div className="flex h-screen w-screen flex-col items-center overflow-y-scroll bg-gray-100">
         <h1 className="mb-2 mt-8 flex text-3xl font-bold leading-none text-gray-700">Patient Details</h1>
         <ViewPatient userId={userId as string} />
-        <Link href="/viewPatients">
+        <Link href="/">
           <Button variant={"link"} className="mx-auto flex">
             back
           </Button>
