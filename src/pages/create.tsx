@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
@@ -25,6 +25,14 @@ export default function Home() {
   const timeNowPlusOneHour = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60 + 60 * 60 * 1000).toISOString().slice(0, 16);
   const [time, setTime] = useState<string>(timeNowPlusOneHour);
   const [user, setUser] = useState<User>();
+  const inviteID = router.query.inviteID as string;
+  const getUserById = api.user.getUserByIdQuery.useQuery({ id: inviteID }, { enabled: !!inviteID });
+
+  useEffect(() => {
+    if (getUserById.isSuccess) {
+      setUser(getUserById.data);
+    }
+  }, [getUserById, inviteID]);
 
   return (
     <>
@@ -44,6 +52,7 @@ export default function Home() {
             <ErrorMessage fieldName="title" zodError={createAppointment.error?.data?.zodError} />
             <Input
               id="title"
+              placeholder="Appointment title"
               className="mb-4"
               value={title}
               onChange={(e) => {
@@ -56,6 +65,7 @@ export default function Home() {
             <ErrorMessage fieldName="content" zodError={createAppointment.error?.data?.zodError} />
             <Input
               id="content"
+              placeholder="Add any notes or details about the appointment"
               className="mb-4"
               value={content}
               onChange={(e) => {

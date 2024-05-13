@@ -7,12 +7,25 @@ export const userRouter = createTRPCRouter({
     .input(z.object({ name: z.string() }))
     .query(async ({ ctx, input }) => {
       const user = await ctx.db.user.findMany({
-        where: { name: { contains: input.name } },
+        where: { name: { contains: input.name, mode: "insensitive" } },
       });
       if (user) {
         return user;
       } else {
         return [];
+      }
+    }),
+  getUserByIdQuery: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.db.user.findUnique({ where: { id: input.id } });
+      if (user) {
+        return user;
+      } else {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
       }
     }),
   getUserById: protectedProcedure
