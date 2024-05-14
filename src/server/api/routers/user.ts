@@ -1,4 +1,4 @@
-import { TRPCError } from "@trpc/server";
+import { TRPCError, type inferRouterOutputs } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
@@ -8,6 +8,7 @@ export const userRouter = createTRPCRouter({
     .query(async ({ ctx, input }) => {
       const user = await ctx.db.user.findMany({
         where: { name: { contains: input.name, mode: "insensitive" } },
+        select: { id: true, name: true, role: true },
       });
       if (user) {
         return user;
@@ -18,7 +19,7 @@ export const userRouter = createTRPCRouter({
   getUserById: protectedProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
-      const user = await ctx.db.user.findUnique({ where: { id: input.id } });
+      const user = await ctx.db.user.findUnique({ where: { id: input.id }, select: { id: true, name: true, role: true }, });
       if (user) {
         return user;
       } else {
@@ -34,7 +35,7 @@ export const userRouter = createTRPCRouter({
       if (ctx.session.user.role !== "doctor" && ctx.session.user.id !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
       const patient = await ctx.db.patient.findUnique({
         where: { userId: input.userId },
-        include: { User: true },
+        include: { User: { select: { id: true, name: true, role: true } } },
       });
       if (patient) {
         return patient;
@@ -56,7 +57,8 @@ export const userRouter = createTRPCRouter({
       take: 20,
       include: { Doctor: true },
     });
-    return doctors;
+    const doctorWithoutEmail = doctors.map((d) => ({ ...d, email: null, image: null }));
+    return doctorWithoutEmail;
   }),
   getPatients: protectedProcedure.input(z.object({ name: z.string().nullable() })).query(async ({ ctx, input }) => {
     const patients = await ctx.db.user.findMany({
@@ -66,9 +68,11 @@ export const userRouter = createTRPCRouter({
           mode: "insensitive"
         }, role: "patient"
       },
+      take: 20,
       include: { Patient: true },
     });
-    return patients;
+    const patientsWithoutEmail = patients.map((p) => ({ ...p, email: null, image: null }));
+    return patientsWithoutEmail;
   }),
   setDoctor: protectedProcedure
     .input(
@@ -90,12 +94,12 @@ export const userRouter = createTRPCRouter({
         data: { role: "doctor", doctorId: doctor.id },
       });
       if (user) {
-        return { user, doctor };
+        return { doctor };
       } else {
         throw new TRPCError({
           code: "NOT_FOUND",
           message: "User not found",
-        });
+        }); ``
       }
     }),
   setPatient: protectedProcedure
@@ -126,7 +130,7 @@ export const userRouter = createTRPCRouter({
         data: { role: "patient", patientId: patient.id },
       });
       if (user) {
-        return { user, patient };
+        return { patient };
       } else {
         throw new TRPCError({
           code: "NOT_FOUND",
@@ -135,3 +139,5 @@ export const userRouter = createTRPCRouter({
       }
     }),
 });
+
+export type UserWithoutEmail = inferRouterOutputs<typeof userRouter>["searchUserByName"][0];

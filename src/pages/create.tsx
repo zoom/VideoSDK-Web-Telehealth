@@ -12,7 +12,7 @@ import { useRouter } from "next/router";
 import { useToast } from "~/components/ui/use-toast";
 import { type typeToFlattenedError } from "zod";
 import SearchUser from "~/components/ui/SearchUser";
-import { type User } from "@prisma/client";
+import { type UserWithoutEmail } from "~/server/api/routers/user";
 
 export default function Home() {
   const createAppointment = api.room.create.useMutation();
@@ -24,7 +24,7 @@ export default function Home() {
   const { toast } = useToast();
   const timeNowPlusOneHour = new Date(new Date().getTime() - new Date().getTimezoneOffset() * 1000 * 60 + 60 * 60 * 1000).toISOString().slice(0, 16);
   const [time, setTime] = useState<string>(timeNowPlusOneHour);
-  const [user, setUser] = useState<User>();
+  const [user, setUser] = useState<UserWithoutEmail>();
   const inviteID = router.query.inviteID as string;
   const getUserById = api.user.getUserById.useQuery({ id: inviteID }, { enabled: !!inviteID });
 

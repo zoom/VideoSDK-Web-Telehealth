@@ -2,11 +2,11 @@ import { useRouter } from "next/router";
 import { api } from "~/utils/api";
 import { Input } from "./input";
 import { Label } from "./label";
-import { type User } from "@prisma/client";
 import { XIcon } from "lucide-react";
 import { useDebouncedCallback } from "~/lib/utils";
+import { type UserWithoutEmail } from "~/server/api/routers/user";
 
-function Search(props: { user: User | undefined; setUser: React.Dispatch<React.SetStateAction<User | undefined>> }) {
+function Search(props: { user: UserWithoutEmail | undefined; setUser: React.Dispatch<React.SetStateAction<UserWithoutEmail | undefined>> }) {
   const { user, setUser } = props;
   const router = useRouter();
   const name = stringOrNull(router.query.name)?.trim();
@@ -44,7 +44,6 @@ function Search(props: { user: User | undefined; setUser: React.Dispatch<React.S
                   <div key={user.id} className="flex items-center gap-2 rounded-md p-2 hover:bg-slate-100" onClick={() => setUser(user)}>
                     <div className="flex-1">
                       <div className="text-sm font-medium">{user.name}</div>
-                      <div className="text-xs text-slate-500">{user.email}</div>
                     </div>
                   </div>
                 ))
