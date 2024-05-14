@@ -3,6 +3,9 @@ import { useRouter } from "next/router";
 import DoctorView from "~/components/Doctor";
 import PatientView from "~/components/Patient";
 import { Button } from "~/components/ui/button";
+import { env } from "~/env";
+import { capitalize } from "~/lib/utils";
+import { api } from "~/utils/api";
 import LandingPage from "~/components/homepage/LandingPage";
 import InfoPanel from "~/components/homepage/InfoPanel";
 import About from "~/components/homepage/About";
@@ -44,6 +47,7 @@ export default function Home() {
     <>
       <Header />
       <div className="flex w-screen flex-col items-center bg-gray-100">
+        {env.NEXT_PUBLIC_TESTMODE === "TESTING" ? <ToggleRole /> : <></>}
         <div className="mt-2 flex min-h-[70vh] flex-col justify-center">{data?.user.role === "doctor" ? <DoctorView /> : <PatientView />}</div>
         <Button variant={"outline"} className="my-8 w-48 self-center" onClick={() => void signOut()}>
           Sign Out
@@ -53,3 +57,21 @@ export default function Home() {
     </>
   );
 }
+
+const ToggleRole = () => {
+  const { data, update } = useSession();
+  const toggleRole = api.user.toggleRole.useMutation();
+  return (
+    <div className="mb-4">
+      <p className="pb-2 text-center">Role: {capitalize(data?.user.role as string)}</p>
+      <Button
+        onClick={async () => {
+          await toggleRole.mutateAsync();
+          await update();
+        }}
+      >
+        ToggleRole
+      </Button>
+    </div>
+  );
+};

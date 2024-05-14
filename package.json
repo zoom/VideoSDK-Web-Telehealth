@@ -12,6 +12,9 @@
     "lint": "next lint",
     "start": "next start"
   },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.501.0",
     "@aws-sdk/s3-request-presigner": "^3.501.0",
@@ -72,6 +75,7 @@
     "prettier-plugin-tailwindcss": "^0.5.7",
     "prisma": "^5.9.1",
     "tailwindcss": "^3.3.5",
+    "tsx": "^4.7.1",
     "typescript": "^5.1.6"
   },
   "ct3aMetadata": {
