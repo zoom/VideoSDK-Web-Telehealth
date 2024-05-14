@@ -7,6 +7,7 @@ import Footer from "~/components/ui/footer";
 import Header from "~/components/ui/header";
 import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/utils/api";
+import { useDebounce } from "@uidotdev/usehooks";
 
 const Patients = () => {
   return (
@@ -31,7 +32,8 @@ const Patients = () => {
 
 const ViewPatient = () => {
   const [name, setName] = useState("");
-  const { data, isLoading } = api.user.getPatients.useQuery({ name });
+  const debouncedSearchTerm = useDebounce(name, 500);
+  const { data, isLoading } = api.user.getPatients.useQuery({ name: debouncedSearchTerm }, { refetchOnWindowFocus: false });
 
   return (
     <div className="flex flex-col items-center">

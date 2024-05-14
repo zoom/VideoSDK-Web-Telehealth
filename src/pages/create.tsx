@@ -26,7 +26,7 @@ export default function Home() {
   const [time, setTime] = useState<string>(timeNowPlusOneHour);
   const [user, setUser] = useState<User>();
   const inviteID = router.query.inviteID as string;
-  const getUserById = api.user.getUserByIdQuery.useQuery({ id: inviteID }, { enabled: !!inviteID });
+  const getUserById = api.user.getUserById.useQuery({ id: inviteID }, { enabled: !!inviteID });
 
   useEffect(() => {
     if (getUserById.isSuccess) {
