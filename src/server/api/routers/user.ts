@@ -58,15 +58,27 @@ export const userRouter = createTRPCRouter({
         });
       }
     }),
-  getDoctors: protectedProcedure.query(async ({ ctx }) => {
-    const doctors = await ctx.db.doctor.findMany({
-      include: { User: true },
+  getDoctors: protectedProcedure.input(z.object({ name: z.string().nullable() })).query(async ({ ctx, input }) => {
+    const doctors = await ctx.db.user.findMany({
+      where: {
+        name: {
+          contains: input.name ? input.name : "",
+          mode: "insensitive"
+        }, role: "doctor"
+      },
+      include: { Doctor: true },
     });
     return doctors;
   }),
-  getPatients: protectedProcedure.query(async ({ ctx }) => {
-    const patients = await ctx.db.patient.findMany({
-      include: { User: true },
+  getPatients: protectedProcedure.input(z.object({ name: z.string().nullable() })).query(async ({ ctx, input }) => {
+    const patients = await ctx.db.user.findMany({
+      where: {
+        name: {
+          contains: input.name ? input.name : "",
+          mode: "insensitive"
+        }, role: "patient"
+      },
+      include: { Patient: true },
     });
     return patients;
   }),

@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Input } from "~/components/ui/input";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import Footer from "~/components/ui/footer";
@@ -28,10 +30,12 @@ const Patients = () => {
 };
 
 const ViewPatient = () => {
-  const { data, isLoading } = api.user.getPatients.useQuery();
+  const [name, setName] = useState("");
+  const { data, isLoading } = api.user.getPatients.useQuery({ name });
 
   return (
-    <>
+    <div className="flex flex-col items-center">
+      <Input type="text" placeholder="Search Patients" className="w-96" onChange={(e) => setName(e.target.value)} />
       {isLoading ? (
         <Card className="m-4 flex h-48 flex-col justify-center self-center p-8">
           <Skeleton className="h-8 w-80 animate-pulse" />
@@ -39,24 +43,31 @@ const ViewPatient = () => {
           <Skeleton className="h-4 w-80 animate-pulse" />
         </Card>
       ) : (
-        <>
-          {data?.map((patient) => (
-            <Card className="m-4 flex h-64 w-96 flex-col justify-center self-center p-8" key={patient.id}>
-              <p className="text-xl font-bold">{patient.User?.name}</p>
+        <div className="flex flex-wrap justify-center self-center">
+          {data?.length === 0 ? (
+            <Card className="m-4 flex h-48 w-96 flex-col justify-center self-center p-8 text-center">
+              <p className="text-xl font-bold">No Doctors found</p>
+            </Card>
+          ) : (
+            <></>
+          )}
+          {data?.map((user) => (
+            <Card className="m-4 flex h-64 w-96 flex-col justify-center self-center p-8" key={user.Patient?.id}>
+              <p className="text-xl font-bold">{user?.name}</p>
               <p>
-                Date of Birth: <span className="font-bold">{patient?.DOB?.toDateString().split(" ").slice(1).join(" ")}</span>
+                Date of Birth: <span className="font-bold">{user.Patient?.DOB?.toDateString().split(" ").slice(1).join(" ")}</span>
               </p>
-              <Link href={`/viewPatient/${patient.userId}`} className="mt-4">
+              <Link href={`/viewPatient/${user.Patient?.userId}`} className="mt-4">
                 <Button variant={"secondary"}>View details</Button>
               </Link>
-              <Link href={`/create?inviteID=${patient.userId}`} className="mt-4">
+              <Link href={`/create?inviteID=${user.Patient?.userId}`} className="mt-4">
                 <Button variant={"default"}>Schedule appointment</Button>
               </Link>
             </Card>
           ))}
-        </>
+        </div>
       )}
-    </>
+    </div>
   );
 };
 export { ViewPatient };
