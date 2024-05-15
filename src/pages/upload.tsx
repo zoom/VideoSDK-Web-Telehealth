@@ -6,6 +6,7 @@ import Footer from "~/components/ui/footer";
 import Header from "~/components/ui/header";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { env } from "~/env";
 import { api } from "~/utils/api";
 
 const InputFile = () => {
@@ -42,6 +43,12 @@ const InputFile = () => {
             <Button
               disabled={loading}
               onClick={async () => {
+                if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
+                  if (file) {
+                    setStatus("File upload is disabled in test mode");
+                    return;
+                  }
+                }
                 if (file) {
                   setLoading(true);
                   setStatus("Uploading...");
