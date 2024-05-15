@@ -210,7 +210,7 @@ export const userRouter = createTRPCRouter({
         message: "Demo mode is disabled",
       });
     }
-    const user = await ctx.db.user.update({
+    await ctx.db.user.update({
       where: { id: ctx.session.user.id },
       data: { role: ctx.session.user.role === "doctor" ? "patient" : "doctor" }
     });
