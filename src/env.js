@@ -39,7 +39,6 @@ export const env = createEnv({
    */
   client: {
     NEXT_PUBLIC_TESTMODE: z.string().optional(),
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
   },
 
   /**
