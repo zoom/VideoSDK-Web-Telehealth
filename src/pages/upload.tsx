@@ -45,7 +45,7 @@ const InputFile = () => {
               onClick={async () => {
                 if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
                   if (file) {
-                    setStatus("File upload is disabled in test mode");
+                    setStatus("File upload is disabled in demo mode");
                     return;
                   }
                 }
