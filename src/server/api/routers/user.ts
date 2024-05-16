@@ -89,18 +89,6 @@ export const userRouter = createTRPCRouter({
       data: { role: 'doctor', doctorId: doctor.id }
     });
     if (user) {
-      if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
-        await ctx.db.room.create({
-          data: {
-            title: "Test Session",
-            content: "This is a test session",
-            User_CreatedBy: { connect: { id: ctx.session.user.id } },
-            duration: 1,
-            time: moment().utc().add(10, 'day').toDate(),
-            User_CreatedFor: { connect: { email: 'test@test.com' } },
-          },
-        });
-      }
       return { user, doctor };
     }
     else {
@@ -130,18 +118,6 @@ export const userRouter = createTRPCRouter({
       data: { role: 'patient', patientId: patient.id }
     });
     if (user) {
-      if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
-        await ctx.db.room.create({
-          data: {
-            title: "Test Session",
-            content: "This is a test session",
-            User_CreatedBy: { connect: { id: ctx.session.user.id } },
-            duration: 1,
-            time: moment().utc().add(10, 'day').toDate(),
-            User_CreatedFor: { connect: { email: 'test@test.com' } },
-          },
-        });
-      }
       return { user, patient };
     }
     else {
@@ -186,12 +162,21 @@ export const userRouter = createTRPCRouter({
     if (user) {
       await ctx.db.room.create({
         data: {
-          title: "Test Session",
-          content: "This is a test session",
+          title: "Demo Session",
+          content: "This is a demo session",
           User_CreatedBy: { connect: { id: ctx.session.user.id } },
           duration: 1,
           time: moment().utc().add(10, 'day').toDate(),
-          User_CreatedFor: { connect: { email: 'test@test.com' } },
+          User_CreatedFor: { connect: { email: 'bob@test.com' } },
+        },
+      });
+      await ctx.db.file.create({
+        data: {
+          name: "clteivw2g000ducoqlixsjqcg_26311_next.jpg",
+          type: "application/pdf",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          patientId: patient.id,
         },
       });
       return { user, patient };

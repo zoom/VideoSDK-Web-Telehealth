@@ -23,17 +23,14 @@ const Onboarding = () => {
   }
 
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center overflow-y-scroll bg-gray-100 pt-8">
-      <h1 className="my-10 flex text-5xl font-bold leading-none text-gray-700">Welcome {data?.user.name?.split(" ")[0]}</h1>
-      <Card className="mb-8 flex w-96 flex-col flex-wrap justify-center p-4 shadow-lg">
-        <Label htmlFor="r2">Account Type</Label>
-        <RadioGroup defaultValue={defaultRole} className="my-4 flex flex-row">
-          {env.NEXT_PUBLIC_TESTMODE === "TESTING" ? (
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="null" id="r1" onClick={() => setRoleState("null")} />
-              <Label htmlFor="r1">Demo</Label>
-            </div>
-          ) : (
+    <div className="flex w-screen flex-col items-center ">
+      <h1 className="my-10 flex text-5xl font-bold leading-none text-gray-700">Welcome {data?.user.name}</h1>
+      {env.NEXT_PUBLIC_TESTMODE === "TESTING" ? (
+        <DoctorAndPatientFields />
+      ) : (
+        <Card className="mb-8 flex w-96 flex-col flex-wrap justify-center p-4 shadow-lg">
+          <Label htmlFor="r2">Account Type</Label>
+          <RadioGroup defaultValue={defaultRole} className="my-4 flex flex-row">
             <>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="Doctor" id="r2" onClick={() => setRoleState("doctor")} />
@@ -44,10 +41,10 @@ const Onboarding = () => {
                 <Label htmlFor="r1">Patient</Label>
               </div>
             </>
-          )}
-        </RadioGroup>
-        {env.NEXT_PUBLIC_TESTMODE === "TESTING" && role === "null" ? <DoctorAndPatientFields /> : role === "doctor" ? <DoctorFields /> : <PatientFields />}
-      </Card>
+          </RadioGroup>
+          {role === "doctor" ? <DoctorFields /> : <PatientFields />}
+        </Card>
+      )}
     </div>
   );
 };
@@ -146,63 +143,70 @@ const DoctorFields = () => {
 const DoctorAndPatientFields = () => {
   const { update } = useSession();
   const { toast } = useToast();
-  const setDoctor = api.user.setDoctor.useMutation();
-  const setPatient = api.user.setPatient.useMutation();
-  const [department, setDepartment] = useState("");
-  const [position, setPosition] = useState("");
-  const [height, setHeight] = useState("");
-  const [weight, setWeight] = useState("");
-  const [bloodType, setBloodType] = useState("");
-  const [allergies, setAllergies] = useState("");
-  const [medications, setMedications] = useState("");
-  const [DOB, setDOB] = useState("");
+  const setDemo = api.user.setDemo.useMutation();
+  const [department, setDepartment] = useState("General Medicine");
+  const [position, setPosition] = useState("General Practitioner");
+  const [height, setHeight] = useState("180");
+  const [weight, setWeight] = useState("60");
+  const [bloodType, setBloodType] = useState("B+");
+  const [allergies, setAllergies] = useState("None");
+  const [medications, setMedications] = useState("None");
+  const [DOB, setDOB] = useState("2001-01-01");
 
   return (
-    <>
-      <p className="text-sm">Demo accounts creates both a Doctor and Patient profile, only available in demo mode.</p>
-      <p className="py-4 font-bold">Patient:</p>
-      <Label htmlFor="height" className="mb-2">
-        Height
-      </Label>
-      <Input type="number" id="height" className="mb-4" value={height} onChange={(e) => setHeight(e.target.value)} />
-      <Label htmlFor="weight" className="mb-2">
-        Weight
-      </Label>
-      <Input type="number" id="weight" className="mb-4" value={weight} onChange={(e) => setWeight(e.target.value)} />
-      <Label htmlFor="bloodType" className="mb-2">
-        Blood Type
-      </Label>
-      <Input id="bloodType" className="mb-4" value={bloodType} onChange={(e) => setBloodType(e.target.value)} />
-      <Label htmlFor="allergies" className="mb-2">
-        Allergies
-      </Label>
-      <Input id="allergies" className="mb-4" value={allergies} onChange={(e) => setAllergies(e.target.value)} />
-      <Label htmlFor="medications" className="mb-2">
-        Medications
-      </Label>
-      <Input id="medications" className="mb-4" value={medications} onChange={(e) => setMedications(e.target.value)} />
-      <Label htmlFor="DOB" className="mb-2">
-        Date of Birth
-      </Label>
-      <Input type="date" id="DOB" className="mb-4" value={DOB} onChange={(e) => setDOB(e.target.value)} />
-      <p className="py-4 font-bold">Doctor:</p>
-      <Label htmlFor="department" className="mb-2">
-        Department
-      </Label>
-      <Input id="department" className="mb-4" value={department} onChange={(e) => setDepartment(e.target.value)} />
-      <Label htmlFor="position" className="mb-2">
-        Designation
-      </Label>
-      <Input id="position" className="mb-4" value={position} onChange={(e) => setPosition(e.target.value)} />
+    <div className="flex flex-col items-center">
+      <p className="text-sm">Demo accounts creates both a Doctor and Patient profile, we&apos;ve prefilled the details to make it easier to get started.</p>
+      <p className="text-sm">Only available in demo mode.</p>
+      <div className="flex flex-row items-center pt-8">
+        <Card className="mx-4 mb-8 flex w-96 flex-col flex-wrap justify-center p-4 shadow-lg">
+          <p className="py-4 font-bold">Patient:</p>
+          <Label htmlFor="height" className="mb-2">
+            Height
+          </Label>
+          <Input type="number" id="height" className="mb-4" value={height} onChange={(e) => setHeight(e.target.value)} />
+          <Label htmlFor="weight" className="mb-2">
+            Weight
+          </Label>
+          <Input type="number" id="weight" className="mb-4" value={weight} onChange={(e) => setWeight(e.target.value)} />
+          <Label htmlFor="bloodType" className="mb-2">
+            Blood Type
+          </Label>
+          <Input id="bloodType" className="mb-4" value={bloodType} onChange={(e) => setBloodType(e.target.value)} />
+          <Label htmlFor="allergies" className="mb-2">
+            Allergies
+          </Label>
+          <Input id="allergies" className="mb-4" value={allergies} onChange={(e) => setAllergies(e.target.value)} />
+          <Label htmlFor="medications" className="mb-2">
+            Medications
+          </Label>
+          <Input id="medications" className="mb-4" value={medications} onChange={(e) => setMedications(e.target.value)} />
+          <Label htmlFor="DOB" className="mb-2">
+            Date of Birth
+          </Label>
+          <Input type="date" id="DOB" className="mb-4" value={DOB} onChange={(e) => setDOB(e.target.value)} />
+        </Card>
+        <Card className="mx-4 mb-8 flex w-96 flex-col flex-wrap justify-center p-4 shadow-lg">
+          <p className="py-4 font-bold">Doctor:</p>
+          <Label htmlFor="department" className="mb-2">
+            Department
+          </Label>
+          <Input id="department" className="mb-4" value={department} onChange={(e) => setDepartment(e.target.value)} />
+          <Label htmlFor="position" className="mb-2">
+            Designation
+          </Label>
+          <Input id="position" className="mb-4" value={position} onChange={(e) => setPosition(e.target.value)} />
+        </Card>
+      </div>
       <Button
         onClick={async () => {
-          await setDoctor.mutateAsync({ department, position });
-          await setPatient.mutateAsync({
+          await setDemo.mutateAsync({
             height: parseFloat(height),
             weight: parseFloat(weight),
             bloodType,
             allergies,
             medications,
+            department,
+            position,
             DOB: new Date(DOB),
           });
           toast({
@@ -213,7 +217,7 @@ const DoctorAndPatientFields = () => {
       >
         Submit
       </Button>
-    </>
+    </div>
   );
 };
 
