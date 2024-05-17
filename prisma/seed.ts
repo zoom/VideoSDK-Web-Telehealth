@@ -11,7 +11,7 @@ async function main() {
         role: 'patient',
       },
     });
-    const alicePatient = await prisma.patient.create({
+    await prisma.patient.create({
       data: {
         userId: alice.id,
         height: 170,
@@ -32,7 +32,7 @@ async function main() {
         name: 'Bob',
       },
     })
-    const bobDoctor = await prisma.doctor.create({
+    await prisma.doctor.create({
       data: {
         userId: bob.id,
         position: 'General Practitioner',

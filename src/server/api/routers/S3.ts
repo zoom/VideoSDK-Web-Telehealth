@@ -66,19 +66,3 @@ export const S3Router = createTRPCRouter({
       return url;
     }),
 });
-
-// const response = await S3.send(
-//   new PutBucketCorsCommand({
-//     Bucket: env.S3_BUCKET, //TODO: replace
-//     CORSConfiguration: {
-//       CORSRules: new Array({
-//         AllowedHeaders: ["content-type"], //this is important, do not use "*"
-//         AllowedMethods: ["GET", "PUT", "HEAD"],
-//         AllowedOrigins: ["*"],
-//         ExposeHeaders: [],
-//         MaxAgeSeconds: 3000,
-//       }),
-//     },
-//   })
-// );
-// console.dir(response)

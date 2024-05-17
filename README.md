@@ -42,13 +42,21 @@ bun install # or npm install
 bunx prisma db push
 ```
 
-5. Run the app
+5. Seed the database with some data
+
+```bash
+bunx prisma db seed
+```
+
+7. Run the app
 
 ```bash
 bun dev # or npm run dev
 ```
 
-5. Open [http://localhost:3000](http://localhost:3000) with your browser.
+8. Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+> If you intend to use file uploads, you need to set the S3 bucket policy. An example can be found in `utils/set-s3-policy.ts`. You can run this script to set the CORS Rules to allow all requests from any origin.
 
 ## Customisation
 
