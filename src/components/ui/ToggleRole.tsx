@@ -14,7 +14,7 @@ const ToggleRoleBanner = () => {
         <p className="text-sm font-medium">
           <TooltipProvider>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger>
                 <div className="flex items-center justify-center">
                   <span className="text-xl font-bold">Demo Mode</span>
                   <LucideInfo className="ml-2" />
