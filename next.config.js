@@ -17,6 +17,15 @@ const config = {
     locales: ["en"],
     defaultLocale: "en",
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "source.boringavatars.com",
+        pathname: "**/*",
+      },
+    ],
+  },
 };
 
 export default config;
