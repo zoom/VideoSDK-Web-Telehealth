@@ -25,32 +25,30 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
 
   return (
     <div>
-      <div className="min-h-[8rem] w-full min-w-[680px] rounded-lg bg-white shadow-lg">
+      <div className="min-h-[8rem] w-full min-w-[720px] rounded-lg bg-white shadow-lg">
         <div className="flex items-start gap-4 p-4">
           <p className="text-1xl rounded-lg bg-blue-200 p-2 px-4 text-center font-bold text-white">
             {rooms.time.toString().slice(4, 7)}
             <br></br>
             {rooms.time.toString().slice(7, 11)}
           </p>
-          <div className="min-w-[540px] bg-white">
+          <div className="w-full bg-white">
             <div className="flex items-center justify-between">
-              <span className="flex items-center">
-                <h4 className="text-base font-semibold uppercase tracking-wide text-indigo-500">
-                  {rooms.title}, with {isDoctor ? rooms.User_CreatedFor?.[0].name : rooms.User_CreatedBy?.name}
-                </h4>
-                <Button
-                  variant={"link"}
-                  onClick={async () => {
-                    const link = `${window.location.origin}/room/`;
-                    await navigator.clipboard.writeText(link);
-                    toast({ title: "Copied link to clipoard", description: link });
-                  }}
-                  className="max-w-full"
-                >
-                  <LinkIcon height={18} strokeWidth={3} />
-                </Button>
-              </span>
-              <small className="text-sm text-gray-700">{moment(rooms.time).local().fromNow()}</small>
+              <h4 className="text-base font-semibold uppercase tracking-wide text-indigo-500">
+                {rooms.title}, with {isDoctor ? rooms.User_CreatedFor?.[0].name : rooms.User_CreatedBy?.name}
+              </h4>
+              <Button
+                variant={"link"}
+                onClick={async () => {
+                  const link = `${window.location.origin}/room/`;
+                  await navigator.clipboard.writeText(link);
+                  toast({ title: "Copied link to clipoard", description: link });
+                }}
+                className="max-w-full"
+              >
+                <LinkIcon height={18} strokeWidth={3} />
+              </Button>
+              {/* <small className="text-sm text-gray-700">{moment(rooms.time).local().fromNow()}</small> */}
             </div>
             <Link className="flex flex-1 text-sm text-blue-500 hover:underline" href={`/room/${rooms.id}`}>
               Join Session
