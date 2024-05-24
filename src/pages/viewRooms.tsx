@@ -19,20 +19,25 @@ export default function Home() {
   const { data: invitedRoomsPast, isLoading: loading3 } = api.room.getInvitedPast.useQuery();
   const { data: invitedRoomsUpcoming, isLoading: loading4 } = api.room.getInvitedUpcoming.useQuery();
 
+  console.log('roomsreversed', createdRoomsPast?.sort())
+  console.log('roomsforward', createdRoomsPast)
+
   return (
     <>
+
+    
       <Header />
-      <div className="flex h-screen w-screen flex-col items-left overflow-y-scroll bg-gray-100 pb-4 px-10">
+      <div className="flex flex-col h-screen w-screen overflow-y-scroll bg-gray-100 pb-4 px-10">
         <h1 className="mb-4 mt-6 flex text-center text-4xl font-sans leading-none text-gray-700">Your Schedule</h1>
-        <h3 className="gray text-left text-base font-sans text-gray-700">Upcoming Appointments</h3>
-        <div>
+        <h3 className="gray text-center text-base font-sans text-gray-700">Upcoming Appointments</h3>
+        <div className="">
     
               <Rooms rooms={createdRoomsUpcoming} isLoading={loading1} />
  
         </div>
-        <h3 className="text-left text-base font-sans text-gray-700">Past Appointments</h3>
+        <h3 className="text-center text-base font-sans text-gray-700">Past Appointments</h3>
         <div>
-              <Rooms rooms={createdRoomsPast} isLoading={loading3} />
+              <Rooms rooms={createdRoomsPast?.reverse()} isLoading={loading3} />
         </div>
     
         <Link href="/">
@@ -50,7 +55,7 @@ const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => 
     console.log('room', room)
   })
   return (
-    <div className="mb-4 flex">
+    <div className="my-5 flex flex-col items-center gap-3 rounded-xl">
       {isLoading ? (
         <Card className="m-8 flex h-[28rem] w-80 flex-col justify-center self-center rounded-lg bg-white p-5 text-center shadow-lg">
           <Skeleton className="h-96 w-full animate-pulse" />
@@ -60,7 +65,7 @@ const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => 
       ) : (
         rooms?.map((room) => (
           // <Card key={room.id} className="mx-6 my-4 flex h-[28rem] w-80 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
-          <div className='items-start px-2'>
+          <div className=''>
 
             <UpcomingSession data={room} isDoctor={data?.user.role === "doctor"} key={room.id} />
         
