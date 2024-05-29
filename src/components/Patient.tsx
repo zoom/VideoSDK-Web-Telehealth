@@ -13,61 +13,50 @@ const DoctorView = () => {
   return (
     <>
       <span className="py-8">
-        <h2 className="mb-8 self-center text-2xl font-bold text-gray-700">Welcome Patient, {userData?.user.name}</h2>
+        <p className="text-sm text-gray-700">Welcome,</p>
+        <h2 className="mb-6 mt-2 self-center text-2xl font-bold text-gray-700">{userData?.user.name}</h2>
         <h3 className="text-sm text-gray-700">
           Welcome to your dashboard, where you can view upcoming apointments, join scheduled appointments, and view active users
         </h3>
+        <div className="flex w-full flex-row">
+          <Link href={"/create"} className="m-2 flex flex-row justify-around">
+            <Button>
+              <CalendarPlus size={20} className="mr-2" />
+              Create an appointment
+            </Button>
+          </Link>
+          <Link href={"/viewRooms"} className="m-2 flex flex-row justify-around">
+            <Button variant={"outline"}>
+              <Calendar size={18} className="mr-2" />
+              See your schedule
+            </Button>
+          </Link>
+          <Link href={"/viewDoctors"} className="m-2 flex flex-row justify-around">
+            <Button variant={"outline"}>
+              <BadgePlus className="mr-2" />
+              Find a doctor
+            </Button>
+          </Link>
+          <Link href={`/viewPatient/${userData?.user.id}`} className="m-2 flex flex-row justify-around">
+            <Button variant={"outline"}>
+              <BookUser className="mr-2" />
+              View your profile
+            </Button>
+          </Link>
+          <Link href={"/upload"} className="m-2 flex flex-row justify-around">
+            <Button variant={"outline"}>
+              <Upload size={18} className="mr-2" />
+              Upload Document
+            </Button>
+          </Link>
+        </div>
       </span>
       <div className="flex flex-1 flex-row justify-around">
         <div className="flex flex-1 flex-col">
-          <h3 className="self-center text-xl font-bold text-gray-700">Upcoming Appointments</h3>
-          <Card className="m-4 mx-8 flex min-h-96 min-w-96 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
-            {isLoading ? <Skeleton className="h-64 w-64"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} /> : <p>No Appointments</p>}
-          </Card>
-        </div>
-        <div className="flex flex-1 flex-col">
-          <h3 className="self-center text-xl font-bold text-gray-700">Appointments</h3>
-          <Card className="m-4 flex h-full w-80 flex-col justify-around self-center rounded-lg bg-white p-4 text-center shadow-sm">
-            <div className="flex flex-row justify-center">
-              <Link href={"/create"} className="m-2 flex flex-row justify-around">
-                <Button>
-                  <CalendarPlus size={20} className="mr-2" />
-                  Schedule
-                </Button>
-              </Link>
-              <Link href={"/viewRooms"} className="m-2 flex flex-row justify-around">
-                <Button variant={"outline"}>
-                  <Calendar size={18} className="mr-2" />
-                  View All
-                </Button>
-              </Link>
-            </div>
-            <div className="flex flex-row justify-center">
-              <Link href={"/viewDoctors"} className="m-2 flex flex-row justify-around">
-                <Button variant={"outline"}>
-                  <BadgePlus className="mr-2" />
-                  View Doctors
-                </Button>
-              </Link>
-            </div>
-          </Card>
-          <h3 className="self-center text-xl font-bold text-gray-700">Profile</h3>
-          <Card className="m-4 mx-8 flex h-full w-80 flex-col justify-around self-center rounded-lg bg-white p-4 text-center shadow-sm">
-            <div className="flex flex-col justify-center">
-              <Link href={"/upload"} className="m-2 flex flex-row justify-around">
-                <Button>
-                  <Upload size={18} className="mr-2" />
-                  Upload Document
-                </Button>
-              </Link>
-              <Link href={`/viewPatient/${userData?.user.id}`} className="m-2 flex flex-row justify-around">
-                <Button variant={"outline"}>
-                  <BookUser className="mr-2" />
-                  View Details
-                </Button>
-              </Link>
-            </div>
-          </Card>
+          <h3 className="text-xl font-bold text-gray-700">Upcoming Appointments</h3>
+          <div className="flex flex-col rounded-lg text-center">
+            {isLoading ? <Skeleton className="h-64 w-64"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} /> : <p>No appointments, yet.</p>}
+          </div>
         </div>
       </div>
     </>

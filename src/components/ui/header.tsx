@@ -13,7 +13,7 @@ function Header() {
   return (
     <div className="w-screen bg-white px-4 lg:px-8">
       <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
-        <Link href="/" className="flex w-full items-center gap-2">
+        <Link href="/" className="flex items-center gap-2">
           <Image className="inline" src={"/logo.svg"} height={24} width={80} alt="product logo" />
           <span className="text-xl leading-tight tracking-tighter">
             Video SDK <span>for Healthcare</span>

@@ -27,11 +27,10 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
     <div>
       <div className="min-h-[8rem] w-full min-w-[720px] rounded-lg bg-white shadow-lg">
         <div className="flex items-start gap-4 p-4">
-          <p className="text-1xl rounded-lg bg-blue-200 p-2 px-4 text-center font-bold text-white">
-            {rooms.time.toString().slice(4, 7)}
-            <br></br>
-            {rooms.time.toString().slice(7, 11)}
-          </p>
+          <div className="flex flex-col rounded-lg rounded-lg border border-gray-400 text-center text-lg">
+            <div className="w-full rounded-t-md bg-gray-400 px-3 py-0.5 text-sm uppercase text-white">{rooms.time.toString().slice(4, 7)}</div>
+            <div className="text-gray-400">{rooms.time.toString().slice(7, 11)}</div>
+          </div>
           <div className="w-full bg-white">
             <div className="flex items-center justify-between">
               <h4 className="text-base font-semibold uppercase tracking-wide text-indigo-500">

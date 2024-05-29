@@ -11,9 +11,9 @@ const Doctors = () => {
     <>
       <Header />
       <div className="flex min-h-[80vh] w-screen flex-col items-center overflow-y-scroll bg-gray-100">
-        <h1 className="mb-2 mt-8 flex text-3xl font-bold leading-none text-gray-700">Doctors</h1>
-        <div className="mx-24 flex flex-row flex-wrap justify-center self-center">
-          <ViewDoctor />
+        <h1 className="mx-auto mb-2 mt-8 flex w-full max-w-xl self-start text-3xl font-bold leading-none text-gray-700">View all Doctors</h1>
+        <div className="flex w-full flex-row flex-wrap justify-center self-center">
+          <ViewDoctors />
         </div>
         <Link href="/">
           <Button variant={"link"} className="mx-auto mb-8 flex">
@@ -26,7 +26,7 @@ const Doctors = () => {
   );
 };
 
-const ViewDoctor = () => {
+const ViewDoctors = () => {
   const { data, isLoading } = api.user.getDoctors.useQuery();
 
   return (
@@ -39,24 +39,32 @@ const ViewDoctor = () => {
         </Card>
       ) : (
         <>
-          {data?.map((doctor) => (
-            <Card className="m-4 flex h-48 w-96 flex-col justify-center self-center p-8" key={doctor.id}>
-              <p className="text-xl font-bold">{doctor.User?.name}</p>
-              <p>
-                Department: <span className="font-bold">{doctor.department}</span>
-              </p>
-              <p>
-                Title: <span className="font-bold">{doctor.position}</span>
-              </p>
-              <p>
-                Email: <span className="font-bold">{doctor.User?.email}</span>
-              </p>
-            </Card>
-          ))}
+          <div className="flex w-full max-w-xl flex-col gap-2">
+            {data?.map((doctor) => (
+              <Card className="flex w-full flex-row justify-between	p-4" key={doctor.id}>
+                <div className="flex flex-row gap-3">
+                  <div className="relative h-10 w-10 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-600">
+                    <svg className="absolute -left-1 h-12 w-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                  <div className="flex-flex-col">
+                    <p className="text-md font-bold">Dr. {doctor.User?.name}</p>
+                    <p className="text-sm text-gray-600">
+                      {doctor.department} - {doctor.position}
+                    </p>
+                  </div>
+                </div>
+                <Button variant={"outline"} className="flex">
+                  Schedule
+                </Button>
+              </Card>
+            ))}
+          </div>
         </>
       )}
     </>
   );
 };
-export { ViewDoctor };
+export { ViewDoctors };
 export default Doctors;

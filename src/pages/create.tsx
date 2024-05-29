@@ -26,7 +26,7 @@ export default function Home() {
     <>
       <Header />
       <div className="flex w-screen flex-col items-center bg-gray-100">
-        <h1 className="my-10 flex text-center text-3xl font-bold leading-none text-gray-700">Schedule Appointment</h1>
+        <h1 className="my-10 flex text-center text-3xl font-bold leading-none text-gray-700">Schedule an appointment</h1>
         <Card className="mb-8 flex w-[32rem] flex-col flex-wrap justify-center p-8 shadow-lg">
           <form
             className="flex w-full flex-col"
