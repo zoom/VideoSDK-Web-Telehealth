@@ -53,7 +53,7 @@ const DoctorView = () => {
       <div className="flex flex-1 flex-row justify-around">
         <div className="flex flex-1 flex-col">
           <h3 className="text-xl font-bold text-gray-700">Upcoming Appointments</h3>
-          <div className="flex flex-col rounded-lg text-center">
+          <div className="mt-4 flex flex-col rounded-lg text-center">
             {isLoading ? <Skeleton className="h-64 w-64"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} /> : <p>No appointments, yet.</p>}
           </div>
         </div>

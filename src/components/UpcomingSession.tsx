@@ -31,7 +31,8 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
           <div className="w-full bg-white">
             <div className="flex items-center justify-between">
               <h4 className="text-base font-semibold uppercase tracking-wide text-indigo-500">
-                {rooms.title}, with {isDoctor ? rooms.User_CreatedFor?.[0].name : rooms.User_CreatedBy?.name}
+                {rooms.title}
+                {rooms.User_CreatedFor?.[0] ? `, with${isDoctor ? rooms.User_CreatedFor?.[0].name : rooms.User_CreatedBy?.name}` : ""}
               </h4>
               <Button
                 variant={"link"}
@@ -51,7 +52,7 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
             </Link>
             <p className="mt-3 flex justify-start text-sm text-gray-700">
               {/* automate doctor speciality */}
-              {isDoctor ? (
+              {isDoctor && rooms.User_CreatedFor?.[0] ? (
                 <Link href={`/viewPatient/${rooms.User_CreatedFor?.[0].id}`} className="text-gray-500">
                   <p className="text-grey-500 hover:text-blue-500" title="click for patient details">
                     Patient: {rooms.User_CreatedFor?.[0].name}
