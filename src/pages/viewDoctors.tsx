@@ -60,9 +60,11 @@ const ViewDoctors = () => {
                   </p>
                 </div>
               </div>
-              <Button variant={"outline"} className="flex">
-                Schedule
-              </Button>
+              <Link href={`/viewDoctor/${doctor.id}`} className="self-start">
+                <Button variant={"outline"} className="flex">
+                  Schedule
+                </Button>
+              </Link>
             </Card>
           ))}
         </div>

@@ -24,13 +24,13 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
     <div>
       <div className="min-h-[8rem] w-full min-w-[720px] rounded-lg bg-white shadow-lg">
         <div className="flex items-start gap-4 p-4">
-          <div className="flex flex-col rounded-lg rounded-lg border border-gray-400 text-center text-lg">
-            <div className="w-full rounded-t-md bg-gray-400 px-3 py-0.5 text-sm uppercase text-white">{rooms.time.toString().slice(4, 7)}</div>
-            <div className="text-gray-400">{rooms.time.toString().slice(7, 11)}</div>
+          <div className="flex flex-col rounded-lg border border-blue-600 text-center text-lg">
+            <div className="w-full rounded-t-md bg-blue-600 px-3 py-0.5 text-sm uppercase text-white">{rooms.time.toString().slice(4, 7)}</div>
+            <div className="text-blue-600">{rooms.time.toString().slice(7, 11)}</div>
           </div>
           <div className="w-full bg-white">
             <div className="flex items-center justify-between">
-              <h4 className="text-base font-semibold uppercase tracking-wide text-indigo-500">
+              <h4 className="text-lg font-semibold uppercase tracking-wide text-blue-700">
                 {rooms.title}
                 {rooms.User_CreatedFor?.[0] ? `, with ${isDoctor ? rooms.User_CreatedFor?.[0].name : rooms.User_CreatedBy?.name}` : ""}
               </h4>
@@ -47,8 +47,9 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
               </Button>
               {/* <small className="text-sm text-gray-700">{moment(rooms.time).local().fromNow()}</small> */}
             </div>
-            <Link className="flex flex-1 text-sm text-blue-500 hover:underline" href={`/room/${rooms.id}`}>
-              Join Session
+            <Link className="flex flex-1 text-sm text-blue-600 hover:underline" href={`/room/${rooms.id}`}>
+              Join Apointment
+              {/* add logic to show join session button if time is in the future by some amount */}
             </Link>
             <p className="mt-3 flex justify-start text-sm text-gray-700">
               {/* automate doctor speciality */}
@@ -59,20 +60,29 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
                   </p>
                 </Link>
               ) : (
-                <p className="text-gray-500">Dr. {rooms.User_CreatedBy?.name}, Cardiology Specialist</p>
+                <p className="text-gray-500">Dr. {rooms.User_CreatedBy?.name}</p>
               )}
             </p>
             <div className="flex gap-4">
-              <Link href={`/viewNotes/`}>
+              <Link href={`/viewNotes/${data.id}`}>
                 <Button className="p-0" variant={"link"}>
                   Notes
                 </Button>
               </Link>
-              <Link href={`/viewNotes/`}>
+              <Link href={`/`}>
                 <Button className="p-0" variant={"link"}>
                   Recordings
                 </Button>
               </Link>
+              {data.time.getTime() > new Date().getTime() ? (
+                <Link href={``}>
+                  <Button className="p-0" variant={"link"}>
+                    Add to calendar
+                  </Button>{" "}
+                </Link>
+              ) : (
+                <></>
+              )}
             </div>
           </div>
         </div>
@@ -152,3 +162,10 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
 };
 
 export default UpcomingSession;
+
+// - Patient can see
+// - Recording
+// - Transcript
+// - Add to calendar
+// - Doctor can also
+// - notes
