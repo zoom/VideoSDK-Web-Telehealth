@@ -3,11 +3,8 @@ import moment from "moment";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
-import { LinkIcon, X } from "lucide-react";
+import { LinkIcon } from "lucide-react";
 import { api } from "~/utils/api";
-import RecordingModal from "./RecordingModal";
-import { Avatar } from "~/components/ui/avatar";
-import { AvatarImage } from "@radix-ui/react-avatar";
 
 type RoomData = Room & {
   User_CreatedFor?: User[];

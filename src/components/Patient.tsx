@@ -2,7 +2,6 @@ import { useSession } from "next-auth/react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { api } from "~/utils/api";
-import { Card } from "./ui/card";
 import UpcomingSession from "./UpcomingSession";
 import { Skeleton } from "./ui/skeleton";
 import { CalendarPlus, BadgePlus, Calendar, Upload, BookUser } from "lucide-react";

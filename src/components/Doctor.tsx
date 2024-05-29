@@ -5,7 +5,7 @@ import { api } from "~/utils/api";
 import { Card } from "./ui/card";
 import UpcomingSession from "./UpcomingSession";
 import { Skeleton } from "./ui/skeleton";
-import { CalendarPlus, UserSearch, BadgePlus, Calendar } from "lucide-react";
+import { CalendarPlus, UserSearch, Calendar } from "lucide-react";
 
 const DoctorView = () => {
   const { data: userData } = useSession();

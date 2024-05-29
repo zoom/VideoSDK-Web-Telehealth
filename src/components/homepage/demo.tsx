@@ -1,5 +1,4 @@
 import { signIn } from "next-auth/react";
-import Image from "next/image";
 import { buttonVariants } from "~/components/ui/button";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { Button } from "~/components/ui/button";
@@ -12,9 +11,7 @@ const Demopage = () => {
       <div className="space-y-6 text-center lg:text-start">
         <main className="text-5xl font-bold md:text-6xl">
           <h1 className="inline">
-            <span className="flex justify-start">
-              {/* <h1 className="ml-2 inline text-5xl font-bold leading-none text-gray-700">Demo Health</h1> */}
-            </span>{" "}
+            <span className="flex justify-start">{/* <h1 className="ml-2 inline text-5xl font-bold leading-none text-gray-700">Demo Health</h1> */}</span>{" "}
             <span className="inline bg-gradient-to-r from-[#61DAFB] via-[#1fc0f1] to-[#03a3d7] bg-clip-text text-transparent">Demo Health</span>
           </h1>{" "}
         </main>

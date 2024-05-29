@@ -1,5 +1,4 @@
 import { type Room } from "@prisma/client";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "~/components/ui/tabs";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import UpcomingSession from "~/components/UpcomingSession";
@@ -9,8 +8,6 @@ import { Skeleton } from "~/components/ui/skeleton";
 import { api } from "~/utils/api";
 import Footer from "~/components/ui/footer";
 import Header from "~/components/ui/header";
-import { Avatar } from "~/components/ui/avatar";
-import { AvatarImage } from "@radix-ui/react-avatar";
 
 export default function Home() {
   const { data: createdRoomsPast, isLoading: loading1 } = api.room.getCreatedPast.useQuery();
@@ -67,12 +64,7 @@ const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => 
           You have no upcoming appointments.
         </Card>
       ) : (
-        rooms?.map((room) => (
-          // <Card key={room.id} className="mx-6 my-4 flex h-[28rem] w-80 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
-          <div className="">
-            <UpcomingSession data={room} isDoctor={data?.user.role === "doctor"} key={room.id} />
-          </div>
-        ))
+        rooms?.map((room) => <UpcomingSession data={room} isDoctor={data?.user.role === "doctor"} key={room.id} />)
       )}
     </div>
   );

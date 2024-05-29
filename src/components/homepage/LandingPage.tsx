@@ -1,7 +1,4 @@
 import { signIn } from "next-auth/react";
-import Image from "next/image";
-import { buttonVariants } from "~/components/ui/button";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { useRouter } from "next/router";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -23,7 +20,9 @@ const LandingPage = () => {
           </h1>{" "}
         </main>
 
-        <p className="mx-auto text-xl text-muted-foreground md:w-10/12 lg:mx-0">Welcome to your healthcare corner, where we'll treat with you respect and handle you with care</p>
+        <p className="mx-auto text-xl text-muted-foreground md:w-10/12 lg:mx-0">
+          Welcome to your healthcare corner, where we&apos;ll treat with you respect and handle you with care
+        </p>
 
         <div className="space-y-4 md:space-x-4 md:space-y-0">
           <Button variant={"outline"} onClick={() => void signIn()}>
