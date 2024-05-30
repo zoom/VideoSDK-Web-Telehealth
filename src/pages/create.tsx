@@ -117,11 +117,11 @@ export default function Home() {
                 if (!(title && content && user && duration && time)) return;
                 const utcTime = moment(time).utc().toDate();
                 try {
+                  await createAppointment.mutateAsync({ title, content, IDs: [user?.id], duration, time: utcTime });
                   toast({
                     title: "Success",
                     description: "Appointment created, redirecting...",
                   });
-                  await createAppointment.mutateAsync({ title, content, IDs: [user?.id], duration, time: utcTime });
                   await utils.room.getCreatedUpcoming.invalidate();
                   await router.push("/");
                 } catch (e) {
