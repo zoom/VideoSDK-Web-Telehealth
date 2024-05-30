@@ -45,11 +45,12 @@ const RightBar = (props: RightBarProps) => {
         </TabsContent>
       </div>
     </Tabs>
-  ) : Object.keys(transcriptionSubtitle).length > 0 ? (
+  ) : inCall ? (
     // for patient view
-    <Tabs className="mt-2 flex flex-1 flex-col self-start">
+    // patient only sees rightbar during call as no feature are available outside call for them
+    <Tabs className="mt-2 flex flex-1 flex-col self-start" value={activeTab} onValueChange={setActiveTab}>
       <TabsList>
-        <TabsTrigger value="transcript">Transcript</TabsTrigger>
+        {Object.keys(transcriptionSubtitle).length > 0 ? <TabsTrigger value="transcript">Transcript</TabsTrigger> : <></>}
         {inCall ? <TabsTrigger value="chat">Chat</TabsTrigger> : <></>}
         <Button
           variant={"secondary"}
