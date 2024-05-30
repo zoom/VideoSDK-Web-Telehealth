@@ -25,10 +25,10 @@ const DoctorView = () => {
               Create an appointment
             </Button>
           </Link>
-          <Link href={"/viewRooms"} className="m-2 flex flex-row justify-around">
+          <Link href={"/schedule"} className="m-2 flex flex-row justify-around">
             <Button variant={"outline"}>
               <Calendar size={18} className="mr-2" />
-              See your schedule
+              View your schedule
             </Button>
           </Link>
           <Link href={"/patients"} className="m-2 flex flex-row justify-around">
