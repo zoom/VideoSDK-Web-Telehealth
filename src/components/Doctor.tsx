@@ -31,7 +31,7 @@ const DoctorView = () => {
               See your schedule
             </Button>
           </Link>
-          <Link href={"/viewPatients"} className="m-2 flex flex-row justify-around">
+          <Link href={"/patients"} className="m-2 flex flex-row justify-around">
             <Button variant={"outline"}>
               <UserSearch size={18} className="mr-2" />
               Find a patient

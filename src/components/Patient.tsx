@@ -37,7 +37,7 @@ const DoctorView = () => {
               Find a doctor
             </Button>
           </Link>
-          <Link href={`/viewPatient/${userData?.user.id}`} className="m-2 flex flex-row justify-around">
+          <Link href={`/patient/${userData?.user.id}`} className="m-2 flex flex-row justify-around">
             <Button variant={"outline"}>
               <BookUser className="mr-2" />
               View your profile

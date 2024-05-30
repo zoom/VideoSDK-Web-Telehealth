@@ -1,7 +1,7 @@
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
-const forbiddenRoutesForPatient = ["/viewPatients", "/viewPatient"];
+const forbiddenRoutesForPatient = ["/patients", "/patient"];
 
 const RouteValidator = ({ children }: { children: React.ReactNode }) => {
   const { status, data } = useSession();

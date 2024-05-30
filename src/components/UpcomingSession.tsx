@@ -6,7 +6,6 @@ import { useToast } from "./ui/use-toast";
 import { LinkIcon } from "lucide-react";
 import { api } from "~/utils/api";
 import { useSession } from "next-auth/react";
-import { capitalize } from "~/lib/utils";
 
 type RoomData = Room & {
   User_CreatedFor?: User[];
@@ -59,14 +58,14 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
             <p className="mt-3 flex justify-start text-sm text-gray-700">
               {data.createByUserId === userData?.user.id ? (
                 data.User_CreatedFor?.[0]?.role === "patient" ? (
-                  <Link href={`/viewPatient/${data.User_CreatedFor?.[0].id}`} className="text-gray-500">
+                  <Link href={`/patient/${data.User_CreatedFor?.[0].id}`} className="text-gray-500">
                     <p className="text-grey-500 hover:text-blue-500" title="Patient details">{`Patient: ${data.User_CreatedFor?.[0]?.name}`}</p>
                   </Link>
                 ) : (
                   <p>{`Doctor: ${data.User_CreatedFor?.[0]?.name}`}</p>
                 )
               ) : data.User_CreatedBy?.role === "patient" ? (
-                <Link href={`/viewPatient/${data.User_CreatedBy.id}`} className="text-gray-500">
+                <Link href={`/patient/${data.User_CreatedBy.id}`} className="text-gray-500">
                   <p className="text-grey-500 hover:text-blue-500" title="Patient details">{`Patient: ${data.User_CreatedFor?.[0]?.name}`}</p>
                 </Link>
               ) : (
@@ -149,7 +148,7 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
     //       {/* <Avatar className="ml-4">
     //         <AvatarImage src={data?.user.image as string | undefined} alt="User Avatar" />
     //       </Avatar>               */}
-    //         <Link href={`/viewPatient/${rooms.User_CreatedFor?.[0].id}`} className="mt-2 text-gray-500">
+    //         <Link href={`/patient/${rooms.User_CreatedFor?.[0].id}`} className="mt-2 text-gray-500">
     //         <p className="mt-2 text-grey-500 hover:text-blue-500" title='click for patient details'>Patient: {rooms.User_CreatedFor?.[0].name}</p>
     //         </Link>
     //       {/* <p className="mt-2 text-gray-500">Patient: {rooms.User_CreatedFor?.[0].name}</p> */}
