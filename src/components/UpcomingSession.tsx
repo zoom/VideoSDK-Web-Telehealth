@@ -69,7 +69,7 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
                   Notes
                 </Button>
               </Link>
-              <Link href={`/`}>
+              <Link href={`/viewRecordings/${data.id}`}>
                 <Button className="p-0" variant={"link"}>
                   Recordings
                 </Button>
@@ -83,6 +83,7 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
               ) : (
                 <></>
               )}
+              {/* <button onClick={() => deleteRoom.mutate({ id: data.id })}>delete</button> */}
             </div>
           </div>
         </div>

@@ -4,7 +4,7 @@ import { api } from "~/utils/api";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 
 const RecordingModal = (props: { roomId: string; buttonVariant?: "link" | "default" | "secondary" | "outline" }) => {
-  const getAllRecordings = api.zoom.getAllRecordings.useMutation();
+  const fetchAllRecordings = api.zoom.fetchAllRecordings.useMutation();
   const { buttonVariant } = props;
 
   return (
@@ -13,7 +13,7 @@ const RecordingModal = (props: { roomId: string; buttonVariant?: "link" | "defau
         <Button
           variant={buttonVariant ? buttonVariant : "link"}
           onClick={() => {
-            if (getAllRecordings.status === "idle") getAllRecordings.mutate({ roomId: props.roomId }, {});
+            if (fetchAllRecordings.status === "idle") fetchAllRecordings.mutate({ roomId: props.roomId }, {});
           }}
         >
           Recordings
@@ -23,10 +23,10 @@ const RecordingModal = (props: { roomId: string; buttonVariant?: "link" | "defau
         <DialogHeader>
           <DialogTitle>Recordings</DialogTitle>
         </DialogHeader>
-        {getAllRecordings.isLoading ? (
+        {fetchAllRecordings.isLoading ? (
           <DialogDescription>Loading...</DialogDescription>
         ) : (
-          getAllRecordings.data?.map((e) => (
+          fetchAllRecordings.data?.map((e) => (
             <div key={e.session_id} className="flex flex-row justify-between">
               <div className="flex flex-col">
                 <p>{new Date(e.start_time).toLocaleDateString()}</p>
