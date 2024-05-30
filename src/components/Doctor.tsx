@@ -42,9 +42,15 @@ const DoctorView = () => {
       <div className="flex flex-1 flex-row justify-around">
         <div className="flex flex-1 flex-col">
           <h3 className="text-xl font-bold text-gray-700">Upcoming appointments</h3>
-          <Card className="rounded-lgp-5 mt-4 flex min-w-96 flex-col text-center">
-            {isLoading ? <Skeleton className="w-full animate-pulse" /> : data?.[0] ? <UpcomingSession data={data[0]} isDoctor /> : <p>No appointments, yet</p>}
-          </Card>
+          <div className="mt-4 flex flex-col rounded-lg text-center">
+            {isLoading ? (
+              <Skeleton className="w-full animate-pulse" />
+            ) : data?.[0] ? (
+              <UpcomingSession data={data[0]} isDoctor />
+            ) : (
+              <Card className="p-4">No appointments, yet</Card>
+            )}
+          </div>
         </div>
       </div>
     </>

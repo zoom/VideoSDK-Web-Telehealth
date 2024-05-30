@@ -5,6 +5,7 @@ import { api } from "~/utils/api";
 import UpcomingSession from "./UpcomingSession";
 import { Skeleton } from "./ui/skeleton";
 import { CalendarPlus, BadgePlus, Calendar, Upload, BookUser } from "lucide-react";
+import { Card } from "./ui/card";
 
 const DoctorView = () => {
   const { data: userData } = useSession();
@@ -54,7 +55,13 @@ const DoctorView = () => {
         <div className="flex flex-1 flex-col">
           <h3 className="text-xl font-bold text-gray-700">Upcoming Appointments</h3>
           <div className="mt-4 flex flex-col rounded-lg text-center">
-            {isLoading ? <Skeleton className="h-64 w-64"></Skeleton> : data?.[0] ? <UpcomingSession data={data[0]} /> : <p>No appointments, yet.</p>}
+            {isLoading ? (
+              <Skeleton className="h-64 w-64"></Skeleton>
+            ) : data?.[0] ? (
+              <UpcomingSession data={data[0]} />
+            ) : (
+              <Card className="p-4">No appointments, yet</Card>
+            )}
           </div>
         </div>
       </div>
