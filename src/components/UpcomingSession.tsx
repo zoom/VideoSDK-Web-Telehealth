@@ -58,9 +58,19 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
             </Link>
             <p className="mt-3 flex justify-start text-sm text-gray-700">
               {data.createByUserId === userData?.user.id ? (
-                <p>{capitalize(data.User_CreatedFor?.[0]?.role) + ": " + data.User_CreatedFor?.[0]?.name}</p>
+                data.User_CreatedFor?.[0]?.role === "patient" ? (
+                  <Link href={`/viewPatient/${data.User_CreatedFor?.[0].id}`} className="text-gray-500">
+                    <p className="text-grey-500 hover:text-blue-500" title="Patient details">{`Patient: ${data.User_CreatedFor?.[0]?.name}`}</p>
+                  </Link>
+                ) : (
+                  <p>{`Doctor: ${data.User_CreatedFor?.[0]?.name}`}</p>
+                )
+              ) : data.User_CreatedBy?.role === "patient" ? (
+                <Link href={`/viewPatient/${data.User_CreatedBy.id}`} className="text-gray-500">
+                  <p className="text-grey-500 hover:text-blue-500" title="Patient details">{`Patient: ${data.User_CreatedFor?.[0]?.name}`}</p>
+                </Link>
               ) : (
-                <p>{capitalize(data.User_CreatedBy?.role) + ": " + data.User_CreatedBy?.name}</p>
+                <p>{`Doctor: ${data.User_CreatedBy?.name}`}</p>
               )}
             </p>
             <div className="flex gap-4">
