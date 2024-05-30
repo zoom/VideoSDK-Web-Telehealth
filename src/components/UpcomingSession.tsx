@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 import { LinkIcon } from "lucide-react";
 import { api } from "~/utils/api";
+import { useSession } from "next-auth/react";
 
 type RoomData = Room & {
   User_CreatedFor?: User[];
@@ -13,6 +14,7 @@ type RoomData = Room & {
 
 const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolean }) => {
   const rooms = data;
+  const { data: userData } = useSession();
   const { toast } = useToast();
   const deleteRoom = api.room.delete.useMutation();
   const utils = api.useUtils();
@@ -32,7 +34,9 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
             <div className="flex items-center justify-between">
               <h4 className="text-lg font-semibold uppercase tracking-wide text-blue-700">
                 {rooms.title}
-                {rooms.User_CreatedFor?.[0] ? `, with ${isDoctor ? rooms.User_CreatedFor?.[0].name : rooms.User_CreatedBy?.name}` : ""}
+                {rooms.User_CreatedFor?.[0]
+                  ? `, with ${rooms.User_CreatedBy?.id === userData?.user.id ? rooms.User_CreatedFor?.[0].name : rooms.User_CreatedBy?.name}`
+                  : ""}
               </h4>
               <Button
                 variant={"link"}
