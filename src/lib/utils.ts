@@ -6,7 +6,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const capitalize = (s: string) => {
+export const capitalize = (s: string | null | undefined) => {
   if (typeof s !== "string") return ""
   return s.charAt(0).toUpperCase() + s.slice(1)
 }

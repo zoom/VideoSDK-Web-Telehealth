@@ -6,6 +6,7 @@ import { useToast } from "./ui/use-toast";
 import { LinkIcon } from "lucide-react";
 import { api } from "~/utils/api";
 import { useSession } from "next-auth/react";
+import { capitalize } from "~/lib/utils";
 
 type RoomData = Room & {
   User_CreatedFor?: User[];
@@ -56,15 +57,10 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
               {/* add logic to show join session button if time is in the future by some amount */}
             </Link>
             <p className="mt-3 flex justify-start text-sm text-gray-700">
-              {/* automate doctor speciality */}
-              {isDoctor && rooms.User_CreatedFor?.[0] ? (
-                <Link href={`/viewPatient/${rooms.User_CreatedFor?.[0].id}`} className="text-gray-500">
-                  <p className="text-grey-500 hover:text-blue-500" title="click for patient details">
-                    Patient: {rooms.User_CreatedFor?.[0].name}
-                  </p>
-                </Link>
+              {data.createByUserId === userData?.user.id ? (
+                <p>{capitalize(data.User_CreatedFor?.[0]?.role) + ": " + data.User_CreatedFor?.[0]?.name}</p>
               ) : (
-                <p className="text-gray-500">Dr. {rooms.User_CreatedBy?.name}</p>
+                <p>{capitalize(data.User_CreatedBy?.role) + ": " + data.User_CreatedBy?.name}</p>
               )}
             </p>
             <div className="flex gap-4">
