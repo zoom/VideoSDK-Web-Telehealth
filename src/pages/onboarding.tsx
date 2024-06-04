@@ -128,8 +128,8 @@ const DoctorFields = () => {
   const { update } = useSession();
   const { toast } = useToast();
   const setDoctor = api.user.setDoctor.useMutation();
-  const [department, setDepartment] = useState("");
-  const [position, setPosition] = useState("");
+  const [department, setDepartment] = useState("General Medicine");
+  const [position, setPosition] = useState("General Practitioner");
 
   return (
     <>
