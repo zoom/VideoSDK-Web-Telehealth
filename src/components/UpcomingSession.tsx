@@ -6,6 +6,7 @@ import { useToast } from "./ui/use-toast";
 import { LinkIcon } from "lucide-react";
 import { api } from "~/utils/api";
 import { useSession } from "next-auth/react";
+import DownloadICSButton from "./DownloadICS";
 
 type RoomData = Room & {
   User_CreatedFor?: User[];
@@ -84,11 +85,15 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
                 </Button>
               </Link>
               {data.time.getTime() > new Date().getTime() ? (
-                <Link href={``}>
-                  <Button className="p-0" variant={"link"}>
-                    Add to calendar
-                  </Button>{" "}
-                </Link>
+                <DownloadICSButton
+                  event={{
+                    start: data.time.getTime(),
+                    duration: {
+                      hours: data.duration,
+                    },
+                    title: `${data.title}`,
+                  }}
+                />
               ) : (
                 <></>
               )}

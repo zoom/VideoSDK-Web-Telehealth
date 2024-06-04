@@ -48,6 +48,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^1.0.0",
+    "ics": "^3.7.2",
     "jsrsasign": "^11.0.0",
     "lucide-react": "^0.314.0",
     "moment": "^2.30.1",
