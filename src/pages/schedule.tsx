@@ -64,7 +64,7 @@ const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => 
           You have no upcoming appointments.
         </Card>
       ) : (
-        rooms?.map((room) => <UpcomingSession data={room} isDoctor={data?.user.role === "doctor"} key={room.id} />)
+        rooms?.map((room) => <UpcomingSession data={room} key={room.id} />)
       )}
     </div>
   );

@@ -1,5 +1,4 @@
 import { Label } from "@radix-ui/react-label";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -13,13 +12,6 @@ import { api } from "~/utils/api";
 const Notes = () => {
   const router = useRouter();
   const { roomId } = router.query;
-  const { data } = useSession();
-
-  // Redirect if not a doctor
-  if (data?.user.role !== "doctor") {
-    void router.replace("/");
-    return <></>;
-  }
 
   return (
     <>

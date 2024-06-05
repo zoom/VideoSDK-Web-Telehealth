@@ -46,7 +46,7 @@ const DoctorView = () => {
             {isLoading ? (
               <Skeleton className="w-full animate-pulse" />
             ) : data?.[0] ? (
-              <UpcomingSession data={data[0]} isDoctor />
+              <UpcomingSession data={data[0]} />
             ) : (
               <Card className="p-4">No appointments, yet</Card>
             )}

@@ -13,9 +13,10 @@ type RoomData = Room & {
   User_CreatedBy?: User;
 };
 
-const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolean }) => {
+const UpcomingSession = ({ data }: { data: RoomData }) => {
   const rooms = data;
   const { data: userData } = useSession();
+  const isDoctor = userData?.user.role === "doctor";
   const { toast } = useToast();
   const deleteRoom = api.room.delete.useMutation();
   const utils = api.useUtils();
@@ -74,11 +75,15 @@ const UpcomingSession = ({ data, isDoctor }: { data: RoomData; isDoctor?: boolea
               )}
             </p>
             <div className="flex gap-4">
-              <Link href={`/viewNotes/${data.id}`}>
-                <Button className="p-0" variant={"link"}>
-                  Notes
-                </Button>
-              </Link>
+              {isDoctor ? (
+                <Link href={`/viewNotes/${data.id}`}>
+                  <Button className="p-0" variant={"link"}>
+                    Notes
+                  </Button>
+                </Link>
+              ) : (
+                <></>
+              )}
               <Link href={`/viewRecordings/${data.id}`}>
                 <Button className="p-0" variant={"link"}>
                   Recordings
