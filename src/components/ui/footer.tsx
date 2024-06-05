@@ -15,8 +15,8 @@ export default function Footer() {
         </div>
       </div>
       <nav className="m-auto flex w-full max-w-2xl flex-row text-xs sm:items-start sm:gap-2">
-        <Link href="/">Privacy Policy</Link>
-        <Link href="/">Terms of Use</Link>
+        <Link href="/privacy">Privacy Policy</Link>
+        <Link href="/terms">Terms of Use</Link>
         <p className="text-xs italic text-gray-400">(Replace with your own!)</p>
       </nav>
     </footer>
