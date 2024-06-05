@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
 import { LinkIcon } from "lucide-react";
-import { api } from "~/utils/api";
+// import { api } from "~/utils/api";
 import { useSession } from "next-auth/react";
 import DownloadICSButton from "./DownloadICS";
 
@@ -18,8 +18,8 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
   const { data: userData } = useSession();
   const isDoctor = userData?.user.role === "doctor";
   const { toast } = useToast();
-  const deleteRoom = api.room.delete.useMutation();
-  const utils = api.useUtils();
+  // const deleteRoom = api.room.delete.useMutation();
+  // const utils = api.useUtils();
 
   //convert to minutes to be able to check and conditionally render join session button
   console.log(moment(rooms.time).local().fromNow());
@@ -60,9 +60,7 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
             <p className="mt-3 flex justify-start text-sm text-gray-700">
               {data.createByUserId === userData?.user.id ? (
                 data.User_CreatedFor?.[0]?.role === "patient" ? (
-                  <Link href={`/patient/${data.User_CreatedFor?.[0].id}`} className="text-gray-500">
-                    <p className="text-grey-500 hover:text-blue-500" title="Patient details">{`Patient: ${data.User_CreatedFor?.[0]?.name}`}</p>
-                  </Link>
+                  <p className="text-grey-500">{`Patient: ${data.User_CreatedFor?.[0]?.name}`}</p>
                 ) : (
                   <p>{`Doctor: ${data.User_CreatedFor?.[0]?.name}`}</p>
                 )
@@ -183,9 +181,6 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
 
 export default UpcomingSession;
 
-// - Patient can see
-// - Recording
-// - Transcript
-// - Add to calendar
-// - Doctor can also
-// - notes
+// upcoming card
+//  -> join apointment should be conditional
+//  -> show time
