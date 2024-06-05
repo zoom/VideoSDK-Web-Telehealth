@@ -25,7 +25,7 @@ const Onboarding = () => {
   }
 
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
+    <div className="flex w-screen flex-col items-center justify-center">
       <div className="w-screen max-w-screen-sm">
         <h1 className="my-10 flex text-5xl font-bold leading-none text-gray-700">Welcome {data?.user.name?.split(" ")[0]}</h1>
         {env.NEXT_PUBLIC_TESTMODE === "TESTING" ? (
