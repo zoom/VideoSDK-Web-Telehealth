@@ -39,12 +39,15 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
           </div>
           <div className="relative w-full bg-white">
             <div className="flex items-center justify-between">
-              <h4 className="text-lg font-semibold uppercase tracking-wide text-blue-700">
-                {rooms.title}
-                {rooms.User_CreatedFor?.[0]
-                  ? `, with ${rooms.User_CreatedBy?.id === userData?.user.id ? rooms.User_CreatedFor?.[0].name : rooms.User_CreatedBy?.name}`
-                  : ""}
-              </h4>
+              <Link href={`/roomInfo/${rooms.id}`}>
+                <h4 className="text-lg font-semibold uppercase tracking-wide text-blue-700 hover:underline">
+                  {rooms.title}
+                  {rooms.User_CreatedFor?.[0]
+                    ? `, with ${rooms.User_CreatedBy?.id === userData?.user.id ? rooms.User_CreatedFor?.[0].name : rooms.User_CreatedBy?.name}`
+                    : ""}
+                </h4>
+              </Link>
+              {/* no time shown? */}
               <Button
                 variant={"link"}
                 onClick={async () => {
@@ -70,21 +73,7 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
                 <X size={18} />
               </Button>
             </div>
-            <p className="mt-3 flex justify-start text-sm text-gray-700">
-              {data.createByUserId === userData?.user.id ? (
-                data.User_CreatedFor?.[0]?.role === "patient" ? (
-                  <p className="text-grey-500">{`Patient: ${data.User_CreatedFor?.[0]?.name}`}</p>
-                ) : (
-                  <p>{`Doctor: ${data.User_CreatedFor?.[0]?.name}`}</p>
-                )
-              ) : data.User_CreatedBy?.role === "patient" ? (
-                <Link href={`/patient/${data.User_CreatedBy.id}`} className="text-gray-500">
-                  <p className="text-grey-500 hover:text-blue-500" title="Patient details">{`Patient: ${data.User_CreatedFor?.[0]?.name}`}</p>
-                </Link>
-              ) : (
-                <p>{`Doctor: ${data.User_CreatedBy?.name}`}</p>
-              )}
-            </p>
+            <MeetingWithLabel roomData={data} />
             <div className="mt-2 flex gap-4 text-sm text-gray-500">{rooms.duration} hour(s)</div>
             <div className="flex gap-4">
               {isDoctor ? (
@@ -200,6 +189,29 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
     //     </div>
     //   </div>
     // </div>
+  );
+};
+
+export const MeetingWithLabel = ({ roomData }: { roomData: RoomData }) => {
+  const { data: userData } = useSession();
+  return (
+    <p className="mt-3 flex justify-start text-sm text-gray-700">
+      {roomData.createByUserId === userData?.user.id ? (
+        roomData.User_CreatedFor?.[0]?.role === "patient" ? (
+          <Link href={`/patient/${roomData.User_CreatedFor?.[0].id}`} className="text-gray-500">
+            <p className="text-grey-500 hover:text-blue-500" title="Patient details">{`Patient: ${roomData.User_CreatedFor?.[0]?.name}`}</p>
+          </Link>
+        ) : (
+          <p>{`Doctor: ${roomData.User_CreatedFor?.[0]?.name}`}</p>
+        )
+      ) : roomData.User_CreatedBy?.role === "patient" ? (
+        <Link href={`/patient/${roomData.User_CreatedBy.id}`} className="text-gray-500">
+          <p className="text-grey-500 hover:text-blue-500" title="Patient details">{`Patient: ${roomData.User_CreatedFor?.[0]?.name}`}</p>
+        </Link>
+      ) : (
+        <p>{`Doctor: ${roomData.User_CreatedBy?.name}`}</p>
+      )}
+    </p>
   );
 };
 
