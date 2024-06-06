@@ -1,7 +1,7 @@
-import { Button } from "./ui/button";
+import { Button, ButtonProps } from "./ui/button";
 import { type EventAttributes, createEvent } from "ics";
 
-const DownloadICSButton = ({ event: eventData, className, variant }: { event: EventAttributes; className?: string; variant?: string }) => {
+const DownloadICSButton = ({ event: eventData, className, variant }: { event: EventAttributes; className?: string; variant?: ButtonProps["variant"] }) => {
   const handleDownload = async () => {
     const filename = "Event.ics";
     const file = await new Promise<File>((resolve, reject) => {
