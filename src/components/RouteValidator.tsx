@@ -2,7 +2,7 @@ import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 
 // you can add more routes here
-const forbiddenRoutesForPatient = ["/patients", "/patient/[userId]", "/viewNotes/[roomId]"];
+const forbiddenRoutesForPatient = ["/patients", "/viewNotes/[roomId]"];
 
 const RouteValidator = ({ children }: { children: React.ReactNode }) => {
   const { status, data } = useSession();

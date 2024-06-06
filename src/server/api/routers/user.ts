@@ -48,6 +48,31 @@ export const userRouter = createTRPCRouter({
         });
       }
     }),
+  setPatientDetails: protectedProcedure
+    .input(z.object({
+      height: z.number(),
+      weight: z.number(),
+      bloodType: z.string(),
+      allergies: z.string(),
+      medications: z.string(),
+      DOB: z.date(),
+      userId: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      if (ctx.session.user.id !== input.userId) throw new TRPCError({ code: "FORBIDDEN" });
+      const patient = await ctx.db.patient.update({
+        where: { userId: ctx.session.user.id },
+        data: { height: input.height, weight: input.weight, bloodType: input.bloodType, allergies: input.allergies, medications: input.medications, DOB: input.DOB }
+      });
+      if (patient) {
+        return patient;
+      } else {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Patient not found",
+        });
+      }
+    }),
   getDoctors: protectedProcedure.input(z.object({ name: z.string().nullable() })).query(async ({ ctx, input }) => {
     const doctors = await ctx.db.user.findMany({
       where: {

@@ -7,11 +7,19 @@ import Header from "~/components/ui/header";
 import { Skeleton } from "~/components/ui/skeleton";
 import { File, Download } from "lucide-react";
 import { api } from "~/utils/api";
+import { useSession } from "next-auth/react";
+import { useState } from "react";
+import { Avatar, AvatarImage } from "~/components/ui/avatar";
+import { Label } from "@radix-ui/react-label";
+import { Input } from "~/components/ui/input";
+import { BloodGroupSelect } from "~/components/BloodGroup";
 
-const Uploaded = () => {
+const ViewPatientContainer = () => {
   const router = useRouter();
   const { userId } = router.query;
+  const { data: sessionData } = useSession();
   const { error, isError } = api.S3.getUploadList.useQuery({ userId: userId as string }, { retry: 0 });
+  const [isEdit, setEdit] = useState(false);
 
   if (isError) {
     return (
@@ -29,10 +37,17 @@ const Uploaded = () => {
     <>
       <Header />
       <div className="flex h-screen w-screen flex-col items-center overflow-y-scroll bg-gray-100">
-        <div className="mb-4 mt-8 w-full max-w-xl">
+        <div className="mb-4 mt-8 flex w-full max-w-xl flex-row">
           <h1 className="mb-2 mt-8 flex text-3xl font-bold leading-none text-gray-700 ">Patient details</h1>
+          {userId === sessionData?.user.id ? (
+            <Button variant={"default"} className="ml-auto" onClick={() => setEdit(true)}>
+              Edit
+            </Button>
+          ) : (
+            <></>
+          )}
         </div>
-        <ViewPatient userId={userId as string} />
+        {isEdit ? <EditPatient userId={userId as string} setEdit={setEdit} /> : <ViewPatient userId={userId as string} />}
         <Link href="/">
           <Button variant={"link"} className="mx-auto flex">
             back
@@ -46,6 +61,7 @@ const Uploaded = () => {
 
 const ViewPatient = (props: { userId: string }) => {
   const { userId } = props;
+  const { data: sessionData } = useSession();
   const { data: patientData, isLoading: patientLoading } = api.user.getPatientDetails.useQuery({ userId: userId });
   const { data, isLoading } = api.S3.getUploadList.useQuery({ userId: userId }, { retry: 0 });
   const { mutateAsync } = api.S3.getDownloadLink.useMutation();
@@ -64,11 +80,9 @@ const ViewPatient = (props: { userId: string }) => {
       ) : (
         <>
           <Card className="flex w-full max-w-xl items-center gap-4 p-8">
-            <div className="relative h-10 w-10 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-600">
-              <svg className="absolute -left-1 h-12 w-12 text-gray-400" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
+            <Avatar className="ml-4">
+              <AvatarImage src={sessionData?.user.image ?? undefined} alt="User Avatar" />
+            </Avatar>
             <p className="m-0 p-0 text-xl font-bold">{patientData?.User?.name}</p>
           </Card>
           <Card className="m-2 flex w-full max-w-xl flex-col justify-center self-center p-8">
@@ -91,7 +105,6 @@ const ViewPatient = (props: { userId: string }) => {
         </>
       )}
       {/* TODO: add patient's most recent appointments here */}
-      <div>{isLoading ? <div></div> : <div></div>}</div>
       <div className="my-10 flex w-full max-w-xl flex-col justify-center">
         <p className="mb-2 flex text-center text-xl font-bold leading-none text-gray-700">Files</p>
         {isLoading ? (
@@ -131,5 +144,57 @@ const ViewPatient = (props: { userId: string }) => {
     </>
   );
 };
+
+const EditPatient = (props: { userId: string; setEdit: React.Dispatch<React.SetStateAction<boolean>> }) => {
+  const { userId, setEdit } = props;
+  const { data } = useSession();
+  const { data: patientData } = api.user.getPatientDetails.useQuery({ userId: userId });
+  const { mutateAsync } = api.user.setPatientDetails.useMutation();
+  const [height, setHeight] = useState(patientData?.height ?? 0);
+  const [weight, setWeight] = useState(patientData?.weight ?? 0);
+  const [bloodType, setBloodType] = useState(patientData?.bloodType ?? "");
+  const [allergies, setAllergies] = useState(patientData?.allergies ?? "");
+  const [medications, setMedications] = useState(patientData?.medications ?? "");
+  const [DOB, setDOB] = useState(patientData?.DOB?.toLocaleDateString() ?? "");
+
+  return (
+    <>
+      <Card className="flex w-full max-w-xl items-center gap-4 p-8">
+        <Avatar className="ml-4">
+          <AvatarImage src={data?.user.image ?? undefined} alt="User Avatar" />
+        </Avatar>
+        <p className="m-0 p-0 text-xl font-bold">{patientData?.User?.name}</p>
+      </Card>
+      <Card className="m-2 flex w-full max-w-xl flex-col justify-center self-center p-8">
+        <Label>Height:</Label>
+        <Input value={height} onChange={(e) => setHeight(parseInt(e.target.value))} className="mb-4" />
+        <Label>Weight:</Label>
+        <Input value={weight} onChange={(e) => setWeight(parseInt(e.target.value))} className="mb-4" />
+        <Label>Medications:</Label>
+        <Input value={medications} onChange={(e) => setMedications(e.target.value)} className="mb-4" />
+        <Label>Allergies:</Label>
+        <Input value={allergies} onChange={(e) => setAllergies(e.target.value)} className="mb-4" />
+        <Label>Blood type:</Label>
+        <BloodGroupSelect value={bloodType} setValue={setBloodType} />
+        <Label>Date of Birth:</Label>
+        <Input value={DOB} onChange={(e) => setDOB(e.target.value)} className="mb-4" />
+        <div className="flex w-64 flex-col justify-between self-center">
+          <Button
+            className="my-2"
+            onClick={async () => {
+              await mutateAsync({ height, weight, bloodType, allergies, medications, DOB: new Date(DOB), userId: userId });
+              setEdit(false);
+            }}
+          >
+            Save
+          </Button>
+          <Button className="my-2" onClick={() => setEdit(false)} variant={"destructive"}>
+            Cancel
+          </Button>
+        </div>
+      </Card>
+    </>
+  );
+};
 export { ViewPatient };
-export default Uploaded;
+export default ViewPatientContainer;

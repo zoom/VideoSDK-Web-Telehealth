@@ -51,15 +51,17 @@ function Header() {
             Create
           </Link>
           {status === "authenticated" ? (
-            <Button variant={"outline"} className="self-center" onClick={() => void signOut()}>
-              Sign Out
-            </Button>
+            <>
+              <Button variant={"outline"} className="self-center" onClick={() => void signOut()}>
+                Sign Out
+              </Button>
+              <Avatar className="ml-4">
+                <AvatarImage src={data?.user.image ?? undefined} alt="User Avatar" />
+              </Avatar>
+            </>
           ) : (
             <Button onClick={() => void signIn()}>Sign in</Button>
           )}
-          <Avatar className="ml-4">
-            <AvatarImage src={data?.user.image ?? undefined} alt="User Avatar" />
-          </Avatar>
         </div>
       </header>
     </div>
