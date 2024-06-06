@@ -62,7 +62,7 @@ export const authOptions: NextAuthOptions = {
         const { user } = message;
         const randomAnimal = animals[Math.floor(Math.random() * (animals.length - 1))];
         const randomColor = colors[Math.floor(Math.random() * (colors.length - 1))];
-        const name = `${capitalize(randomColor!)} ${capitalize(randomAnimal!)}`;
+        const name = `${capitalize(randomColor)} ${capitalize(randomAnimal)}`;
         await db.user.update({
           where: { id: user.id },
           data: { name: name, image: `https://source.boringavatars.com/marble/120/${name}?colors=264653,2a9d8f,e9c46a,f4a261,e76f51` },
