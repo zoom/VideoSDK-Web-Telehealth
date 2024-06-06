@@ -3,8 +3,8 @@ import moment from "moment";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { useToast } from "./ui/use-toast";
-import { LinkIcon } from "lucide-react";
-// import { api } from "~/utils/api";
+import { LinkIcon, X } from "lucide-react";
+import { api } from "~/utils/api";
 import { useSession } from "next-auth/react";
 import DownloadICSButton from "./DownloadICS";
 
@@ -18,8 +18,8 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
   const { data: userData } = useSession();
   const isDoctor = userData?.user.role === "doctor";
   const { toast } = useToast();
-  // const deleteRoom = api.room.delete.useMutation();
-  // const utils = api.useUtils();
+  const deleteRoom = api.room.delete.useMutation();
+  const utils = api.useUtils();
 
   //convert to minutes to be able to check and conditionally render join session button
   console.log(moment(rooms.time).local().fromNow());
@@ -28,11 +28,16 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
     <div>
       <div className="min-h-[8rem] w-full min-w-[720px] rounded-lg bg-white shadow-lg">
         <div className="flex items-start gap-4 p-4">
-          <div className="flex flex-col rounded-lg border border-blue-600 text-center text-lg">
-            <div className="w-full rounded-t-md bg-blue-600 px-3 py-0.5 text-sm uppercase text-white">{rooms.time.toString().slice(4, 7)}</div>
-            <div className="text-blue-600">{rooms.time.toString().slice(7, 11)}</div>
+          <div>
+            <div className="flex flex-col rounded-lg border border-blue-600 text-center text-lg">
+              <div className="w-full rounded-t-md bg-blue-600 px-3 py-0.5 text-sm uppercase text-white">{rooms.time.toString().slice(4, 7)}</div>
+              <div className="text-blue-600">{rooms.time.toString().slice(7, 11)}</div>
+            </div>
+            <div className="mt-2 text-sm text-gray-500">
+              {moment(rooms.time).local().hour()}:{moment(rooms.time).local().minute()}
+            </div>
           </div>
-          <div className="w-full bg-white">
+          <div className="relative w-full bg-white">
             <div className="flex items-center justify-between">
               <h4 className="text-lg font-semibold uppercase tracking-wide text-blue-700">
                 {rooms.title}
@@ -47,16 +52,24 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
                   await navigator.clipboard.writeText(link);
                   toast({ title: "Copied link to clipoard", description: link });
                 }}
-                className="max-w-full"
+                title="Copy link to clipboard"
+                className="ml-0 mr-auto hover:underline"
               >
                 <LinkIcon height={18} strokeWidth={3} />
               </Button>
-              {/* <small className="text-sm text-gray-700">{moment(rooms.time).local().fromNow()}</small> */}
+              <Button
+                variant={"destructive"}
+                className="absolute right-2 m-[-8px] h-6 w-6 p-0"
+                title="Delete appointment"
+                onClick={async () => {
+                  toast({ title: "Deleting Appointment", description: rooms.title });
+                  await deleteRoom.mutateAsync({ id: rooms.id });
+                  await utils.room.invalidate();
+                }}
+              >
+                <X size={18} />
+              </Button>
             </div>
-            <Link className="flex flex-1 text-sm text-blue-600 hover:underline" href={`/room/${rooms.id}`}>
-              Join Apointment
-              {/* add logic to show join session button if time is in the future by some amount */}
-            </Link>
             <p className="mt-3 flex justify-start text-sm text-gray-700">
               {data.createByUserId === userData?.user.id ? (
                 data.User_CreatedFor?.[0]?.role === "patient" ? (
@@ -72,6 +85,7 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
                 <p>{`Doctor: ${data.User_CreatedBy?.name}`}</p>
               )}
             </p>
+            <div className="mt-2 flex gap-4 text-sm text-gray-500">{rooms.duration} hour(s)</div>
             <div className="flex gap-4">
               {isDoctor ? (
                 <Link href={`/viewNotes/${data.id}`}>
@@ -87,8 +101,13 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
                   Recordings
                 </Button>
               </Link>
-              {data.time.getTime() > new Date().getTime() ? (
+            </div>
+
+            {data.time.getTime() > new Date().getTime() ? (
+              data.time.getTime() > new Date().getTime() + 1000 * 60 * 10 ? (
                 <DownloadICSButton
+                  className="ml-0 flex"
+                  variant="outline"
                   event={{
                     start: data.time.getTime(),
                     duration: {
@@ -98,10 +117,15 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
                   }}
                 />
               ) : (
-                <></>
-              )}
-              {/* <button onClick={() => deleteRoom.mutate({ id: data.id })}>delete</button> */}
-            </div>
+                <Link className="flex flex-1 text-sm text-blue-600 hover:underline" href={`/room/${rooms.id}`}>
+                  <Button variant={"default"} className="ml-0 hover:underline">
+                    Join Apointment
+                  </Button>
+                </Link>
+              )
+            ) : (
+              <></>
+            )}
           </div>
         </div>
       </div>
@@ -180,7 +204,3 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
 };
 
 export default UpcomingSession;
-
-// upcoming card
-//  -> join apointment should be conditional
-//  -> show time
