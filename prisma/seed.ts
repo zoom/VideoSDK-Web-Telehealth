@@ -30,6 +30,7 @@ async function main() {
       data: {
         email: 'bob@test.com',
         name: 'Bob',
+        role: 'doctor',
       },
     })
     await prisma.doctor.create({

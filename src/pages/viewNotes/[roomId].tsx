@@ -1,5 +1,4 @@
 import { Label } from "@radix-ui/react-label";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -13,13 +12,6 @@ import { api } from "~/utils/api";
 const Notes = () => {
   const router = useRouter();
   const { roomId } = router.query;
-  const { data } = useSession();
-
-  // Redirect if not a doctor
-  if (data?.user.role !== "doctor") {
-    void router.replace("/");
-    return <></>;
-  }
 
   return (
     <>
@@ -38,7 +30,7 @@ const Notes = () => {
   );
 };
 
-const ViewNotes = ({ roomId }: { roomId: string }) => {
+const ViewNotes = ({ roomId, dontShowAdd }: { roomId: string; dontShowAdd?: boolean }) => {
   const { data, isLoading } = api.room.getNotesFromRoom.useQuery({ id: roomId });
   const addNote = api.room.addNote.useMutation();
   const { room } = api.useUtils();
@@ -79,47 +71,51 @@ const ViewNotes = ({ roomId }: { roomId: string }) => {
           <p>No notes</p>
         )}
       </Card>
-      <Card className="my-2 min-w-96 p-8">
-        <div className="mb-4 flex flex-col">
-          <Label htmlFor="note" className="font-bold">
-            Subjective - Patient&apos;s Perspective
-          </Label>
-          <textarea className="min-h-8 rounded-sm border-2 p-1" value={S} onChange={(e) => setS(e.target.value)} />
-        </div>
-        <div className="mb-4 flex flex-col">
-          <Label htmlFor="note" className="font-bold">
-            Objective - Observed Objective Data
-          </Label>
-          <textarea className="min-h-8 rounded-sm border-2 p-1" value={O} onChange={(e) => setO(e.target.value)} />
-        </div>
-        <div className="mb-4 flex flex-col">
-          <Label htmlFor="note" className="font-bold">
-            Assessment - Summary of Patient&apos;s Status and Progress
-          </Label>
-          <textarea className="min-h-8 rounded-sm border-2 p-1" value={A} onChange={(e) => setA(e.target.value)} />
-        </div>
-        <div className="mb-4 flex flex-col">
-          <Label htmlFor="note" className="font-bold">
-            Planning - Actions Taken, Referrals, etc.
-          </Label>
-          <textarea className="min-h-8 rounded-sm border-2 p-1" value={P} onChange={(e) => setP(e.target.value)} />
-        </div>
-        {addNote.status !== "idle" ? <p>{addNote.status}</p> : <></>}
-        <Button
-          className="mt-4 w-full"
-          disabled={addNote.isLoading}
-          onClick={async () => {
-            await addNote.mutateAsync({ roomId, contentS: S, contentO: O, contentA: A, contentP: P });
-            setS("");
-            setO("");
-            setA("");
-            setP("");
-            await room.getNotesFromRoom.invalidate({ id: roomId });
-          }}
-        >
-          Add
-        </Button>
-      </Card>
+      {dontShowAdd ? (
+        <></>
+      ) : (
+        <Card className="my-2 min-w-96 p-8">
+          <div className="mb-4 flex flex-col">
+            <Label htmlFor="note" className="font-bold">
+              Subjective - Patient&apos;s Perspective
+            </Label>
+            <textarea className="min-h-8 rounded-sm border-2 p-1" value={S} onChange={(e) => setS(e.target.value)} />
+          </div>
+          <div className="mb-4 flex flex-col">
+            <Label htmlFor="note" className="font-bold">
+              Objective - Observed Objective Data
+            </Label>
+            <textarea className="min-h-8 rounded-sm border-2 p-1" value={O} onChange={(e) => setO(e.target.value)} />
+          </div>
+          <div className="mb-4 flex flex-col">
+            <Label htmlFor="note" className="font-bold">
+              Assessment - Summary of Patient&apos;s Status and Progress
+            </Label>
+            <textarea className="min-h-8 rounded-sm border-2 p-1" value={A} onChange={(e) => setA(e.target.value)} />
+          </div>
+          <div className="mb-4 flex flex-col">
+            <Label htmlFor="note" className="font-bold">
+              Planning - Actions Taken, Referrals, etc.
+            </Label>
+            <textarea className="min-h-8 rounded-sm border-2 p-1" value={P} onChange={(e) => setP(e.target.value)} />
+          </div>
+          {addNote.status !== "idle" ? <p>{addNote.status}</p> : <></>}
+          <Button
+            className="mt-4 w-full"
+            disabled={addNote.isLoading}
+            onClick={async () => {
+              await addNote.mutateAsync({ roomId, contentS: S, contentO: O, contentA: A, contentP: P });
+              setS("");
+              setO("");
+              setA("");
+              setP("");
+              await room.getNotesFromRoom.invalidate({ id: roomId });
+            }}
+          >
+            Add
+          </Button>
+        </Card>
+      )}
     </>
   );
 };
