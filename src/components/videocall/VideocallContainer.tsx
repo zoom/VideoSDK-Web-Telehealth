@@ -43,7 +43,7 @@ const Home = () => {
   if (!isLoading && data) {
     return (
       <>
-        <div className="relative m-0 flex h-screen w-full flex-1 flex-col self-center overflow-y-scroll bg-gray-100 px-0 pb-8">
+        <div className="relative m-0 flex min-h-screen w-full flex-1 flex-col self-center bg-gray-100 px-0 pb-8">
           <div className="mx-16 mt-4 flex flex-row">
             <div className="flex flex-1 flex-col rounded-l-md bg-white p-3">
               <span className="inline-flex">

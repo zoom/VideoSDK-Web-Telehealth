@@ -25,13 +25,13 @@ const DoctorView = () => {
               Create an appointment
             </Button>
           </Link>
-          <Link href={"/viewRooms"} className="m-2 flex flex-row justify-around">
+          <Link href={"/schedule"} className="m-2 flex flex-row justify-around">
             <Button variant={"outline"}>
               <Calendar size={18} className="mr-2" />
-              See your schedule
+              View your schedule
             </Button>
           </Link>
-          <Link href={"/viewPatients"} className="m-2 flex flex-row justify-around">
+          <Link href={"/patients"} className="m-2 flex flex-row justify-around">
             <Button variant={"outline"}>
               <UserSearch size={18} className="mr-2" />
               Find a patient
@@ -42,9 +42,15 @@ const DoctorView = () => {
       <div className="flex flex-1 flex-row justify-around">
         <div className="flex flex-1 flex-col">
           <h3 className="text-xl font-bold text-gray-700">Upcoming appointments</h3>
-          <Card className="rounded-lgp-5 mt-4 flex min-w-96 flex-col text-center">
-            {isLoading ? <Skeleton className="w-full animate-pulse" /> : data?.[0] ? <UpcomingSession data={data[0]} isDoctor /> : <p>No appointments, yet</p>}
-          </Card>
+          <div className="mt-4 flex flex-col rounded-lg text-center">
+            {isLoading ? (
+              <Skeleton className="w-full animate-pulse" />
+            ) : data?.[0] ? (
+              <UpcomingSession data={data[0]} />
+            ) : (
+              <Card className="p-4">No appointments, yet</Card>
+            )}
+          </div>
         </div>
       </div>
     </>

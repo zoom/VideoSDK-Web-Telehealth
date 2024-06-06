@@ -1,5 +1,4 @@
 import { type Role } from "@prisma/client";
-// import { Link } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -12,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
 import { useToast } from "~/components/ui/use-toast";
 import { env } from "~/env";
 import { api } from "~/utils/api";
+import { BloodGroupSelect } from "~/components/BloodGroup";
 
 const defaultRole = (env.NEXT_PUBLIC_TESTMODE === "TESTING" ? "null" : "patient") as Role;
 
@@ -25,7 +25,7 @@ const Onboarding = () => {
   }
 
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-center bg-gray-100">
+    <div className="flex w-screen flex-col items-center justify-center">
       <div className="w-screen max-w-screen-sm">
         <h1 className="my-10 flex text-5xl font-bold leading-none text-gray-700">Welcome {data?.user.name?.split(" ")[0]}</h1>
         {env.NEXT_PUBLIC_TESTMODE === "TESTING" ? (
@@ -48,7 +48,6 @@ const Onboarding = () => {
             <Card className="mb-8 flex w-full flex-col flex-wrap justify-center p-4 shadow-lg">{role === "doctor" ? <DoctorFields /> : <PatientFields />}</Card>
           </>
         )}
-        <p className="text-sm italic text-gray-400">Sample data is used here for creating test users.</p>
       </div>
     </div>
   );
@@ -73,17 +72,17 @@ const PatientFields = () => {
       <Input type="date" id="DOB" className="mb-4" value={DOB} onChange={(e) => setDOB(e.target.value)} />
       {/* TODO: height needs to be feet/inches */}
       <Label htmlFor="height" className="mb-2">
-        Height (in inches)
+        Height (in cm)
       </Label>
       <Input type="number" id="height" className="mb-4" value={height} onChange={(e) => setHeight(e.target.value)} />
       <Label htmlFor="weight" className="mb-2">
-        Weight (in pounds)
+        Weight (in kg)
       </Label>
       <Input type="number" id="weight" className="mb-4" value={weight} onChange={(e) => setWeight(e.target.value)} />
       <Label htmlFor="bloodType" className="mb-2">
         Blood Type
       </Label>
-      <Input id="bloodType" className="mb-4" value={bloodType} onChange={(e) => setBloodType(e.target.value)} />
+      <BloodGroupSelect value={bloodType} setValue={setBloodType} />
       <Label htmlFor="allergies" className="mb-2">
         Allergies
       </Label>
@@ -128,8 +127,8 @@ const DoctorFields = () => {
   const { update } = useSession();
   const { toast } = useToast();
   const setDoctor = api.user.setDoctor.useMutation();
-  const [department, setDepartment] = useState("");
-  const [position, setPosition] = useState("");
+  const [department, setDepartment] = useState("General Medicine");
+  const [position, setPosition] = useState("General Practitioner");
 
   return (
     <>
@@ -171,23 +170,22 @@ const DoctorAndPatientFields = () => {
 
   return (
     <div className="flex flex-col items-center">
-      <p className="text-sm">Demo accounts creates both a Doctor and Patient profile, we&apos;ve prefilled the details to make it easier to get started.</p>
-      <p className="text-sm">Only available in demo mode.</p>
+      <p className="text-sm">Demo accounts creates both a Doctor and a Patient profile, we&apos;ve prefilled the details to make it easier to get started.</p>
       <div className="flex flex-row items-center pt-8">
         <Card className="mx-4 mb-8 flex w-96 flex-col flex-wrap justify-center p-4 shadow-lg">
           <p className="py-4 font-bold">Patient:</p>
           <Label htmlFor="height" className="mb-2">
-            Height
+            Height (in cm)
           </Label>
           <Input type="number" id="height" className="mb-4" value={height} onChange={(e) => setHeight(e.target.value)} />
           <Label htmlFor="weight" className="mb-2">
-            Weight
+            Weight (in kg)
           </Label>
           <Input type="number" id="weight" className="mb-4" value={weight} onChange={(e) => setWeight(e.target.value)} />
           <Label htmlFor="bloodType" className="mb-2">
             Blood Type
           </Label>
-          <Input id="bloodType" className="mb-4" value={bloodType} onChange={(e) => setBloodType(e.target.value)} />
+          <BloodGroupSelect value={bloodType} setValue={setBloodType} />
           <Label htmlFor="allergies" className="mb-2">
             Allergies
           </Label>

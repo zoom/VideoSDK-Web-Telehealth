@@ -60,7 +60,7 @@ const ViewDoctors = () => {
                   </p>
                 </div>
               </div>
-              <Link href={`/viewDoctor/${doctor.id}`} className="self-start">
+              <Link href={`/create/?inviteID=${doctor.id}`} className="self-start">
                 <Button variant={"outline"} className="flex">
                   Schedule
                 </Button>

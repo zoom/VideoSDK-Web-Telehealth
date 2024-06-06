@@ -55,7 +55,7 @@ const ViewPatients = () => {
                   Date of Birth: <span className="font-bold">{patient.Patient?.DOB?.toDateString().split(" ").slice(1).join(" ")}</span>
                 </p>
               </div>
-              <Link href={`/viewPatient/${patient.id}`} className="self-start">
+              <Link href={`/patient/${patient.id}`} className="self-start">
                 <Button variant={"outline"}>View profile</Button>
               </Link>
             </Card>
