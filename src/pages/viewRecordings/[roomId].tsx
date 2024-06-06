@@ -64,4 +64,5 @@ const ViewRecording = ({ roomId }: { roomId: string }) => {
   );
 };
 
+export { ViewRecording };
 export default Recordings;

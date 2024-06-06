@@ -10,6 +10,8 @@ import { Card } from "~/components/ui/card";
 import Header from "~/components/ui/header";
 import Footer from "~/components/ui/footer";
 import { MeetingWithLabel } from "~/components/UpcomingSession";
+import { ViewNotes } from "../viewNotes/[roomId]";
+import { ViewRecording } from "../viewRecordings/[roomId]";
 
 const Home = () => {
   const router = useRouter();
@@ -34,7 +36,7 @@ const Home = () => {
       <>
         <Header />
         <div className="relative m-0 flex min-h-screen w-full flex-1 flex-col self-center bg-gray-100 px-0 pb-8">
-          <Card className="mx-16 mt-4 flex w-96 flex-col self-center p-8">
+          <Card className="w-5xl mx-16 mt-4 flex flex-col self-center p-8">
             <div className="flex items-center justify-between">
               <h1 className="text-xl font-semibold uppercase tracking-wide text-blue-700">
                 {data.room.title}
@@ -63,6 +65,8 @@ const Home = () => {
                 Join Apointment
               </Button>
             </Link>
+            {isDoctor ? <ViewNotes roomId={data.room.id} dontShowAdd /> : <></>}
+            <ViewRecording roomId={data.room.id} />
             <div className="flex gap-4">
               {isDoctor ? (
                 <Link href={`/viewNotes/${data.room.id}`}>
