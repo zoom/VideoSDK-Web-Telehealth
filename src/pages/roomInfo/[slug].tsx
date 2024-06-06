@@ -60,11 +60,6 @@ const Home = () => {
             <p className="text-left text-lg text-gray-700">{new Date(data.room.time).toTimeString().split(" ")[0]}</p>
             <MeetingWithLabel roomData={data.room} />
             <br />
-            <Link className="flex flex-1 text-sm text-blue-600 hover:underline" href={`/room/${data.room.id}`}>
-              <Button variant={"default"} className="max-w-full">
-                Join Apointment
-              </Button>
-            </Link>
             {isDoctor ? <ViewNotes roomId={data.room.id} dontShowAdd /> : <></>}
             <ViewRecording roomId={data.room.id} />
             <div className="flex gap-4">
@@ -82,8 +77,12 @@ const Home = () => {
                   Recordings
                 </Button>
               </Link>
-              {data.room.time.getTime() > new Date().getTime() ? (
+            </div>
+            {data.room.time.getTime() > new Date().getTime() ? (
+              data.room.time.getTime() > new Date().getTime() + 1000 * 60 * 10 ? (
                 <DownloadICSButton
+                  className="ml-0 flex"
+                  variant="default"
                   event={{
                     start: data.room.time.getTime(),
                     duration: {
@@ -93,9 +92,15 @@ const Home = () => {
                   }}
                 />
               ) : (
-                <></>
-              )}
-            </div>
+                <Link className="flex flex-1 text-sm text-blue-600 hover:underline" href={`/room/${data.room.id}`}>
+                  <Button variant={"default"} className="ml-0 hover:underline">
+                    Join Apointment
+                  </Button>
+                </Link>
+              )
+            ) : (
+              <></>
+            )}
           </Card>
         </div>
         <Footer />
