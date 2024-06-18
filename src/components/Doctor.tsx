@@ -5,7 +5,7 @@ import { api } from "~/utils/api";
 import { Card } from "./ui/card";
 import UpcomingSession from "./UpcomingSession";
 import { Skeleton } from "./ui/skeleton";
-import { CalendarPlus, UserSearch, BadgePlus, Calendar } from "lucide-react";
+import { CalendarPlus, UserSearch, Calendar } from "lucide-react";
 
 const DoctorView = () => {
   const { data: userData } = useSession();
@@ -16,65 +16,41 @@ const DoctorView = () => {
       <span className="py-8">
         <h2 className="mb-8 self-center text-2xl font-bold text-gray-700">Welcome Dr. {userData?.user.name}</h2>
         <h3 className="text-sm text-gray-700">
-          Welcome to your dashboard, where you can view upcoming appointments, join scheduled appointments, and view active users
+          Welcome to your dashboard! Here you can create an appointment, join scheduled appointments, and search for patients.
         </h3>
+        <div className="flex w-full flex-row">
+          <Link href={"/create"} className="m-2 flex flex-row justify-around">
+            <Button>
+              <CalendarPlus size={20} className="mr-2" />
+              Create an appointment
+            </Button>
+          </Link>
+          <Link href={"/schedule"} className="m-2 flex flex-row justify-around">
+            <Button variant={"outline"}>
+              <Calendar size={18} className="mr-2" />
+              View your schedule
+            </Button>
+          </Link>
+          <Link href={"/patients"} className="m-2 flex flex-row justify-around">
+            <Button variant={"outline"}>
+              <UserSearch size={18} className="mr-2" />
+              Find a patient
+            </Button>
+          </Link>
+        </div>
       </span>
       <div className="flex flex-1 flex-row justify-around">
         <div className="flex flex-1 flex-col">
-          <h3 className="self-center text-xl font-bold text-gray-700">Upcoming Appointments</h3>
-          <Card className="m-4 mx-8 flex min-h-96 min-w-96 flex-col self-center rounded-lg bg-white p-5 text-center shadow-lg">
+          <h3 className="text-xl font-bold text-gray-700">Upcoming appointments</h3>
+          <div className="mt-4 flex flex-col rounded-lg text-center">
             {isLoading ? (
-              <Skeleton className="h-96 w-full animate-pulse" />
+              <Skeleton className="w-full animate-pulse" />
             ) : data?.[0] ? (
-              <UpcomingSession data={data[0]} isDoctor />
+              <UpcomingSession data={data[0]} />
             ) : (
-              <div className="flex flex-1 flex-col justify-center text-lg">
-                <p>No Appointments</p>
-                <Link href={"/create"}>
-                  <Button variant={"default"} className="m-4 mb-2 text-lg">
-                    Create an Appointment
-                  </Button>
-                </Link>
-              </div>
+              <Card className="p-4">No appointments, yet</Card>
             )}
-          </Card>
-        </div>
-        <div className="flex flex-1 flex-col">
-          <h3 className="self-center text-xl font-bold text-gray-700">Appointments</h3>
-          <Card className="m-4 flex h-full w-48 flex-col justify-around self-center rounded-lg bg-white p-4 text-center shadow-sm">
-            <div className="flex flex-col justify-center">
-              <Link href={"/create"} className="m-2 flex flex-row justify-around">
-                <Button>
-                  <CalendarPlus size={20} className="mr-2" />
-                  Create
-                </Button>
-              </Link>
-              <Link href={"/viewRooms"} className="m-2 flex flex-row justify-around">
-                <Button variant={"outline"}>
-                  <Calendar size={18} className="mr-2" />
-                  View All
-                </Button>
-              </Link>
-            </div>
-          </Card>
-          <h3 className="self-center text-xl font-bold text-gray-700">View Users</h3>
-          <Card className="m-4 mx-8 flex h-full w-48 flex-col justify-around self-center rounded-lg bg-white p-4 text-center shadow-sm">
-            <div className="flex flex-col justify-center">
-              <Link href={"/viewPatients"} className="m-2 flex flex-row justify-around">
-                <Button variant={"outline"}>
-                  <UserSearch size={18} className="mr-2" />
-                  Patients
-                </Button>
-              </Link>
-              <div className="w-2"></div>
-              <Link href={"/viewDoctors"} className="m-2 flex flex-row justify-around">
-                <Button variant={"outline"}>
-                  <BadgePlus className="mr-2" />
-                  Doctors
-                </Button>
-              </Link>
-            </div>
-          </Card>
+          </div>
         </div>
       </div>
     </>

@@ -13,7 +13,9 @@ const ConfidentialDialog = () => {
         <DialogHeader>
           <DialogTitle>Notice</DialogTitle>
           <DialogDescription>
-            {userData?.user?.role === "patient" ? "Patient Agreement: Confidentiality Clause" : "Doctor Info: captions are not medical grade"}
+            {userData?.user?.role === "patient"
+              ? "Patient Agreement: Confidentiality Clause. Note: captions are not medical grade."
+              : "Doctor Info: captions are not medical grade."}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>

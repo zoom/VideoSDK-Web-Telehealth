@@ -29,10 +29,42 @@ export const zoomRouter = createTRPCRouter({
     }
     throw new TRPCError({ code: "NOT_FOUND", message: "Room not found" });
   }),
-  getAllRecordings: protectedProcedure
+  fetchAllRecordings: protectedProcedure
     .input(z.object({ roomId: z.string() }))
     // might get rate-limited?
     .mutation(async ({ ctx, input }) => {
+      const room = await ctx.db.room.findUnique({
+        where: { id: input.roomId },
+      });
+      if (room) {
+        const recordings = await Promise.all(
+          room.zoomSessionsIds.map(async (sessionId) => {
+            const getRecording = await fetch(`https://api.zoom.us/v2/videosdk/sessions/${sessionId}/recordings`, {
+              headers: {
+                Authorization: `Bearer ${generateVideoSdkApiJwt(env.ZOOM_API_KEY, env.ZOOM_API_SECRET)}`,
+              },
+            });
+            if (getRecording.status === 3301) {
+              return { status: "processing", data: null } as const;
+            } else if (getRecording.status === 200) {
+              const data = (await getRecording.json()) as typeof ExampleRecordingJSON;
+              return { status: "completed", data: data } as const;
+            } else if (getRecording.status === 404) {
+              return { status: "not_found", data: null } as const;
+            } else {
+              throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Error fetching recording" });
+            }
+          })
+        );
+        const completed = getCompletedRecordings(recordings.filter((e) => e.status === "completed" && e.data !== null).map((e) => e.data));
+        return completed;
+      }
+      throw new TRPCError({ code: "NOT_FOUND", message: "Room not found" });
+    }),
+  getAllRecordings: protectedProcedure
+    .input(z.object({ roomId: z.string() }))
+    // might get rate-limited?
+    .query(async ({ ctx, input }) => {
       const room = await ctx.db.room.findUnique({
         where: { id: input.roomId },
       });
