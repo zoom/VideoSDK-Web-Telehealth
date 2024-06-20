@@ -61,8 +61,8 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
                 <LinkIcon height={18} strokeWidth={3} />
               </Button>
               <Button
-                variant={"destructive"}
-                className="absolute right-2 m-[-8px] h-6 w-6 p-0"
+                variant={"ghost"}
+                className="bg-blue absolute right-2 m-[-8px] h-6 w-6 p-0"
                 title="Delete appointment"
                 onClick={async () => {
                   toast({ title: "Deleting Appointment", description: rooms.title });
@@ -70,7 +70,7 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
                   await utils.room.invalidate();
                 }}
               >
-                <X size={18} />
+                <X size={18} color="#1352e7" />
               </Button>
             </div>
             <MeetingWithLabel roomData={data} />
@@ -108,7 +108,7 @@ const UpcomingSession = ({ data }: { data: RoomData }) => {
               ) : (
                 <Link className="flex flex-1 text-sm text-blue-600 hover:underline" href={`/room/${rooms.id}`}>
                   <Button variant={"default"} className="ml-0 hover:underline">
-                    Join Apointment
+                    Join Appointment
                   </Button>
                 </Link>
               )

@@ -5,7 +5,6 @@ import { Button } from "~/components/ui/button";
 import { useToast } from "~/components/ui/use-toast";
 import { LinkIcon } from "lucide-react";
 import Link from "next/link";
-import DownloadICSButton from "~/components/DownloadICS";
 import { Card } from "~/components/ui/card";
 import Header from "~/components/ui/header";
 import Footer from "~/components/ui/footer";
@@ -79,25 +78,11 @@ const Home = () => {
               </Link>
             </div>
             {data.room.time.getTime() > new Date().getTime() ? (
-              data.room.time.getTime() > new Date().getTime() + 1000 * 60 * 10 ? (
-                <DownloadICSButton
-                  className="ml-0 flex"
-                  variant="default"
-                  event={{
-                    start: data.room.time.getTime(),
-                    duration: {
-                      hours: data.room.duration,
-                    },
-                    title: `${data.room.title}`,
-                  }}
-                />
-              ) : (
-                <Link className="flex flex-1 text-sm text-blue-600 hover:underline" href={`/room/${data.room.id}`}>
-                  <Button variant={"default"} className="ml-0 hover:underline">
-                    Join Apointment
-                  </Button>
-                </Link>
-              )
+              <Link className="flex flex-1 text-sm text-blue-600 hover:underline" href={`/room/${data.room.id}`}>
+                <Button variant={"default"} className="ml-0 hover:underline">
+                  Join Appointment
+                </Button>
+              </Link>
             ) : (
               <></>
             )}

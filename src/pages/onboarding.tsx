@@ -20,9 +20,9 @@ const Onboarding = () => {
   const { data } = useSession();
   const [role, setRoleState] = useState<Role>(defaultRole);
 
-  if (data?.user.role !== null) {
-    void router.push("/");
-  }
+  // if (data?.user.role !== null) {
+  //   void router.push("/");
+  // }
 
   return (
     <div className="flex w-screen flex-col items-center justify-center">

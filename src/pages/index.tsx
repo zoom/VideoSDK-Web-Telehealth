@@ -4,9 +4,10 @@ import DoctorView from "~/components/Doctor";
 import PatientView from "~/components/Patient";
 import LandingPage from "~/components/homepage/LandingPage";
 import InfoPanel from "~/components/homepage/InfoPanel";
-import About from "~/components/homepage/About";
+import Features from "~/components/homepage/Features";
 import Footer from "~/components/ui/footer";
 import Header from "~/components/ui/header";
+import TechStack from "~/components/homepage/TechStack";
 
 export default function Home() {
   const { data, status } = useSession();
@@ -25,8 +26,9 @@ export default function Home() {
       <div>
         <Header />
         <LandingPage />
+        <Features />
         <InfoPanel />
-        <About />
+        <TechStack/>
         <Footer />
       </div>
     );
