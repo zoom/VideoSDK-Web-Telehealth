@@ -12,8 +12,8 @@ import Header from "~/components/ui/header";
 export default function Home() {
   const { data: createdRoomsPast, isLoading: loading1 } = api.room.getCreatedPast.useQuery();
   const { data: createdRoomsUpcoming, isLoading: loading2 } = api.room.getCreatedUpcoming.useQuery();
-  const { data: invitedRoomsPast, isLoading: loading3 } = api.room.getInvitedPast.useQuery();
-  const { data: invitedRoomsUpcoming, isLoading: loading4 } = api.room.getInvitedUpcoming.useQuery();
+  // const { data: invitedRoomsPast, isLoading: loading3 } = api.room.getInvitedPast.useQuery();
+  // const { data: invitedRoomsUpcoming, isLoading: loading4 } = api.room.getInvitedUpcoming.useQuery();
 
   const sortedCreatedRoomsUpcoming = createdRoomsUpcoming?.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
   const sortedCreatedRoomsPast = createdRoomsPast?.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
@@ -29,11 +29,11 @@ export default function Home() {
           <h1 className="mb-4 mt-6 flex text-center font-sans text-4xl leading-none text-gray-700">Your Schedule</h1>
           <h3 className="gray text-left font-sans text-base text-gray-700">Upcoming Appointments</h3>
           <div className="">
-            <Rooms rooms={sortedCreatedRoomsUpcoming} isLoading={loading1} />
+            <Rooms rooms={sortedCreatedRoomsUpcoming} isLoading={loading2} />
           </div>
           <h3 className="text-left font-sans text-base text-gray-700">Past Appointments</h3>
           <div>
-            <Rooms rooms={sortedCreatedRoomsPast} isLoading={loading3} />
+            <Rooms rooms={sortedCreatedRoomsPast} isLoading={loading1} />
           </div>
 
           <Link href="/">

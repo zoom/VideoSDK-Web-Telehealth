@@ -1,7 +1,6 @@
 import { type Role } from "@prisma/client";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
@@ -16,7 +15,6 @@ import { BloodGroupSelect } from "~/components/BloodGroup";
 const defaultRole = (env.NEXT_PUBLIC_TESTMODE === "TESTING" ? "null" : "patient") as Role;
 
 const Onboarding = () => {
-  const router = useRouter();
   const { data } = useSession();
   const [role, setRoleState] = useState<Role>(defaultRole);
 
