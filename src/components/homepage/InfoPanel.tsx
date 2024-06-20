@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
-import DoctorExperience from "./images/doctorExperience.png";
+import DoctorExperience from "./images/DoctorExperience.png";
 import PatientExperience from "./images/PatientExperience.png";
 import Onboarding from "./images/onboarding.png";
 
