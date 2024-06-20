@@ -56,7 +56,9 @@ const Home = () => {
               </Button>
             </div>
             <p className="text-left text-lg text-gray-700">{data.room.content}</p>
-            <p className="text-left text-lg text-gray-700">{new Date(data.room.time).toTimeString().split(" ")[0]}</p>
+            <p className="text-left text-lg text-gray-700">
+              {new Date(data.room.time).toLocaleTimeString("en-US", { hour: "numeric", minute: "numeric", hour12: true })}
+            </p>
             <MeetingWithLabel roomData={data.room} />
             <br />
             {isDoctor ? <ViewNotes roomId={data.room.id} dontShowAdd /> : <></>}

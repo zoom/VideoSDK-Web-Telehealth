@@ -44,8 +44,8 @@ const Home = () => {
     return (
       <>
         <div className="relative m-0 flex min-h-screen w-full flex-1 flex-col self-center bg-gray-100 px-0 pb-8">
-          <div className="mx-16 mt-4 flex flex-row">
-            <div className="flex flex-1 flex-col rounded-l-md bg-white p-3">
+          <div className="mx-16 mt-4 flex flex-row bg-white ">
+            <div className="flex flex-1 flex-col rounded-l-md p-3">
               <span className="inline-flex">
                 <Button variant={"link"} className="flex" onClick={copyLink}>
                   <h1 className="text-left text-3xl font-bold text-gray-700">{data.room.title}</h1>
@@ -57,7 +57,7 @@ const Home = () => {
                 <p className="ml-4 text-left text-lg text-gray-700">| {new Date(data.room.time).toTimeString().split(" ")[0]}</p>
               </span>
             </div>
-            <div className=" h-full justify-center rounded-r-md bg-white p-4">
+            <div className="h-full justify-center self-center rounded-r-md p-4">
               <RightBar data={data} transcriptionSubtitle={transcriptionSubtitle} client={client} records={records} inCall={inCall} />
             </div>
           </div>
