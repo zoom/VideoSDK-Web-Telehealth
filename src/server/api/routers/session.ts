@@ -19,8 +19,8 @@ export const sessionRouter = createTRPCRouter({
       const { title, content, IDs, time, duration } = input;
       return ctx.db.room.create({
         data: {
-          title,
-          content,
+          title: title.trim(),
+          content: content.trim(),
           User_CreatedBy: { connect: { id: ctx.session.user.id } },
           duration,
           time,
