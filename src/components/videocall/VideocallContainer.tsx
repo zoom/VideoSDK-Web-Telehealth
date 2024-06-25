@@ -23,7 +23,6 @@ const Home = () => {
   const { data: userData } = useSession();
   const [records, setRecords] = useState<ChatRecord[]>([]);
   const [transcriptionSubtitle, setTranscriptionSubtitle] = useState<TranscriptEleType>({});
-  // this now needs to be wrapped in dyamic import
   const client = useRef(ZoomVideo.createClient());
 
   if (isError) {

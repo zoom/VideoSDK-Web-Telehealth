@@ -63,7 +63,6 @@ export const zoomRouter = createTRPCRouter({
     }),
   getAllRecordings: protectedProcedure
     .input(z.object({ roomId: z.string() }))
-    // might get rate-limited?
     .query(async ({ ctx, input }) => {
       const room = await ctx.db.room.findUnique({
         where: { id: input.roomId },

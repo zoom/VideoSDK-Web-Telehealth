@@ -104,7 +104,6 @@ const ViewPatient = (props: { userId: string }) => {
           </Card>
         </>
       )}
-      {/* TODO: add patient's most recent appointments here */}
       <div className="my-10 flex w-full max-w-xl flex-col justify-center">
         <p className="mb-2 flex text-center text-xl font-bold leading-none text-gray-700">Files</p>
         {isLoading ? (

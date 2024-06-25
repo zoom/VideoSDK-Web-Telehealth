@@ -1,5 +1,4 @@
 import { type Room } from "@prisma/client";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import UpcomingSession from "~/components/UpcomingSession";
 import { Button } from "~/components/ui/button";
@@ -12,8 +11,6 @@ import Header from "~/components/ui/header";
 export default function Home() {
   const { data: createdRoomsPast, isLoading: loading1 } = api.room.getCreatedPast.useQuery();
   const { data: createdRoomsUpcoming, isLoading: loading2 } = api.room.getCreatedUpcoming.useQuery();
-  // const { data: invitedRoomsPast, isLoading: loading3 } = api.room.getInvitedPast.useQuery();
-  // const { data: invitedRoomsUpcoming, isLoading: loading4 } = api.room.getInvitedUpcoming.useQuery();
 
   const sortedCreatedRoomsUpcoming = createdRoomsUpcoming?.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
   const sortedCreatedRoomsPast = createdRoomsPast?.sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
@@ -49,7 +46,6 @@ export default function Home() {
 }
 
 const Rooms = ({ rooms, isLoading }: { rooms?: Room[]; isLoading: boolean }) => {
-  const { data } = useSession();
   rooms?.forEach((room) => {
     console.log("room", room);
   });

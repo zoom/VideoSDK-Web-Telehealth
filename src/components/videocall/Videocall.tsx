@@ -74,9 +74,7 @@ const Videocall = (props: VideoCallProps) => {
     client.current.off("peer-video-state-change", (payload: { action: "Start" | "Stop"; userId: number }) => void renderVideo(payload));
     client.current.off("chat-on-message", onChatMessage);
     await client.current.leave().catch((e) => console.log("leave error", e));
-    // hard refresh to reset the state
     window.location.href = "/";
-    // setInCall(false);
   };
 
   return (

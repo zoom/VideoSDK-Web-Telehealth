@@ -71,8 +71,6 @@ export const authOptions: NextAuthOptions = {
     },
   },
   theme: {
-    // brandColor: config.theme.extend.colors.primary.DEFAULT,
-    // buttonText: config.theme.extend.colors.primary.foreground,
     colorScheme: "light",
     logo: "/logo.svg",
   },
