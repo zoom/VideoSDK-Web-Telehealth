@@ -46,7 +46,9 @@ const LandingPage = () => {
               </div>
             </div>
           </div>
-          <video src="/video.webm" autoPlay loop muted className="p-6 sm:p-4" poster="ZoomDevelopers.png" />
+          <div className="relative mx-auto max-w-3xl">
+            <video src="/video.webm" controls className="p-6 sm:p-4" poster="ZoomDevelopers.png" />
+          </div>
         </div>
       </div>
     </section>
