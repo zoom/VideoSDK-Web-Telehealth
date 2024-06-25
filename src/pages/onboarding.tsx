@@ -11,16 +11,18 @@ import { useToast } from "~/components/ui/use-toast";
 import { env } from "~/env";
 import { api } from "~/utils/api";
 import { BloodGroupSelect } from "~/components/BloodGroup";
+import { useRouter } from "next/router";
 
 const defaultRole = (env.NEXT_PUBLIC_TESTMODE === "TESTING" ? "null" : "patient") as Role;
 
 const Onboarding = () => {
   const { data } = useSession();
   const [role, setRoleState] = useState<Role>(defaultRole);
+  const router = useRouter();
 
-  // if (data?.user.role !== null) {
-  //   void router.push("/");
-  // }
+  if (data?.user.role !== null) {
+    void router.push("/");
+  }
 
   return (
     <div className="flex w-screen flex-col items-center justify-center">
