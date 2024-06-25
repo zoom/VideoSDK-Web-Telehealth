@@ -1,6 +1,5 @@
 import { signIn } from "next-auth/react";
 import { Button, buttonVariants } from "~/components/ui/button";
-import ReactPlayer from "react-player/youtube";
 
 const LandingPage = () => {
   return (
@@ -47,18 +46,7 @@ const LandingPage = () => {
               </div>
             </div>
           </div>
-          {/* YouTube doesn't allow you to access a video on localhost */}
-          {/* <ReactPlayer url="https://www.youtube.com/watch?v=h11smfVrWrE" width="100%" height="500px" /> */}
-          <iframe
-            width="700"
-            height="450"
-            src="https://www.youtube.com/embed/h11smfVrWrE?si=MAk7M0Q2K0rydq3j"
-            title="Get started with Zoom Telehealth Starter Kit"
-            className="mx-auto max-w-6xl px-4"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          ></iframe>
+          <video src="/video.webm" autoPlay loop muted className="p-6 sm:p-4" poster="ZoomDevelopers.png" />
         </div>
       </div>
     </section>
