@@ -24,7 +24,7 @@ This sample app demonstrates how to use the [Zoom SDK](https://developers.zoom.u
 1. Clone the repo
 
 ```bash
-git clone https://github.com/EkaanshArora/Zoom-Telehealth
+git clone https://github.com/zoom/VideoSDK-Web-Telehealth
 ```
 
 2. Install dependencies
