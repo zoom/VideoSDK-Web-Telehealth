@@ -85,7 +85,8 @@ const Videocall = (props: VideoCallProps) => {
       </div>
       {!inCall ? (
         <div className="mx-auto flex w-64 flex-col self-center">
-          <UIToolKit />
+          <div className="w-4 h-8" />
+          {/* <UIToolKit /> */}
           <div className="w-4" />
           <Button className="flex flex-1" onClick={startCall}>
             Join
