@@ -1,9 +1,11 @@
 import * as React from "react";
 import * as Slider from "@radix-ui/react-slider";
+import audioSample1 from 'public/audio_samples';
 
-const VolumeSlider = ({audioSample1}: any) => {
+const VolumeSlider = () => {
   
   const changeVolume = (e: any) => {
+    audioSample1.play();
     audioSample1.volume = e[0] / 100;  
   }; 
 

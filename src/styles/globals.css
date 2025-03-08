@@ -173,3 +173,48 @@ progress::-moz-progress-bar {
   background-color: grey;
   border-radius: 7px;
 }
+
+
+.preview-video-container {
+  width: 65vw; 
+  display: flex; 
+  flex-direction: column;
+}
+
+.video-container {
+  background: #403f3f; 
+  border: solid 12px #403f3f; 
+  border-radius: 12px;
+}
+
+.preview-controls-container {
+  display: flex;
+  margin-top: 13px; 
+  align-items: flex-start; 
+  justify-content: space-around;
+  flex-wrap: wrap
+}
+
+.preview-control {
+   display: flex; 
+   flex-direction: column;
+   align-items: center;
+}
+
+.btn-drop-container {
+  display: flex; 
+  align-items: center;
+}
+
+.preview-btn {
+  border-radius: 32px; 
+  padding: 0px;
+  border: solid 32px hsl(220deg 89.96% 48.72%);
+}
+
+
+@media screen and (max-width: 800px) {
+  .preview-video-container {
+    width: 95vw;
+  }
+}
