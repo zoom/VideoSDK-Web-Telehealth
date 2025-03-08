@@ -300,28 +300,28 @@ const Preview = ({setCloseToolkit}: any, ) => {
             </DropdownMenu>
               </div>
   
-              <div>
-              <DropdownMenu>
-               <DropdownMenuTrigger>
-                 <Button variant="outline" title="Select Virtual Background">
-                   <Image />
-                 </Button>
-               </DropdownMenuTrigger>
-               <DropdownMenuContent>
-                 <DropdownMenuLabel>Select Virtual Background</DropdownMenuLabel>
-                 <DropdownMenuSeparator />
-                  { // eslint-disable-next-line @typescript-eslint/no-floating-promises}
-                   <DropdownMenuItem key={0} onClick={()=>{startCamera('', currentCamera)}}>{'None'}{(currentBackground === '') && <CheckIcon />}</DropdownMenuItem>
-                  }
-                  { // eslint-disable-next-line @typescript-eslint/no-floating-promises}
-                   <DropdownMenuItem key={1} onClick={()=>{startCamera('blur', currentCamera)}}>{'Blur'}{(currentBackground === 'blur') && <CheckIcon />}</DropdownMenuItem>
-                  }
-                  { // eslint-disable-next-line @typescript-eslint/no-floating-promises}
-                   <DropdownMenuItem key={2} onClick={()=>{startCamera(BeachPhoto.src, currentCamera)}}>{'Beach'}{(currentBackground === BeachPhoto.src) && <CheckIcon />}</DropdownMenuItem>
-                  }
-               </DropdownMenuContent>
-              </DropdownMenu>
-              </div>
+            {!mobileDevice && <div>
+            <DropdownMenu>
+            <DropdownMenuTrigger>
+                <Button variant="outline" title="Select Virtual Background">
+                <Image />
+                </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+                <DropdownMenuLabel>Select Virtual Background</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                { // eslint-disable-next-line @typescript-eslint/no-floating-promises}
+                <DropdownMenuItem key={0} onClick={()=>{startCamera('', currentCamera)}}>{'None'}{(currentBackground === '') && <CheckIcon />}</DropdownMenuItem>
+                }
+                { // eslint-disable-next-line @typescript-eslint/no-floating-promises}
+                <DropdownMenuItem key={1} onClick={()=>{startCamera('blur', currentCamera)}}>{'Blur'}{(currentBackground === 'blur') && <CheckIcon />}</DropdownMenuItem>
+                }
+                { // eslint-disable-next-line @typescript-eslint/no-floating-promises}
+                <DropdownMenuItem key={2} onClick={()=>{startCamera(BeachPhoto.src, currentCamera)}}>{'Beach'}{(currentBackground === BeachPhoto.src) && <CheckIcon />}</DropdownMenuItem>
+                }
+            </DropdownMenuContent>
+            </DropdownMenu>
+            </div>}
               </div>
           </div>
             
