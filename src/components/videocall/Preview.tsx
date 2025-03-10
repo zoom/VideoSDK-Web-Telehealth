@@ -28,7 +28,7 @@ import {
   }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const Preview = ({setCloseToolkit}: any, ) => {
+const Preview = ({init}: any, ) => {
     
   const hasMounted = useRef(false);
   const [videoDevices, setVideoDevices] = useState<any[]>();
@@ -215,6 +215,7 @@ const Preview = ({setCloseToolkit}: any, ) => {
 
   const startPreview = async () => {
     checkMobile();
+    await init();
     await startCamera();
     await startMicrophone();
     await startSpeaker();

@@ -12,7 +12,6 @@ import { videoCallStyle } from "~/lib/utils";
 import SettingsModal from "./SettingsModal";
 import ActionModal from "./ActionModal";
 import { type setTranscriptionType } from "./Transcript";
-// import UIToolKit from "./UIToolKit";
 import TranscriptionButton from "./TranscriptionButton";
 import RecordingButton from "./RecordingButton";
 import { CameraButton, MicButton } from "./MuteButtons";
@@ -45,7 +44,6 @@ const Videocall = (props: VideoCallProps) => {
   const startCall = async () => {
     toast({ title: "Joining", description: "Please wait..." });
     // await init();
-    // if (closeToolkit) closeToolkit();
     setInCall(true);
     const mediaStream = client.current.getMediaStream();
     // @ts-expect-error https://stackoverflow.com/questions/7944460/detect-safari-browser/42189492#42189492
@@ -85,16 +83,12 @@ const Videocall = (props: VideoCallProps) => {
     window.location.href = "/";
   };
 
-  useEffect(() => {
-    init();
-  }, []);
-
   return (
     <div className="flex h-full w-full flex-1 flex-col rounded-md px-4">
       {!inCall ? (
         <div className="mx-auto flex w-64 flex-col self-center">
           <div className="w-4 h-8" />
-          <Preview />
+          <Preview init={init}/>
           <div className="w-4" />
           <Button className="flex flex-1" onClick={startCall}>
             Join
