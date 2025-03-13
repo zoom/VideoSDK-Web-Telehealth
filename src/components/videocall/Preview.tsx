@@ -44,6 +44,7 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
   const [videoOnToggle, setVideoOnToggle] = useState(false);
   const [volumeBtn, setVolumeBtn] = useState(2);
   const [animation, setAnimation] = useState<NodeJS.Timeout>();
+  const [isLoading, setIsLoading] = useState(true);
 
   const startCamera = useCallback(async (background?: string, cameraId?: string) => {
     let devices;
@@ -217,6 +218,7 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
         await startCamera();
         await startMicrophone();
         await startSpeaker();
+        setIsLoading(false);
       };
       void startPreview();
     }
@@ -234,7 +236,7 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
       <div className='preview-controls-container'>
         <div className='preview-control'>
           <div className='btn-drop-container'>
-            <Button variant={"outline"} title="microphone" className='preview-btn' onClick={toggleMicrophone}>
+            <Button variant={"outline"} title="microphone" className='preview-btn' onClick={toggleMicrophone} disabled={isLoading}>
               {!audioOnToggle ? <MicOff color="white" /> : <Mic color="white" />}
             </Button>
             <div style={{ marginLeft: '10px' }}>
@@ -262,7 +264,7 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
         </div>
         <div className='preview-control'>
           <div className='btn-drop-container'>
-            <Button variant={"outline"} title="camera" className='preview-btn' onClick={toggleCamera}>
+            <Button variant={"outline"} title="camera" className='preview-btn' onClick={toggleCamera} disabled={isLoading}>
               {!videoOnToggle ? <VideoOff color="white" /> : <Video color="white" />}
             </Button>
             <div style={{ marginLeft: '10px' }}>
@@ -306,7 +308,7 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
         </div>
         <div className='preview-control'>
           <div className='btn-drop-container'>
-            <Button variant={"outline"} title="speaker" className='preview-btn' onClick={playSpeaker} disabled={speakerPlaying}>
+            <Button variant={"outline"} title="speaker" className='preview-btn' onClick={playSpeaker} disabled={speakerPlaying || isLoading}>
               {(volumeBtn === 0) ? <Volume color="white" /> :
                 (volumeBtn === 1) ? <Volume1 color="white" /> : <Volume2 color="white" />}
             </Button>
