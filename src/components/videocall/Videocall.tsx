@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-floating-promises */
 import { useSession } from "next-auth/react";
-import { type MutableRefObject, useEffect, useRef, useState } from "react";
+import { type MutableRefObject, useState } from "react";
 import { type VideoClient, VideoQuality, type VideoPlayer, type ChatMessage } from "@zoom/videosdk";
 import { PhoneOff } from "lucide-react";
 import { Button } from "~/components/ui/button";
@@ -22,9 +21,6 @@ const Videocall = (props: VideoCallProps) => {
   const { setTranscriptionSubtitle, isCreator, jwt, session, client, inCall, setInCall } = props;
   const [isVideoMuted, setIsVideoMuted] = useState(!client.current.getCurrentUserInfo()?.bVideoOn);
   const [isAudioMuted, setIsAudioMuted] = useState(client.current.getCurrentUserInfo()?.muted ?? true);
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  const [closeToolkit, setCloseToolkit] = useState<Function | null>(null);
-  const videoContainerRef = useRef<HTMLDivElement>(null);
   const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
   const { data } = useSession();
   const { toast } = useToast();
@@ -88,31 +84,31 @@ const Videocall = (props: VideoCallProps) => {
       {!inCall ? (
         <div className="mx-auto flex w-64 flex-col self-center">
           <div className="w-4 h-8" />
-          <Preview init={init}/>
+          <Preview init={init} />
           <div className="w-4" />
           <Button className="flex flex-1" onClick={startCall}>
             Join
           </Button>
-        </div>        
+        </div>
       ) : (
         <div>
           <div className="flex w-full flex-1" style={inCall ? {} : { display: "none" }}>
             {/* @ts-expect-error html component */}
-             <video-player-container style={videoCallStyle} />
-              </div>
-          <div className="flex w-full flex-col justify-around self-center">
-          <div className="mt-4 flex w-[30rem] flex-1 justify-around self-center rounded-md bg-white p-4">
-            <CameraButton client={client} isVideoMuted={isVideoMuted} setIsVideoMuted={setIsVideoMuted} renderVideo={renderVideo} />
-            <MicButton isAudioMuted={isAudioMuted} client={client} setIsAudioMuted={setIsAudioMuted} />
-            <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
-            <RecordingButton client={client} />
-            <SettingsModal client={client} /> 
-            <ActionModal />
-            <Button variant={"destructive"} onClick={leaveCall} title="leave call">
-              <PhoneOff />
-            </Button>
+            <video-player-container style={videoCallStyle} />
           </div>
-        </div>
+          <div className="flex w-full flex-col justify-around self-center">
+            <div className="mt-4 flex w-[30rem] flex-1 justify-around self-center rounded-md bg-white p-4">
+              <CameraButton client={client} isVideoMuted={isVideoMuted} setIsVideoMuted={setIsVideoMuted} renderVideo={renderVideo} />
+              <MicButton isAudioMuted={isAudioMuted} client={client} setIsAudioMuted={setIsAudioMuted} />
+              <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
+              <RecordingButton client={client} />
+              <SettingsModal client={client} />
+              <ActionModal />
+              <Button variant={"destructive"} onClick={leaveCall} title="leave call">
+                <PhoneOff />
+              </Button>
+            </div>
+          </div>
         </div>
       )}
     </div>
