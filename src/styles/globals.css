@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "@radix-ui/colors/black-alpha.css";
+@import "@radix-ui/colors/violet.css";
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -70,6 +73,7 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -81,24 +85,30 @@ video-player-container {
   display: grid !important;
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
+
 video-player-container:has(> :nth-child(2)) {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
 video-player-container:has(> :nth-child(5)) {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+
 video-player-container:has(> :nth-child(17)) {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
+
 video-player-container {
   width: 100%;
   height: 100%;
   display: grid !important;
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
+
 video-player-container:has(> :nth-child(2)) {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
+
 video-player-container:has(> :nth-child(5)) {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
@@ -107,4 +117,70 @@ video-player {
   width: 100%;
   height: auto;
   aspect-ratio: 16/9;
+}
+
+progress {
+  border-radius: 7px;
+  height: 10px;
+  margin-top: 14px;
+}
+
+progress::-webkit-progress-bar {
+  background-color: grey;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+progress::-webkit-progress-value {
+  background-color: #0c57ec;
+  border-radius: 7px;
+}
+
+progress::-moz-progress-bar {
+  background-color: grey;
+  border-radius: 7px;
+}
+
+.preview-video-container {
+  width: 65vw;
+  display: flex;
+  flex-direction: column;
+}
+
+.video-container {
+  background: #403f3f;
+  border: solid 12px #403f3f;
+  border-radius: 12px;
+}
+
+.preview-controls-container {
+  display: flex;
+  margin-top: 13px;
+  align-items: flex-start;
+  justify-content: space-around;
+  flex-wrap: wrap
+}
+
+.preview-control {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.btn-drop-container {
+  display: flex;
+  align-items: center;
+}
+
+.preview-btn {
+  border-radius: 32px;
+  padding: 0px;
+  border: solid 32px hsl(220deg 89.96% 48.72%);
+}
+
+
+@media screen and (max-width: 800px) {
+  .preview-video-container {
+    width: 95vw;
+  }
 }
