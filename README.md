@@ -30,7 +30,7 @@ git clone https://github.com/zoom/VideoSDK-Web-Telehealth
 2. Install dependencies
 
 ```bash
-cd Zoom-Telehealth
+cd VideoSDK-Web-Telehealth
 bun install # or npm install
 ```
 
