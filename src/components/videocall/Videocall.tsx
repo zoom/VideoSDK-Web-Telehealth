@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import { type MutableRefObject, useState } from "react";
-import { type VideoClient, VideoQuality, type VideoPlayer, type ChatMessage } from "@zoom/videosdk";
+import { type VideoClient, VideoQuality, type VideoPlayer, type ChatMessage, type Participant} from "@zoom/videosdk";
 import { PhoneOff } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { useToast } from "~/components/ui/use-toast";
@@ -27,11 +27,6 @@ const Videocall = (props: VideoCallProps) => {
 
   const init = async () => {
     await client.current.init("en-US", "Global", { patchJsMedia: true });
-    client.current.on("peer-video-state-change", (payload) => void renderVideo(payload));
-    client.current.on("chat-on-message", onChatMessage);
-    await client.current.join(session, jwt, data?.user.name ?? "User").catch((e) => {
-      console.log(e);
-    });
     if (isCreator) {
       await writeZoomSessionID.mutateAsync({ zoomSessionsId: client.current.getSessionInfo().sessionId, roomId: session });
     }
@@ -39,7 +34,13 @@ const Videocall = (props: VideoCallProps) => {
 
   const startCall = async () => {
     toast({ title: "Joining", description: "Please wait..." });
-    // await init();
+
+    client.current.on("peer-video-state-change", (payload) => void renderVideo(payload));
+    client.current.on("chat-on-message", onChatMessage);
+    await client.current.join(session, jwt, data?.user.name ?? "User").catch((e) => {
+      console.log(e);
+    });
+
     setInCall(true);
     const mediaStream = client.current.getMediaStream();
     // @ts-expect-error https://stackoverflow.com/questions/7944460/detect-safari-browser/42189492#42189492
@@ -47,7 +48,13 @@ const Videocall = (props: VideoCallProps) => {
     setIsAudioMuted(client.current.getCurrentUserInfo().muted ?? true);
     await mediaStream.startVideo();
     setIsVideoMuted(!client.current.getCurrentUserInfo().bVideoOn);
-    await renderVideo({ action: "Start", userId: client.current.getCurrentUserInfo().userId });
+
+    const users: Participant[] = client.current.getAllUser();
+    
+    for( const user of users ) {
+      if (user.bVideoOn) await renderVideo({ action: "Start", userId: user.userId });
+    };
+    
   };
 
   const renderVideo = async (event: { action: "Start" | "Stop"; userId: number }) => {
