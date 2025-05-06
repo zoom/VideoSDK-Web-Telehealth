@@ -1,6 +1,6 @@
 import { useSession } from "next-auth/react";
 import { type MutableRefObject, useState } from "react";
-import { type VideoClient, VideoQuality, type VideoPlayer, type ChatMessage, type Participant} from "@zoom/videosdk";
+import { type VideoClient, VideoQuality, type VideoPlayer, type ChatMessage, type Participant } from "@zoom/videosdk";
 import { PhoneOff } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { useToast } from "~/components/ui/use-toast";
@@ -27,14 +27,10 @@ const Videocall = (props: VideoCallProps) => {
 
   const init = async () => {
     await client.current.init("en-US", "Global", { patchJsMedia: true });
-    if (isCreator) {
-      await writeZoomSessionID.mutateAsync({ zoomSessionsId: client.current.getSessionInfo().sessionId, roomId: session });
-    }
   };
 
   const startCall = async () => {
     toast({ title: "Joining", description: "Please wait..." });
-
     client.current.on("peer-video-state-change", (payload) => void renderVideo(payload));
     client.current.on("chat-on-message", onChatMessage);
     await client.current.join(session, jwt, data?.user.name ?? "User").catch((e) => {
@@ -50,11 +46,12 @@ const Videocall = (props: VideoCallProps) => {
     setIsVideoMuted(!client.current.getCurrentUserInfo().bVideoOn);
 
     const users: Participant[] = client.current.getAllUser();
-    
-    for( const user of users ) {
+    for (const user of users) {
       if (user.bVideoOn) await renderVideo({ action: "Start", userId: user.userId });
     };
-    
+    if (isCreator && client.current.getSessionInfo().sessionId) {
+      await writeZoomSessionID.mutateAsync({ zoomSessionsId: client.current.getSessionInfo().sessionId, roomId: session });
+    }
   };
 
   const renderVideo = async (event: { action: "Start" | "Stop"; userId: number }) => {
