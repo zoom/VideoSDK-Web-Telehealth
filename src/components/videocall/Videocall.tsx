@@ -36,15 +36,22 @@ const Videocall = (props: VideoCallProps) => {
     await client.current.join(session, jwt, data?.user.name ?? "User").catch((e) => {
       console.log(e);
     });
-
+//-----------------------------
     setInCall(true);
     const mediaStream = client.current.getMediaStream();
     // @ts-expect-error https://stackoverflow.com/questions/7944460/detect-safari-browser/42189492#42189492
     window.safari ? await WorkAroundForSafari(client.current) : await mediaStream.startAudio();
     setIsAudioMuted(client.current.getCurrentUserInfo().muted ?? true);
-    await mediaStream.startVideo();
-    setIsVideoMuted(!client.current.getCurrentUserInfo().bVideoOn);
 
+    if (isAudioMuted) await mediaStream.muteAudio();
+    if (!isVideoMuted) {
+      await mediaStream.startVideo();
+      setIsVideoMuted(!client.current.getCurrentUserInfo().bVideoOn);
+    }
+
+
+    console.log("AUDIO / VIDEO / client muted?", isAudioMuted, isVideoMuted, client.current.getCurrentUserInfo().muted);
+//----------------------------
     const users: Participant[] = client.current.getAllUser();
     for (const user of users) {
       if (user.bVideoOn) await renderVideo({ action: "Start", userId: user.userId });
@@ -88,7 +95,7 @@ const Videocall = (props: VideoCallProps) => {
       {!inCall ? (
         <div className="mx-auto flex w-64 flex-col self-center">
           <div className="w-4 h-8" />
-          <Preview init={init} />
+          <Preview init={init} setIsVideoMuted={setIsVideoMuted} setIsAudioMuted={setIsAudioMuted}/>
           <div className="w-4" />
           <Button className="flex flex-1" onClick={startCall}>
             Join
