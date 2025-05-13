@@ -24,10 +24,12 @@ interface MyLocalVideoTrack extends LocalVideoTrack {
   isVideoStarted: boolean;
 }
 
-const Preview = ({ init, setIsVideoMuted, setIsAudioMuted }: { 
+const Preview = ({ init, setIsVideoMuted, setIsAudioMuted, currentBackground, setCurrentBackground}: { 
   init: () => Promise<void>,
   setIsVideoMuted: Dispatch<SetStateAction<boolean>>,
-  setIsAudioMuted: Dispatch<SetStateAction<boolean>>
+  setIsAudioMuted: Dispatch<SetStateAction<boolean>>,
+  currentBackground: string,
+  setCurrentBackground: Dispatch<SetStateAction<string>>
 }) => {
 
   const hasMounted = useRef(false);
@@ -40,7 +42,6 @@ const Preview = ({ init, setIsVideoMuted, setIsAudioMuted }: {
   const [speakerTester, setSpeakerTester] = useState<TestSpeakerReturn>();
   const [speakerPlaying, setSpeakerPlaying] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<string>('');
-  const [currentBackground, setCurrentBackground] = useState<string>('');
   const [localAudioTrack, setLocalAudioTrack] = useState({} as MyLocalAudioTrack);
   const [localVideoTrack, setLocalVideoTrack] = useState({} as MyLocalVideoTrack);
   const [localSpeakerTrack, setLocalSpeakerTrack] = useState({} as MyLocalAudioTrack);
@@ -56,7 +57,7 @@ const Preview = ({ init, setIsVideoMuted, setIsAudioMuted }: {
     let cameraDevices;
     let videoTrack;
 
-    if (background) await localVideoTrack.stop();
+    if (background) localVideoTrack.isVideoStarted ?? await localVideoTrack.stop();
 
     if (mobileDevice) {
       cameraDevices = [{
@@ -87,7 +88,7 @@ const Preview = ({ init, setIsVideoMuted, setIsAudioMuted }: {
       setVideoOnToggle(true);
       setIsVideoMuted(false);
     }
-  }, [localVideoTrack, mobileDevice, setIsVideoMuted]);
+  }, [localVideoTrack, mobileDevice, setCurrentBackground, setIsVideoMuted]);
 
   const startMicrophone = useCallback(async (microphoneId?: string) => {
     const devices = await ZoomVideo.getDevices();

@@ -25,16 +25,17 @@ const MicButton = ({ client, isAudioMuted, setIsAudioMuted } : {
   );
 };
 
-const CameraButton = ({ client, isVideoMuted, setIsVideoMuted, renderVideo }: {
+const CameraButton = ({ client, isVideoMuted, setIsVideoMuted, renderVideo, currentBackground}: {
   client: MutableRefObject<typeof VideoClient>;
   isVideoMuted: boolean;
   setIsVideoMuted: Dispatch<SetStateAction<boolean>>;
   renderVideo: (event: { action: "Start" | "Stop"; userId: number }) => Promise<void>;
+  currentBackground: string;
 }) => {
   const onCameraClick = async () => {
     const mediaStream = client.current.getMediaStream();
     if (isVideoMuted) {
-      await mediaStream.startVideo();
+      await mediaStream.startVideo({ virtualBackground: { imageUrl: currentBackground } });
       setIsVideoMuted(false);
       await renderVideo({ action: "Start", userId: client.current.getCurrentUserInfo().userId });
     } else {
