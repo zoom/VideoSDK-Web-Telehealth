@@ -1,6 +1,6 @@
 import ZoomVideo, { type LocalAudioTrack, type LocalVideoTrack, type TestMicrophoneReturn, type TestSpeakerReturn } from '@zoom/videosdk'
 // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 import { Button } from "~/components/ui/button";
 import { Mic, MicOff, Video, VideoOff, Volume, Volume1, Volume2, ChevronRight, CheckIcon, Image as ImageIcon, StopCircle } from "lucide-react";
@@ -24,7 +24,7 @@ interface MyLocalVideoTrack extends LocalVideoTrack {
   isVideoStarted: boolean;
 }
 
-const Preview = ({ init, setIsVideoMuted, setIsAudioMuted, currentBackground, setCurrentBackground}: { 
+const Preview = ({ init, setIsVideoMuted, setIsAudioMuted, currentBackground, setCurrentBackground }: {
   init: () => Promise<void>,
   setIsVideoMuted: Dispatch<SetStateAction<boolean>>,
   setIsAudioMuted: Dispatch<SetStateAction<boolean>>,

@@ -37,7 +37,6 @@ const Videocall = (props: VideoCallProps) => {
     await client.current.join(session, jwt, data?.user.name ?? "User").catch((e) => {
       console.log(e);
     });
-//-----------------------------
     setInCall(true);
     const mediaStream = client.current.getMediaStream();
     // @ts-expect-error https://stackoverflow.com/questions/7944460/detect-safari-browser/42189492#42189492
@@ -50,9 +49,6 @@ const Videocall = (props: VideoCallProps) => {
       setIsVideoMuted(!client.current.getCurrentUserInfo().bVideoOn);
     }
 
-
-    console.log("AUDIO / VIDEO / client muted?", isAudioMuted, isVideoMuted, client.current.getCurrentUserInfo().muted);
-//----------------------------
     const users: Participant[] = client.current.getAllUser();
     for (const user of users) {
       if (user.bVideoOn) await renderVideo({ action: "Start", userId: user.userId });
@@ -96,11 +92,11 @@ const Videocall = (props: VideoCallProps) => {
       {!inCall ? (
         <div className="mx-auto flex w-64 flex-col self-center">
           <div className="w-4 h-8" />
-          <Preview init={init} 
-              setIsVideoMuted={setIsVideoMuted} 
-              setIsAudioMuted={setIsAudioMuted} 
-              currentBackground={currentBackground} 
-              setCurrentBackground={setCurrentBackground}/>
+          <Preview init={init}
+            setIsVideoMuted={setIsVideoMuted}
+            setIsAudioMuted={setIsAudioMuted}
+            currentBackground={currentBackground}
+            setCurrentBackground={setCurrentBackground} />
           <div className="w-4" />
           <Button className="flex flex-1" onClick={startCall}>
             Join
@@ -114,12 +110,12 @@ const Videocall = (props: VideoCallProps) => {
           </div>
           <div className="flex w-full flex-col justify-around self-center">
             <div className="mt-4 flex w-[30rem] flex-1 justify-around self-center rounded-md bg-white p-4">
-              <CameraButton 
-                client={client} 
-                isVideoMuted={isVideoMuted} 
-                setIsVideoMuted={setIsVideoMuted} 
-                renderVideo={renderVideo} 
-                currentBackground={currentBackground}/>
+              <CameraButton
+                client={client}
+                isVideoMuted={isVideoMuted}
+                setIsVideoMuted={setIsVideoMuted}
+                renderVideo={renderVideo}
+                currentBackground={currentBackground} />
 
               <MicButton isAudioMuted={isAudioMuted} client={client} setIsAudioMuted={setIsAudioMuted} />
               <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
