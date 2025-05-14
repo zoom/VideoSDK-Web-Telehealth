@@ -21,6 +21,7 @@ const Videocall = (props: VideoCallProps) => {
   const { setTranscriptionSubtitle, isCreator, jwt, session, client, inCall, setInCall } = props;
   const [isVideoMuted, setIsVideoMuted] = useState(!client.current.getCurrentUserInfo()?.bVideoOn);
   const [isAudioMuted, setIsAudioMuted] = useState(client.current.getCurrentUserInfo()?.muted ?? true);
+  const [currentBackground, setCurrentBackground] = useState<string>('');
   const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
   const { data } = useSession();
   const { toast } = useToast();
@@ -36,14 +37,17 @@ const Videocall = (props: VideoCallProps) => {
     await client.current.join(session, jwt, data?.user.name ?? "User").catch((e) => {
       console.log(e);
     });
-
     setInCall(true);
     const mediaStream = client.current.getMediaStream();
     // @ts-expect-error https://stackoverflow.com/questions/7944460/detect-safari-browser/42189492#42189492
     window.safari ? await WorkAroundForSafari(client.current) : await mediaStream.startAudio();
     setIsAudioMuted(client.current.getCurrentUserInfo().muted ?? true);
-    await mediaStream.startVideo();
-    setIsVideoMuted(!client.current.getCurrentUserInfo().bVideoOn);
+
+    if (isAudioMuted) await mediaStream.muteAudio();
+    if (!isVideoMuted) {
+      await mediaStream.startVideo({ virtualBackground: { imageUrl: currentBackground } });
+      setIsVideoMuted(!client.current.getCurrentUserInfo().bVideoOn);
+    }
 
     const users: Participant[] = client.current.getAllUser();
     for (const user of users) {
@@ -88,7 +92,11 @@ const Videocall = (props: VideoCallProps) => {
       {!inCall ? (
         <div className="mx-auto flex w-64 flex-col self-center">
           <div className="w-4 h-8" />
-          <Preview init={init} />
+          <Preview init={init}
+            setIsVideoMuted={setIsVideoMuted}
+            setIsAudioMuted={setIsAudioMuted}
+            currentBackground={currentBackground}
+            setCurrentBackground={setCurrentBackground} />
           <div className="w-4" />
           <Button className="flex flex-1" onClick={startCall}>
             Join
@@ -102,7 +110,13 @@ const Videocall = (props: VideoCallProps) => {
           </div>
           <div className="flex w-full flex-col justify-around self-center">
             <div className="mt-4 flex w-[30rem] flex-1 justify-around self-center rounded-md bg-white p-4">
-              <CameraButton client={client} isVideoMuted={isVideoMuted} setIsVideoMuted={setIsVideoMuted} renderVideo={renderVideo} />
+              <CameraButton
+                client={client}
+                isVideoMuted={isVideoMuted}
+                setIsVideoMuted={setIsVideoMuted}
+                renderVideo={renderVideo}
+                currentBackground={currentBackground} />
+
               <MicButton isAudioMuted={isAudioMuted} client={client} setIsAudioMuted={setIsAudioMuted} />
               <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
               <RecordingButton client={client} />

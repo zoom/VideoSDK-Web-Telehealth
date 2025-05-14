@@ -1,5 +1,6 @@
 import ZoomVideo, { type LocalAudioTrack, type LocalVideoTrack, type TestMicrophoneReturn, type TestSpeakerReturn } from '@zoom/videosdk'
-import { useCallback, useEffect, useRef, useState } from "react";
+// eslint-disable-next-line @typescript-eslint/consistent-type-imports
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 import { Button } from "~/components/ui/button";
 import { Mic, MicOff, Video, VideoOff, Volume, Volume1, Volume2, ChevronRight, CheckIcon, Image as ImageIcon, StopCircle } from "lucide-react";
@@ -23,7 +24,13 @@ interface MyLocalVideoTrack extends LocalVideoTrack {
   isVideoStarted: boolean;
 }
 
-const Preview = ({ init }: { init: () => Promise<void> }) => {
+const Preview = ({ init, setIsVideoMuted, setIsAudioMuted, currentBackground, setCurrentBackground }: {
+  init: () => Promise<void>,
+  setIsVideoMuted: Dispatch<SetStateAction<boolean>>,
+  setIsAudioMuted: Dispatch<SetStateAction<boolean>>,
+  currentBackground: string,
+  setCurrentBackground: Dispatch<SetStateAction<string>>
+}) => {
 
   const hasMounted = useRef(false);
   const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>();
@@ -35,7 +42,6 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
   const [speakerTester, setSpeakerTester] = useState<TestSpeakerReturn>();
   const [speakerPlaying, setSpeakerPlaying] = useState(false);
   const [currentSpeaker, setCurrentSpeaker] = useState<string>('');
-  const [currentBackground, setCurrentBackground] = useState<string>('');
   const [localAudioTrack, setLocalAudioTrack] = useState({} as MyLocalAudioTrack);
   const [localVideoTrack, setLocalVideoTrack] = useState({} as MyLocalVideoTrack);
   const [localSpeakerTrack, setLocalSpeakerTrack] = useState({} as MyLocalAudioTrack);
@@ -51,7 +57,7 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
     let cameraDevices;
     let videoTrack;
 
-    if (background) await localVideoTrack.stop();
+    if (background) localVideoTrack.isVideoStarted ?? await localVideoTrack.stop();
 
     if (mobileDevice) {
       cameraDevices = [{
@@ -80,8 +86,9 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
       await videoTrack.start(document.querySelector('#local-preview-video')!, { imageUrl: background ?? '' });
       setCurrentBackground(background ?? '');
       setVideoOnToggle(true);
+      setIsVideoMuted(false);
     }
-  }, [localVideoTrack, mobileDevice]);
+  }, [localVideoTrack, mobileDevice, setCurrentBackground, setIsVideoMuted]);
 
   const startMicrophone = useCallback(async (microphoneId?: string) => {
     const devices = await ZoomVideo.getDevices();
@@ -105,9 +112,9 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
       });
       setMicrophoneTester(tester);
       setAudioOnToggle(true);
-
+      setIsAudioMuted(false);
     }
-  }, [currentMicrophone]);
+  }, [currentMicrophone, setIsAudioMuted]);
 
   const startSpeaker = async (speakerId?: string) => {
     const devices = await ZoomVideo.getDevices();
@@ -146,9 +153,11 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
     if (videoOnToggle) {
       if (localVideoTrack.isVideoStarted) await localVideoTrack.stop();
       setVideoOnToggle(false);
+      setIsVideoMuted(true);
     } else {
       await localVideoTrack.start(document.querySelector('#local-preview-video')!, { imageUrl: currentBackground ?? '' });
       setVideoOnToggle(true);
+      setIsVideoMuted(false);
     }
   };
   const toggleMicrophone = async () => {
@@ -158,10 +167,12 @@ const Preview = ({ init }: { init: () => Promise<void> }) => {
       microphoneTester?.stop();
       if (localAudioTrack.isAudioStarted) await localAudioTrack.stop();
       setAudioOnToggle(false);
+      setIsAudioMuted(true);
     } else {
       await localAudioTrack.start();
       testMicrophone();
       setAudioOnToggle(true);
+      setIsAudioMuted(false);
     }
   };
 
