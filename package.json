@@ -47,7 +47,7 @@
     "@trpc/server": "^10.43.6",
     "@types/jsrsasign": "^10.5.12",
     "@uidotdev/usehooks": "^2.4.1",
-    "@zoom/videosdk": "^2.2.0",
+    "@zoom/videosdk": "^2.2.5",
     "@zoom/videosdk-ui-toolkit": "^2.1.0-1",
     "bun": "^1.2.4",
     "class-variance-authority": "^0.7.0",
