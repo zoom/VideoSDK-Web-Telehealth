@@ -105,14 +105,14 @@ export default function Home() {
                 }}
               />
             </div>
-            {createAppointment.status === "loading" ? <p className="mb-4 text-center">Loading...</p> : <></>}
+            {createAppointment.status === "pending" ? <p className="mb-4 text-center">Loading...</p> : <></>}
             {createAppointment.status === "error" ? (
               <p className="mb-4 text-left text-sm text-red-500">Uh-oh, we weren&apos;t able to create your appointment. Please fix the errors on screen.</p>
             ) : (
               <></>
             )}
             <Button
-              disabled={createAppointment.status === "loading" || !(title && content && user && duration && time)}
+              disabled={createAppointment.status === "pending" || !(title && content && user && duration && time)}
               onClick={async () => {
                 if (!(title && content && user && duration && time)) return;
                 const utcTime = moment(time).utc().toDate();

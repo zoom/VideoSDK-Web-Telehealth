@@ -102,7 +102,7 @@ const ViewNotes = ({ roomId, dontShowAdd }: { roomId: string; dontShowAdd?: bool
           {addNote.status !== "idle" ? <p>{addNote.status}</p> : <></>}
           <Button
             className="mt-4 w-full"
-            disabled={addNote.isLoading}
+            disabled={addNote.isPending}
             onClick={async () => {
               await addNote.mutateAsync({ roomId, contentS: S, contentO: O, contentA: A, contentP: P });
               setS("");

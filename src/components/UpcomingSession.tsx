@@ -1,4 +1,4 @@
-import { type User, type Room } from "@prisma/client";
+import { type User, type Room } from "~/server/db/schema";
 import moment from "moment";
 import Link from "next/link";
 import { Button } from "./ui/button";

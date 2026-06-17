@@ -23,7 +23,7 @@ export const videoCallStyle = {
 export const useDebouncedCallback = (func: (e: React.ChangeEvent<HTMLInputElement>) => void, wait: number) => {
   // Use a ref to store the timeout between renders
   // and prevent changes to it from causing re-renders
-  const timeout = useRef<NodeJS.Timeout>();
+  const timeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
   return useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

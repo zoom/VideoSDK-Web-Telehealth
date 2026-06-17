@@ -1,4 +1,4 @@
-import { type Room } from "@prisma/client";
+import { type Room } from "~/server/db/schema";
 import Link from "next/link";
 import UpcomingSession from "~/components/UpcomingSession";
 import { Button } from "~/components/ui/button";

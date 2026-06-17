@@ -23,7 +23,7 @@ const RecordingModal = (props: { roomId: string; buttonVariant?: "link" | "defau
         <DialogHeader>
           <DialogTitle>Recordings</DialogTitle>
         </DialogHeader>
-        {fetchAllRecordings.isLoading ? (
+        {fetchAllRecordings.isPending ? (
           <DialogDescription>Loading...</DialogDescription>
         ) : (
           fetchAllRecordings.data?.map((e) => (

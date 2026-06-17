@@ -1,4 +1,4 @@
-import { type Role } from "@prisma/client";
+import { type Role } from "~/server/db/schema";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useState } from "react";

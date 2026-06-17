@@ -1,9 +1,9 @@
+@import "@radix-ui/colors/black-alpha.css";
+@import "@radix-ui/colors/violet.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import "@radix-ui/colors/black-alpha.css";
-@import "@radix-ui/colors/violet.css";
 
 @layer base {
   :root {
