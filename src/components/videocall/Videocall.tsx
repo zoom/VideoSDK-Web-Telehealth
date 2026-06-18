@@ -14,7 +14,6 @@ import { type setTranscriptionType } from "./Transcript";
 import TranscriptionButton from "./TranscriptionButton";
 import RecordingButton from "./RecordingButton";
 import { CameraButton, MicButton } from "./MuteButtons";
-import "@zoom/videosdk-ui-toolkit/dist/videosdk-ui-toolkit.css";
 import Preview from "./Preview";
 
 const Videocall = (props: VideoCallProps) => {
