@@ -1,41 +1,39 @@
 @import "@radix-ui/colors/black-alpha.css";
 @import "@radix-ui/colors/violet.css";
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@config "../../tailwind.config.ts";
+@import "tailwindcss";
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
+    --background: 150 20% 98%;
+    --foreground: 184 48% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
+    --card-foreground: 184 48% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
+    --popover-foreground: 184 48% 13%;
 
-    --primary: 220 90% 50%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 174 76% 27%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
+    --secondary: 160 28% 94%;
+    --secondary-foreground: 177 56% 20%;
 
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
+    --muted: 150 16% 95%;
+    --muted-foreground: 184 12% 42%;
 
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
+    --accent: 160 32% 92%;
+    --accent-foreground: 177 56% 20%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive: 6 63% 52%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 224 71.4% 4.1%;
+    --border: 168 15% 87%;
+    --input: 168 15% 84%;
+    --ring: 174 76% 27%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
   }
 
   .dark {
@@ -75,7 +73,14 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply min-h-screen bg-background text-foreground antialiased;
+    background-image:
+      radial-gradient(circle at 8% 0%, hsl(160 35% 93% / 0.7), transparent 26rem),
+      linear-gradient(hsl(var(--background)), hsl(var(--background)));
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.18);
   }
 }
 
@@ -84,6 +89,8 @@ video-player-container {
   height: 100%;
   display: grid !important;
   grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 2px;
+  background: #071b1d;
 }
 
 video-player-container:has(> :nth-child(2)) {
@@ -98,89 +105,26 @@ video-player-container:has(> :nth-child(17)) {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
-video-player-container {
-  width: 100%;
-  height: 100%;
-  display: grid !important;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
-}
-
-video-player-container:has(> :nth-child(2)) {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-video-player-container:has(> :nth-child(5)) {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
 video-player {
   width: 100%;
-  height: auto;
-  aspect-ratio: 16/9;
-}
-
-progress {
-  border-radius: 7px;
-  height: 10px;
-  margin-top: 14px;
+  height: 100%;
+  min-height: 15rem;
+  object-fit: cover;
+  background: #0c282b;
 }
 
 progress::-webkit-progress-bar {
-  background-color: grey;
+  background-color: #dce7e3;
   border-radius: 7px;
   overflow: hidden;
 }
 
 progress::-webkit-progress-value {
-  background-color: #0c57ec;
+  background-color: #108178;
   border-radius: 7px;
 }
 
 progress::-moz-progress-bar {
-  background-color: grey;
+  background-color: #108178;
   border-radius: 7px;
-}
-
-.preview-video-container {
-  width: 65vw;
-  display: flex;
-  flex-direction: column;
-}
-
-.video-container {
-  background: #403f3f;
-  border: solid 12px #403f3f;
-  border-radius: 12px;
-}
-
-.preview-controls-container {
-  display: flex;
-  margin-top: 13px;
-  align-items: flex-start;
-  justify-content: space-around;
-  flex-wrap: wrap
-}
-
-.preview-control {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.btn-drop-container {
-  display: flex;
-  align-items: center;
-}
-
-.preview-btn {
-  border-radius: 32px;
-  padding: 0px;
-  border: solid 32px hsl(220deg 89.96% 48.72%);
-}
-
-
-@media screen and (max-width: 800px) {
-  .preview-video-container {
-    width: 95vw;
-  }
 }

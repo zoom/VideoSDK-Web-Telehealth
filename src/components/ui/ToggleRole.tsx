@@ -30,7 +30,7 @@ const ToggleRoleBanner = () => {
         <div className="flex items-center space-x-4">
           {data?.user.role ? (
             <>
-              <p className="text-center">Viewing as a {capitalize(data?.user.role as string)}</p>
+              <p className="text-center">Viewing as a {capitalize(data?.user.role)}</p>
               <Button
                 className="flex self-center"
                 onClick={async () => {

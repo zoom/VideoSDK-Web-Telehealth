@@ -9,15 +9,9 @@ import {
   rooms,
   roomForUser,
   transcripts,
-  type Room,
   type User,
 } from "~/server/db/schema";
 import { generateSignature } from "~/utils/signJwt";
-
-type RoomWithUsers = Room & {
-  User_CreatedBy: User;
-  User_CreatedFor: User[];
-};
 
 // ponytail: raw SQL because relational-query column interpolation re-aliases to the outer scope
 const invitedRoomIds = (userId: string) =>
@@ -96,7 +90,7 @@ export const sessionRouter = createTRPCRouter({
         User_CreatedBy: true,
       },
     });
-    return result.map(flattenInvited) as RoomWithUsers[];
+    return result.map(flattenInvited);
   }),
   getCreatedUpcoming: protectedProcedure.query(async ({ ctx }) => {
     const time = moment().utc().toDate();
@@ -111,7 +105,7 @@ export const sessionRouter = createTRPCRouter({
         User_CreatedBy: true,
       },
     });
-    return result.map(flattenInvited) as RoomWithUsers[];
+    return result.map(flattenInvited);
   }),
   getInvitedUpcoming: protectedProcedure.query(async ({ ctx }) => {
     const time = moment().utc().toDate();
@@ -136,7 +130,7 @@ export const sessionRouter = createTRPCRouter({
         User_CreatedBy: true,
       },
     });
-    return result.map(flattenInvited) as RoomWithUsers[];
+    return result.map(flattenInvited);
   }),
   getInvitedPast: protectedProcedure.query(async ({ ctx }) => {
     const time = moment().utc().toDate();
@@ -164,7 +158,7 @@ export const sessionRouter = createTRPCRouter({
           message: "Room not found",
         });
       }
-      const room = flattenInvited(raw) as RoomWithUsers;
+      const room = flattenInvited(raw);
       if (room.createByUserId === ctx.session.user.id) {
         const jwt = generateSignature(`${room.id}`, 1);
         return { room, jwt };

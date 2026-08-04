@@ -1,12 +1,7 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
-import { type GetServerSidePropsContext } from "next";
-import {
-  getServerSession,
-  type DefaultSession,
-  type NextAuthOptions,
-} from "next-auth";
-import GithubProvider from "next-auth/providers/github";
 import { eq } from "drizzle-orm";
+import NextAuth, { type DefaultSession } from "next-auth";
+import GitHub from "next-auth/providers/github";
 
 import { env } from "~/env";
 import { capitalize } from "~/lib/utils";
@@ -27,69 +22,63 @@ declare module "next-auth" {
       role?: Role | null;
     };
   }
-
   interface User {
     role?: Role | null;
   }
 }
 
-export const authOptions: NextAuthOptions = {
-  callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-        role: (user as { role?: Role | null }).role,
-      },
-    }),
-    redirect: async ({ url, baseUrl }) => {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      else if (new URL(url).origin === baseUrl) return url;
-      return baseUrl;
-    },
-  },
+declare module "@auth/core/adapters" {
+  interface AdapterUser {
+    role?: Role | null;
+  }
+}
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  // ponytail: env.js validates NEXTAUTH_SECRET; Auth.js v5 defaults to AUTH_SECRET, so pass it explicitly
+  secret: env.NEXTAUTH_SECRET,
+  // trust the request host on known-good infra + dev; opt in elsewhere via AUTH_TRUST_HOST
+  trustHost:
+    env.NODE_ENV !== "production" ||
+    !!process.env.VERCEL ||
+    process.env.AUTH_TRUST_HOST === "true",
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }),
-  events: {
-    createUser: async (message) => {
-      if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
-        const { user } = message;
-        const randomAnimal =
-          animals[Math.floor(Math.random() * (animals.length - 1))];
-        const randomColor =
-          colors[Math.floor(Math.random() * (colors.length - 1))];
-        const name = `${capitalize(randomColor)} ${capitalize(randomAnimal)}`;
-        await db
-          .update(users)
-          .set({
-            name,
-            image: `https://source.boringavatars.com/marble/120/${name}?colors=264653,2a9d8f,e9c46a,f4a261,e76f51`,
-          })
-          .where(eq(users.id, user.id));
-      }
-    },
-  },
-  theme: {
-    colorScheme: "light",
-    logo: "/logo.svg",
-  },
   providers: [
-    GithubProvider({
+    GitHub({
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
       checks: ["none"],
     }),
   ],
-};
-
-export const getServerAuthSession = (ctx: {
-  req: GetServerSidePropsContext["req"];
-  res: GetServerSidePropsContext["res"];
-}) => {
-  return getServerSession(ctx.req, ctx.res, authOptions);
-};
+  callbacks: {
+    session: ({ session, user }) => ({
+      ...session,
+      user: { ...session.user, id: user.id, role: user.role },
+    }),
+    redirect: ({ url, baseUrl }) => {
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
+    },
+  },
+  events: {
+    createUser: async ({ user }) => {
+      if (env.NEXT_PUBLIC_TESTMODE !== "TESTING" || !user.id) return;
+      const randomAnimal = animals[Math.floor(Math.random() * (animals.length - 1))];
+      const randomColor = colors[Math.floor(Math.random() * (colors.length - 1))];
+      const name = `${capitalize(randomColor)} ${capitalize(randomAnimal)}`;
+      await db
+        .update(users)
+        .set({
+          name,
+          image: `https://source.boringavatars.com/marble/120/${name}?colors=264653,2a9d8f,e9c46a,f4a261,e76f51`,
+        })
+        .where(eq(users.id, user.id));
+    },
+  },
+  theme: { colorScheme: "light", logo: "/logo.svg" },
+});
