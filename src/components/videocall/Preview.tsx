@@ -367,14 +367,15 @@ const Preview = ({
   return (
     <section className="mx-auto flex w-full max-w-5xl flex-col gap-5">
       <div className="relative aspect-video overflow-hidden rounded-2xl bg-slate-950 shadow-2xl shadow-slate-950/15">
-        {/* Zoom recommends its VideoPlayer element for virtual backgrounds. */}
-        {/* @ts-expect-error Zoom registers this custom element at runtime. */}
-        <video-player
-          ref={(element: VideoPlayer | null) => {
-            previewElementRef.current = element;
-          }}
-          className="h-full w-full object-cover"
-        />
+        {/* Zoom requires every VideoPlayer to have a VideoPlayerContainer ancestor. */}
+        <video-player-container className="h-full w-full">
+          <video-player
+            ref={(element: VideoPlayer | null) => {
+              previewElementRef.current = element;
+            }}
+            className="h-full w-full object-cover"
+          />
+        </video-player-container>
         {!videoOn && !isLoading && (
           <div className="absolute inset-0 grid place-items-center bg-slate-900 text-center text-slate-300">
             <div>

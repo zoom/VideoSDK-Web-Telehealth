@@ -267,7 +267,6 @@ const Videocall = (props: VideoCallProps) => {
         }
         aria-hidden={!inCall}
       >
-        {/* @ts-expect-error Zoom registers this standards-based custom element. */}
         <video-player-container
           ref={(element: HTMLElement | null) => {
             videoContainerRef.current = element;
