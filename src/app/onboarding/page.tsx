@@ -2,7 +2,7 @@
 import { type Role } from "~/server/db/schema";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
@@ -17,14 +17,35 @@ import { useRouter } from "next/navigation";
 const defaultRole = (env.NEXT_PUBLIC_TESTMODE === "TESTING" ? "null" : "patient") as Role;
 
 const Onboarding = () => {
-  const { data } = useSession();
+  const { data, status, update } = useSession();
   const [role, setRoleState] = useState<Role>(defaultRole);
   const router = useRouter();
+  const refreshedSession = useRef(false);
   const userRole = data?.user.role;
 
   useEffect(() => {
-    if (userRole != null) router.push("/");
-  }, [userRole, router]);
+    if (userRole != null) {
+      router.replace("/");
+      return;
+    }
+
+    // Recover when profile creation succeeded but the browser missed the
+    // session refresh. Run once so genuinely new users can still choose a role.
+    if (status === "authenticated" && !refreshedSession.current) {
+      refreshedSession.current = true;
+      void update().then((session) => {
+        if (session?.user.role != null) window.location.replace("/");
+      });
+    }
+  }, [status, update, userRole, router]);
+
+  if (status === "loading") {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center text-sm text-muted-foreground">
+        Checking your account...
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-screen flex-col items-center justify-center">
@@ -36,13 +57,17 @@ const Onboarding = () => {
           <>
             <span className="flex w-full flex-col">
               <Label htmlFor="r2">Sign up as a:</Label>
-              <RadioGroup defaultValue="Patient" className="my-4 flex flex-row">
+              <RadioGroup
+                value={role}
+                onValueChange={(value) => setRoleState(value as Role)}
+                className="my-4 flex flex-row"
+              >
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Doctor" id="r2" onClick={() => setRoleState("doctor")} />
+                  <RadioGroupItem value="doctor" id="r2" />
                   <Label htmlFor="r2">Doctor</Label>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="Patient" id="r1" onClick={() => setRoleState("patient")} />
+                  <RadioGroupItem value="patient" id="r1" />
                   <Label htmlFor="r1">Patient</Label>
                 </div>
               </RadioGroup>
@@ -65,6 +90,7 @@ const PatientFields = () => {
   const [allergies, setAllergies] = useState("");
   const [medications, setMedications] = useState("");
   const [DOB, setDOB] = useState("1990-01-01");
+  const [acceptedTerms, setAcceptedTerms] = useState(true);
 
   return (
     <>
@@ -94,7 +120,13 @@ const PatientFields = () => {
       </Label>
       <Input id="medications" className="mb-4" value={medications} onChange={(e) => setMedications(e.target.value)} />
       <span className="my-2 flex flex-row items-center gap-2">
-        <Input type="checkbox" id="toc" checked className="max-w-4" />
+        <Input
+          type="checkbox"
+          id="toc"
+          checked={acceptedTerms}
+          onChange={(event) => setAcceptedTerms(event.target.checked)}
+          className="max-w-4"
+        />
         <Label htmlFor="toc" className="text-gray-600">
           I agree to the{" "}
           <Link className="underline" href="/">
@@ -104,22 +136,32 @@ const PatientFields = () => {
         </Label>
       </span>
       <Button
+        disabled={!acceptedTerms || setPatient.isPending}
         onClick={async () => {
-          await setPatient.mutateAsync({
-            height: parseFloat(height),
-            weight: parseFloat(weight),
-            bloodType,
-            allergies,
-            medications,
-            DOB: new Date(DOB),
-          });
-          toast({
-            title: "Account created, redirecting...",
-          });
-          await update();
+          try {
+            await setPatient.mutateAsync({
+              height: parseFloat(height),
+              weight: parseFloat(weight),
+              bloodType,
+              allergies,
+              medications,
+              DOB: new Date(DOB),
+            });
+            const session = await update();
+            if (session?.user.role !== "patient") {
+              throw new Error("Session role did not refresh");
+            }
+            window.location.replace("/");
+          } catch {
+            toast({
+              variant: "destructive",
+              title: "Could not finish setup",
+              description: "Your information is safe. Please try again.",
+            });
+          }
         }}
       >
-        Submit
+        {setPatient.isPending ? "Creating account..." : "Create account"}
       </Button>
     </>
   );
@@ -143,15 +185,25 @@ const DoctorFields = () => {
       </Label>
       <Input id="position" className="mb-4" value={position} onChange={(e) => setPosition(e.target.value)} />
       <Button
+        disabled={setDoctor.isPending}
         onClick={async () => {
-          await setDoctor.mutateAsync({ department, position });
-          toast({
-            title: "Account created, redirecting...",
-          });
-          await update();
+          try {
+            await setDoctor.mutateAsync({ department, position });
+            const session = await update();
+            if (session?.user.role !== "doctor") {
+              throw new Error("Session role did not refresh");
+            }
+            window.location.replace("/");
+          } catch {
+            toast({
+              variant: "destructive",
+              title: "Could not finish setup",
+              description: "Your information is safe. Please try again.",
+            });
+          }
         }}
       >
-        Submit
+        {setDoctor.isPending ? "Creating account..." : "Create account"}
       </Button>
     </>
   );
@@ -214,24 +266,34 @@ const DoctorAndPatientFields = () => {
         </Card>
       </div>
       <Button
+        disabled={setDemo.isPending}
         onClick={async () => {
-          await setDemo.mutateAsync({
-            height: parseFloat(height),
-            weight: parseFloat(weight),
-            bloodType,
-            allergies,
-            medications,
-            department,
-            position,
-            DOB: new Date(DOB),
-          });
-          toast({
-            title: "Account created, redirecting...",
-          });
-          await update();
+          try {
+            await setDemo.mutateAsync({
+              height: parseFloat(height),
+              weight: parseFloat(weight),
+              bloodType,
+              allergies,
+              medications,
+              department,
+              position,
+              DOB: new Date(DOB),
+            });
+            const session = await update();
+            if (session?.user.role == null) {
+              throw new Error("Session role did not refresh");
+            }
+            window.location.replace("/");
+          } catch {
+            toast({
+              variant: "destructive",
+              title: "Could not finish setup",
+              description: "Your information is safe. Please try again.",
+            });
+          }
         }}
       >
-        Submit
+        {setDemo.isPending ? "Creating account..." : "Create account"}
       </Button>
     </div>
   );

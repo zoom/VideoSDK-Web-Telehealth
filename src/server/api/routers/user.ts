@@ -135,26 +135,35 @@ export const userRouter = createTRPCRouter({
   setDoctor: protectedProcedure
     .input(z.object({ department: z.string(), position: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const [doctor] = await ctx.db
-        .insert(doctors)
-        .values({
-          userId: ctx.session.user.id,
-          department: input.department,
-          position: input.position,
-        })
-        .returning();
-      if (!doctor) {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
-      const [user] = await ctx.db
-        .update(users)
-        .set({ role: "doctor", doctorId: doctor.id })
-        .where(eq(users.id, ctx.session.user.id))
-        .returning();
-      if (!user) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
-      }
-      return { user, doctor };
+      return ctx.db.transaction(async (tx) => {
+        const [doctor] = await tx
+          .insert(doctors)
+          .values({
+            userId: ctx.session.user.id,
+            department: input.department,
+            position: input.position,
+          })
+          .onConflictDoUpdate({
+            target: doctors.userId,
+            set: {
+              department: input.department,
+              position: input.position,
+            },
+          })
+          .returning();
+        if (!doctor) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        }
+        const [user] = await tx
+          .update(users)
+          .set({ role: "doctor", doctorId: doctor.id })
+          .where(eq(users.id, ctx.session.user.id))
+          .returning();
+        if (!user) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+        }
+        return { user, doctor };
+      });
     }),
   setPatient: protectedProcedure
     .input(
@@ -168,30 +177,43 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const [patient] = await ctx.db
-        .insert(patients)
-        .values({
-          userId: ctx.session.user.id,
-          height: input.height,
-          weight: input.weight,
-          bloodType: input.bloodType,
-          allergies: input.allergies,
-          medications: input.medications,
-          DOB: input.DOB,
-        })
-        .returning();
-      if (!patient) {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
-      const [user] = await ctx.db
-        .update(users)
-        .set({ role: "patient", patientId: patient.id })
-        .where(eq(users.id, ctx.session.user.id))
-        .returning();
-      if (!user) {
-        throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
-      }
-      return { user, patient };
+      return ctx.db.transaction(async (tx) => {
+        const [patient] = await tx
+          .insert(patients)
+          .values({
+            userId: ctx.session.user.id,
+            height: input.height,
+            weight: input.weight,
+            bloodType: input.bloodType,
+            allergies: input.allergies,
+            medications: input.medications,
+            DOB: input.DOB,
+          })
+          .onConflictDoUpdate({
+            target: patients.userId,
+            set: {
+              height: input.height,
+              weight: input.weight,
+              bloodType: input.bloodType,
+              allergies: input.allergies,
+              medications: input.medications,
+              DOB: input.DOB,
+            },
+          })
+          .returning();
+        if (!patient) {
+          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+        }
+        const [user] = await tx
+          .update(users)
+          .set({ role: "patient", patientId: patient.id })
+          .where(eq(users.id, ctx.session.user.id))
+          .returning();
+        if (!user) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "User not found" });
+        }
+        return { user, patient };
+      });
     }),
   setDemo: protectedProcedure
     .input(

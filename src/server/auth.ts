@@ -10,7 +10,6 @@ import {
   accounts,
   sessions,
   users,
-  verificationTokens,
   type Role,
 } from "~/server/db/schema";
 import { animals, colors } from "~/utils/random";
@@ -34,8 +33,7 @@ declare module "@auth/core/adapters" {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
-  // ponytail: env.js validates NEXTAUTH_SECRET; Auth.js v5 defaults to AUTH_SECRET, so pass it explicitly
-  secret: env.NEXTAUTH_SECRET,
+  secret: env.AUTH_SECRET,
   // trust the request host on known-good infra + dev; opt in elsewhere via AUTH_TRUST_HOST
   trustHost:
     env.NODE_ENV !== "production" ||
@@ -45,19 +43,21 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     usersTable: users,
     accountsTable: accounts,
     sessionsTable: sessions,
-    verificationTokensTable: verificationTokens,
   }),
   providers: [
     GitHub({
       clientId: env.GITHUB_CLIENT_ID,
       clientSecret: env.GITHUB_CLIENT_SECRET,
-      checks: ["none"],
     }),
   ],
   callbacks: {
     session: ({ session, user }) => ({
       ...session,
-      user: { ...session.user, id: user.id, role: user.role },
+      user: {
+        ...session.user,
+        id: user.id,
+        role: user.role,
+      },
     }),
     redirect: ({ url, baseUrl }) => {
       if (url.startsWith("/")) return `${baseUrl}${url}`;
