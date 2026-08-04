@@ -43,7 +43,6 @@
     "@types/jsrsasign": "^10.5.15",
     "@uidotdev/usehooks": "^2.4.1",
     "@zoom/videosdk": "^2.4.5",
-    "@zoom/videosdk-ui-toolkit": "^2.4.5-1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -74,6 +73,7 @@
     "@typescript-eslint/eslint-plugin": "^8.66.0",
     "@typescript-eslint/parser": "^8.66.0",
     "autoprefixer": "^10.5.4",
+    "brace-expansion": "^1.1.18",
     "drizzle-kit": "^0.31.10",
     "eslint": "9.39.5",
     "eslint-config-next": "^16.3.0",
@@ -83,6 +83,9 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.5",
     "typescript": "6.0.3"
+  },
+  "overrides": {
+    "esbuild": "0.28.1"
   },
   "ct3aMetadata": {
     "initVersion": "7.26.0"
