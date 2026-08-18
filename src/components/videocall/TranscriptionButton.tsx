@@ -1,10 +1,10 @@
 import { Button } from "~/components/ui/button";
-import { type Dispatch, type MutableRefObject, type SetStateAction, useRef, useState } from "react";
+import { type Dispatch, type RefObject, type SetStateAction, useRef, useState } from "react";
 import type { LiveTranscriptionClient, LiveTranscriptionMessage, VideoClient } from "@zoom/videosdk";
 import { MessageCircleMore, MessageCircleOff } from "lucide-react";
 import { useToast } from "../ui/use-toast";
 
-const TranscriptionButton = (props: { setTranscriptionSubtitle: setTranscriptionSubtitle; client: MutableRefObject<typeof VideoClient> }) => {
+const TranscriptionButton = (props: { setTranscriptionSubtitle: setTranscriptionSubtitle; client: RefObject<typeof VideoClient> }) => {
   const { setTranscriptionSubtitle, client } = props;
   const [isStartedLiveTranscription, setIsStartedLiveTranscription] = useState(false);
   const transcriptionClient = useRef<typeof LiveTranscriptionClient>(client.current.getLiveTranscriptionClient());
@@ -14,10 +14,10 @@ const TranscriptionButton = (props: { setTranscriptionSubtitle: setTranscription
     const handleCaptions = (payload: LiveTranscriptionMessage) => {
       setTranscriptionSubtitle(
         (prev) =>
-          (prev = {
-            ...prev,
-            [payload.msgId]: { name: payload.displayName, text: payload.text, isSelf: payload.userId === client.current.getCurrentUserInfo().userId },
-          })
+        (prev = {
+          ...prev,
+          [payload.msgId]: { name: payload.displayName, text: payload.text, isSelf: payload.userId === client.current.getCurrentUserInfo().userId },
+        })
       );
     };
 

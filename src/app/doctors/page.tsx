@@ -73,5 +73,4 @@ const ViewDoctors = () => {
     </div>
   );
 };
-export { ViewDoctors };
 export default Doctors;

@@ -1,7 +1,7 @@
-import React, { useCallback, useState, useRef, useLayoutEffect, type MutableRefObject } from "react";
+import React, { useCallback, useState, useRef, useLayoutEffect, type RefObject } from "react";
 import { type VideoClient } from "@zoom/videosdk";
 
-const Chat = (props: { client: MutableRefObject<typeof VideoClient>; records: ChatRecord[] }) => {
+const Chat = (props: { client: RefObject<typeof VideoClient>; records: ChatRecord[] }) => {
   const zmClient = props.client.current;
   const records = props.records;
   const chatClient = zmClient.getChatClient();

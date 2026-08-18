@@ -6,7 +6,7 @@ import {
 } from "@zoom/videosdk";
 import { useSession } from "next-auth/react";
 import {
-  type MutableRefObject,
+  type RefObject,
   useCallback,
   useEffect,
   useRef,
@@ -63,7 +63,9 @@ const Videocall = (props: VideoCallProps) => {
   const [isAudioMuted, setIsAudioMuted] = useState(true);
   const [currentBackground, setCurrentBackground] = useState("");
   const [isJoining, setIsJoining] = useState(false);
+  const [isAlone, setIsAlone] = useState(true);
   const videoContainerRef = useRef<HTMLElement | null>(null);
+  const placeholdersRef = useRef(new Map<number, HTMLElement>());
   const attachedVideosRef = useRef(new Map<number, HTMLElement[]>());
   const initPromiseRef = useRef<Promise<unknown> | null>(null);
   const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
@@ -95,16 +97,46 @@ const Videocall = (props: VideoCallProps) => {
     [zoomClient],
   );
 
+  // Show/hide a placeholder tile with the user's initial while their video is
+  // off, so the grid slot doesn't collapse when the SDK removes the video.
+  const togglePlaceholder = useCallback(
+    (userId: number, show: boolean) => {
+      const container = videoContainerRef.current;
+      if (!container) return;
+      const existing = placeholdersRef.current.get(userId);
+
+      if (show && !existing) {
+        const name = zoomClient.getUser(userId)?.displayName ?? "User";
+        const tile = document.createElement("div");
+        tile.className =
+          "flex h-full min-h-[16rem] w-full items-center justify-center bg-slate-800";
+        const avatar = document.createElement("div");
+        avatar.className =
+          "flex h-20 w-20 items-center justify-center rounded-full bg-slate-600 text-3xl font-semibold text-white";
+        avatar.textContent = name.charAt(0).toUpperCase();
+        tile.appendChild(avatar);
+        container.appendChild(tile);
+        placeholdersRef.current.set(userId, tile);
+      } else if (!show && existing) {
+        existing.remove();
+        placeholdersRef.current.delete(userId);
+      }
+    },
+    [zoomClient],
+  );
+
   const renderVideo = useCallback(
     async (event: { action: "Start" | "Stop"; userId: number }) => {
       if (event.action === "Stop") {
         await removeAttachedVideo(event.userId);
+        togglePlaceholder(event.userId, true);
         return;
       }
 
       const videoContainer = videoContainerRef.current;
       if (!videoContainer) return;
 
+      togglePlaceholder(event.userId, false);
       await removeAttachedVideo(event.userId);
       const attached: unknown = await zoomClient
         .getMediaStream()
@@ -144,10 +176,24 @@ const Videocall = (props: VideoCallProps) => {
     [setRecords, toast, zoomClient],
   );
 
+  const updateAlone = useCallback(() => {
+    setIsAlone(zoomClient.getAllUser().length <= 1);
+  }, [zoomClient]);
+
+  const onUserRemoved = useCallback(
+    (payload: Participant[]) => {
+      payload.forEach((user) => togglePlaceholder(user.userId, false));
+      updateAlone();
+    },
+    [togglePlaceholder, updateAlone],
+  );
+
   const unregisterListeners = useCallback(() => {
     zoomClient.off("peer-video-state-change", onPeerVideoStateChange);
     zoomClient.off("chat-on-message", onChatMessage);
-  }, [onChatMessage, onPeerVideoStateChange, zoomClient]);
+    zoomClient.off("user-added", updateAlone);
+    zoomClient.off("user-removed", onUserRemoved);
+  }, [onChatMessage, onPeerVideoStateChange, onUserRemoved, updateAlone, zoomClient]);
 
   useEffect(() => unregisterListeners, [unregisterListeners]);
 
@@ -160,9 +206,12 @@ const Videocall = (props: VideoCallProps) => {
       unregisterListeners();
       zoomClient.on("peer-video-state-change", onPeerVideoStateChange);
       zoomClient.on("chat-on-message", onChatMessage);
+      zoomClient.on("user-added", updateAlone);
+      zoomClient.on("user-removed", onUserRemoved);
 
       await zoomClient.join(session, jwt, data?.user.name ?? "User");
       setInCall(true);
+      updateAlone();
 
       // Let React reveal the persistent call surface before attaching video.
       await new Promise<void>((resolve) =>
@@ -202,6 +251,9 @@ const Videocall = (props: VideoCallProps) => {
             renderVideo({ action: "Start", userId: user.userId }),
           ),
       );
+      users
+        .filter((user) => !user.bVideoOn)
+        .forEach((user) => togglePlaceholder(user.userId, true));
       setIsVideoMuted(
         !zoomClient.getCurrentUserInfo()?.bVideoOn,
       );
@@ -247,7 +299,7 @@ const Videocall = (props: VideoCallProps) => {
   };
 
   return (
-    <div className="flex w-full flex-1 flex-col px-4 pb-8 sm:px-8">
+    <div className="flex w-full flex-1 flex-col px-4 pb-4 sm:px-8">
       {!inCall && (
         <Preview
           init={init}
@@ -262,7 +314,7 @@ const Videocall = (props: VideoCallProps) => {
       <div
         className={
           inCall
-            ? "mx-auto flex min-h-[32rem] w-full max-w-7xl flex-1 overflow-hidden rounded-2xl bg-slate-950 shadow-2xl shadow-slate-950/20"
+            ? "relative mx-auto flex min-h-[32rem] w-full max-w-7xl flex-1 overflow-hidden rounded-2xl bg-slate-950 shadow-2xl shadow-slate-950/20"
             : "pointer-events-none fixed -left-[9999px] h-px w-px overflow-hidden"
         }
         aria-hidden={!inCall}
@@ -273,6 +325,15 @@ const Videocall = (props: VideoCallProps) => {
           }}
           className="grid h-full min-h-[32rem] w-full grid-cols-1 gap-1 bg-slate-950 sm:grid-cols-2"
         />
+        {inCall && isAlone && (
+          <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
+            <p className="rounded-full bg-slate-950/70 px-5 py-2.5 text-sm font-medium text-white backdrop-blur">
+              {data?.user.role === "doctor"
+                ? "Waiting for the patient to join…"
+                : "Please wait for the healthcare provider to join…"}
+            </p>
+          </div>
+        )}
       </div>
 
       {inCall && (
@@ -326,7 +387,7 @@ type VideoCallProps = {
   isCreator: boolean;
   setTranscriptionSubtitle: setTranscriptionType;
   setRecords: React.Dispatch<React.SetStateAction<ChatRecord[]>>;
-  client: MutableRefObject<typeof VideoClient>;
+  client: RefObject<typeof VideoClient>;
   inCall: boolean;
   setInCall: React.Dispatch<React.SetStateAction<boolean>>;
 };

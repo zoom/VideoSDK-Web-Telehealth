@@ -1,7 +1,7 @@
 import { type VideoClient } from "@zoom/videosdk";
 import { FileText, MessageSquare, Subtitles, UserRound, X } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { type MutableRefObject, useState } from "react";
+import { type RefObject, useState } from "react";
 
 import { ViewNotes } from "~/components/ViewNotes";
 import { ViewPatient } from "~/components/ViewPatient";
@@ -97,7 +97,7 @@ const RightBar = ({
 type RightBarProps = {
   transcriptionSubtitle: TranscriptEleType;
   data: RouterOutputs["room"]["getById"];
-  client: MutableRefObject<typeof VideoClient>;
+  client: RefObject<typeof VideoClient>;
   records: ChatRecord[];
   inCall: boolean;
 };

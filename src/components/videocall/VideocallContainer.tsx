@@ -130,7 +130,7 @@ const VideocallContainer = () => {
           </div>
         </header>
 
-        <div className="flex flex-1 items-center py-8">
+        <div className="flex flex-1 items-stretch py-4">
           <Videocall
             jwt={data.jwt}
             session={data.room.id}

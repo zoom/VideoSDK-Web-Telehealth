@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 import { Transition } from "@headlessui/react";
 import Image from "next/image";
 import DoctorExperience from "./images/DoctorExperience.png";
@@ -9,16 +9,6 @@ import Onboarding from "./images/onboarding.png";
 
 export default function Features() {
   const [tab, setTab] = useState<number>(1);
-
-  const tabs = useRef<HTMLDivElement>(null);
-
-  const heightFix = () => {
-    if (tabs.current?.parentElement) tabs.current.parentElement.style.height = `${tabs.current.clientHeight}px`;
-  };
-
-  useEffect(() => {
-    heightFix();
-  }, []);
 
   return (
     <section className="relative">
@@ -96,7 +86,7 @@ export default function Features() {
             {/* Tabs items */}
             <div className="mx-auto mb-8 max-w-xl md:order-1 md:col-span-5 md:mb-0 md:w-full md:max-w-none lg:col-span-6">
               <div className="transition-all">
-                <div className="relative flex flex-col text-center lg:text-right" data-aos="zoom-y-out" ref={tabs}>
+                <div className="relative grid text-center lg:text-right [&>*]:col-start-1 [&>*]:row-start-1" data-aos="zoom-y-out">
                   {/* Item 1 */}
                   <Transition
                     show={tab === 1}
@@ -108,7 +98,6 @@ export default function Features() {
                     leave="transition ease-in-out duration-300 transform absolute"
                     leaveFrom="opacity-100 translate-y-0"
                     leaveTo="opacity-0 -translate-y-16"
-                    beforeEnter={() => heightFix()}
                     unmount={false}
                   >
                     <div className="relative inline-flex flex-col">
@@ -134,7 +123,6 @@ export default function Features() {
                     leave="transition ease-in-out duration-300 transform absolute"
                     leaveFrom="opacity-100 translate-y-0"
                     leaveTo="opacity-0 -translate-y-16"
-                    beforeEnter={() => heightFix()}
                     unmount={false}
                   >
                     <div className="relative inline-flex flex-col">
@@ -160,7 +148,6 @@ export default function Features() {
                     leave="transition ease-in-out duration-300 transform absolute"
                     leaveFrom="opacity-100 translate-y-0"
                     leaveTo="opacity-0 -translate-y-16"
-                    beforeEnter={() => heightFix()}
                     unmount={false}
                   >
                     <div className="relative inline-flex flex-col">

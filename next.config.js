@@ -7,6 +7,7 @@ await import("./src/env.js");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
+  reactCompiler: true,
   async headers() {
     // Cross-origin isolation everywhere so Zoom SDK gets SharedArrayBuffer no matter the entry route.
     // credentialless avoids requiring CORP on every Zoom CDN / avatar asset.

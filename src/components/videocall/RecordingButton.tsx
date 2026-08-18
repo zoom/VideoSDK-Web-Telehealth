@@ -1,10 +1,10 @@
-import { type MutableRefObject, useRef, useState } from "react";
+import { type RefObject, useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { RecordingStatus } from "@zoom/videosdk";
 import type { RecordingClient, VideoClient } from "@zoom/videosdk";
 import { CircleDotIcon, CircleSlash2 } from "lucide-react";
 
-const RecordingButton = (props: { client: MutableRefObject<typeof VideoClient> }) => {
+const RecordingButton = (props: { client: RefObject<typeof VideoClient> }) => {
   const { client } = props;
   const [isRecording, setIsRecording] = useState(RecordingStatus.Stopped);
   const recordingClient = useRef<typeof RecordingClient>(client.current.getRecordingClient());

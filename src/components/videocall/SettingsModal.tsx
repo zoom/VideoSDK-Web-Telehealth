@@ -1,4 +1,4 @@
-import { type MutableRefObject, useEffect, useState } from "react";
+import { type RefObject, useEffect, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "~/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "~/components/ui/radio-group";
@@ -8,7 +8,7 @@ import ZoomVideo from "@zoom/videosdk";
 import type { VideoClient } from "@zoom/videosdk";
 import { Settings } from "lucide-react";
 
-const SettingsModal = (props: { client: MutableRefObject<typeof VideoClient> }) => {
+const SettingsModal = (props: { client: RefObject<typeof VideoClient> }) => {
   const [cameraList, setCameraList] = useState<device[]>();
   const [micList, setMicList] = useState<device[]>();
   const [speakerList, setSpeakerList] = useState<device[]>();

@@ -1,4 +1,4 @@
-import { useEffect, useState, type Dispatch, type MutableRefObject, type SetStateAction } from "react";
+import { type RefObject, useState, type Dispatch, type SetStateAction } from "react";
 import { Button } from "~/components/ui/button";
 import type { VideoClient } from "@zoom/videosdk";
 import { Loader2, Mic, MicOff, Video, VideoOff } from "lucide-react";
@@ -17,18 +17,13 @@ const getDeviceError = (error: unknown) => {
   return "Check your browser permissions and try again.";
 };
 
-const MicButton = ({ client, isAudioMuted, setIsAudioMuted } : {
-    client: MutableRefObject<typeof VideoClient>;
-    isAudioMuted: boolean;
-    setIsAudioMuted: Dispatch<SetStateAction<boolean>>;
-  }) => {
+const MicButton = ({ client, isAudioMuted, setIsAudioMuted }: {
+  client: RefObject<typeof VideoClient>;
+  isAudioMuted: boolean;
+  setIsAudioMuted: Dispatch<SetStateAction<boolean>>;
+}) => {
   const [isChanging, setIsChanging] = useState(false);
   const { toast } = useToast();
-
-  // .startAudio() flips isAudioMuted to false on join; mirror Zoom's actual state once per mount/audio-state change
-  useEffect(() => {
-    setIsAudioMuted(client?.current?.getCurrentUserInfo()?.muted ?? true);
-  }, [client, setIsAudioMuted]);
 
   const onMicrophoneClick = async () => {
     setIsChanging(true);
@@ -62,8 +57,8 @@ const MicButton = ({ client, isAudioMuted, setIsAudioMuted } : {
   );
 };
 
-const CameraButton = ({ client, isVideoMuted, setIsVideoMuted, renderVideo, currentBackground}: {
-  client: MutableRefObject<typeof VideoClient>;
+const CameraButton = ({ client, isVideoMuted, setIsVideoMuted, renderVideo, currentBackground }: {
+  client: RefObject<typeof VideoClient>;
   isVideoMuted: boolean;
   setIsVideoMuted: Dispatch<SetStateAction<boolean>>;
   renderVideo: (event: { action: "Start" | "Stop"; userId: number }) => Promise<void>;
