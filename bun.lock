@@ -33,6 +33,7 @@
         "@types/jsrsasign": "^10.5.15",
         "@uidotdev/usehooks": "^2.4.1",
         "@zoom/videosdk": "^2.4.5",
+        "@zoom/videosdk-react": "^0.0.3",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "cmdk": "^1.1.1",
@@ -638,6 +639,8 @@
     "@vimeo/player": ["@vimeo/player@2.29.0", "", { "dependencies": { "native-promise-only": "0.8.1", "weakmap-polyfill": "2.0.4" } }, "sha512-9JjvjeqUndb9otCCFd0/+2ESsLk7VkDE6sxOBy9iy2ukezuQbplVRi+g9g59yAurKofbmTi/KcKxBGO/22zWRw=="],
 
     "@zoom/videosdk": ["@zoom/videosdk@2.4.5", "", {}, "sha512-C73+Fe6vAG6lw9y0jd50R3bBbLn5hrPMINC5XsZwwvBJ4L3l/AOXyBXBAgXCz8squejLaoTPldqOeI2QIsoLtw=="],
+
+    "@zoom/videosdk-react": ["@zoom/videosdk-react@0.0.3", "", { "peerDependencies": { "@zoom/videosdk": "^2.3.5", "react": ">=18.0.0", "react-dom": ">=18.0.0" } }, "sha512-UIYidsIkwVr3dREse61W1FUNIUvTUNXAuQxl1JOosKWucCvB1H6O4LhQguQ3uRrT429HgNWc8Y+hhnXhO0/yow=="],
 
     "acorn": ["acorn@8.18.0", "", { "bin": { "acorn": "bin/acorn" } }, "sha512-lGq+9yr1/GuAWaVYIHRjvvySG5/4VfKIvC8EWxStPdcDh/Ka7FG3twP6v4d5BkravUilhIAsG4Qj83t02LWUPQ=="],
 

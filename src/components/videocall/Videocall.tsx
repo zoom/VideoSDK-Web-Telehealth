@@ -1,19 +1,9 @@
-import {
-  type ChatMessage,
-  type Participant,
-  type VideoClient,
-  VideoQuality,
-} from "@zoom/videosdk";
+import { type ChatMessage, type VideoClient } from "@zoom/videosdk";
+import { VideoPlayerComponent, VideoPlayerContainerComponent, useSessionUsers } from "@zoom/videosdk-react";
 import { useSession } from "next-auth/react";
-import {
-  type RefObject,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { useRouter } from "next/navigation";
+import { type RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, PhoneOff } from "lucide-react";
-
 import { type ChatRecord } from "~/components/chat/Chat";
 import { Button } from "~/components/ui/button";
 import { useToast } from "~/components/ui/use-toast";
@@ -27,49 +17,18 @@ import SettingsModal from "./SettingsModal";
 import TranscriptionButton from "./TranscriptionButton";
 import { type setTranscriptionType } from "./Transcript";
 
-const getErrorMessage = (error: unknown) => {
-  if (error instanceof Error) return error.message;
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "reason" in error &&
-    typeof error.reason === "string"
-  ) {
-    return error.reason;
-  }
-  return "Please check your device permissions and try again.";
-};
-
-const getHtmlElements = (value: unknown): HTMLElement[] => {
-  const values = Array.isArray(value) ? value : [value];
-  return values.filter(
-    (element): element is HTMLElement => element instanceof HTMLElement,
-  );
-};
-
 const Videocall = (props: VideoCallProps) => {
-  const {
-    setTranscriptionSubtitle,
-    isCreator,
-    jwt,
-    session,
-    client,
-    inCall,
-    setInCall,
-    setRecords,
-  } = props;
+  const { setTranscriptionSubtitle, isCreator, jwt, session, client, inCall, setInCall, setRecords } = props;
   const zoomClient = client.current;
   const [isVideoMuted, setIsVideoMuted] = useState(true);
   const [isAudioMuted, setIsAudioMuted] = useState(true);
   const [currentBackground, setCurrentBackground] = useState("");
   const [isJoining, setIsJoining] = useState(false);
-  const [isAlone, setIsAlone] = useState(true);
-  const videoContainerRef = useRef<HTMLElement | null>(null);
-  const placeholdersRef = useRef(new Map<number, HTMLElement>());
-  const attachedVideosRef = useRef(new Map<number, HTMLElement[]>());
   const initPromiseRef = useRef<Promise<unknown> | null>(null);
+  const participants = useSessionUsers();
   const writeZoomSessionID = api.room.addZoomSessionId.useMutation();
   const { data } = useSession();
+  const router = useRouter();
   const { toast } = useToast();
 
   const init = useCallback(async () => {
@@ -79,93 +38,10 @@ const Videocall = (props: VideoCallProps) => {
     await initPromiseRef.current;
   }, [zoomClient]);
 
-  const removeAttachedVideo = useCallback(
-    async (userId: number) => {
-      const existing = attachedVideosRef.current.get(userId) ?? [];
-      existing.forEach((element) => element.remove());
-      attachedVideosRef.current.delete(userId);
-
-      try {
-        const detached: unknown = await zoomClient
-          .getMediaStream()
-          .detachVideo(userId);
-        getHtmlElements(detached).forEach((element) => element.remove());
-      } catch {
-        // The SDK throws when the participant did not have an attached video.
-      }
-    },
-    [zoomClient],
-  );
-
-  // Show/hide a placeholder tile with the user's initial while their video is
-  // off, so the grid slot doesn't collapse when the SDK removes the video.
-  const togglePlaceholder = useCallback(
-    (userId: number, show: boolean) => {
-      const container = videoContainerRef.current;
-      if (!container) return;
-      const existing = placeholdersRef.current.get(userId);
-
-      if (show && !existing) {
-        const name = zoomClient.getUser(userId)?.displayName ?? "User";
-        const tile = document.createElement("div");
-        tile.className =
-          "flex h-full min-h-[16rem] w-full items-center justify-center bg-slate-800";
-        const avatar = document.createElement("div");
-        avatar.className =
-          "flex h-20 w-20 items-center justify-center rounded-full bg-slate-600 text-3xl font-semibold text-white";
-        avatar.textContent = name.charAt(0).toUpperCase();
-        tile.appendChild(avatar);
-        container.appendChild(tile);
-        placeholdersRef.current.set(userId, tile);
-      } else if (!show && existing) {
-        existing.remove();
-        placeholdersRef.current.delete(userId);
-      }
-    },
-    [zoomClient],
-  );
-
-  const renderVideo = useCallback(
-    async (event: { action: "Start" | "Stop"; userId: number }) => {
-      if (event.action === "Stop") {
-        await removeAttachedVideo(event.userId);
-        togglePlaceholder(event.userId, true);
-        return;
-      }
-
-      const videoContainer = videoContainerRef.current;
-      if (!videoContainer) return;
-
-      togglePlaceholder(event.userId, false);
-      await removeAttachedVideo(event.userId);
-      const attached: unknown = await zoomClient
-        .getMediaStream()
-        .attachVideo(event.userId, VideoQuality.Video_360P);
-      const elements = getHtmlElements(attached);
-      if (elements.length === 0) {
-        throw new Error("Zoom did not return a video element.");
-      }
-      elements.forEach((element) => videoContainer.appendChild(element));
-      attachedVideosRef.current.set(event.userId, elements);
-    },
-    [removeAttachedVideo, zoomClient],
-  );
-
-  const onPeerVideoStateChange = useCallback(
-    (payload: { action: "Start" | "Stop"; userId: number }) => {
-      void renderVideo(payload).catch((error: unknown) => {
-        console.error("Unable to render participant video", error);
-      });
-    },
-    [renderVideo],
-  );
-
   const onChatMessage = useCallback(
     (payload: ChatMessage) => {
       setRecords((previous) => [...previous, payload]);
-      if (
-        payload.sender.userId !== zoomClient.getCurrentUserInfo()?.userId
-      ) {
+      if (payload.sender.userId !== zoomClient.getCurrentUserInfo()?.userId) {
         toast({
           title: payload.sender.name,
           description: payload.message,
@@ -173,27 +49,12 @@ const Videocall = (props: VideoCallProps) => {
         });
       }
     },
-    [setRecords, toast, zoomClient],
-  );
-
-  const updateAlone = useCallback(() => {
-    setIsAlone(zoomClient.getAllUser().length <= 1);
-  }, [zoomClient]);
-
-  const onUserRemoved = useCallback(
-    (payload: Participant[]) => {
-      payload.forEach((user) => togglePlaceholder(user.userId, false));
-      updateAlone();
-    },
-    [togglePlaceholder, updateAlone],
+    [setRecords, toast, zoomClient]
   );
 
   const unregisterListeners = useCallback(() => {
-    zoomClient.off("peer-video-state-change", onPeerVideoStateChange);
     zoomClient.off("chat-on-message", onChatMessage);
-    zoomClient.off("user-added", updateAlone);
-    zoomClient.off("user-removed", onUserRemoved);
-  }, [onChatMessage, onPeerVideoStateChange, onUserRemoved, updateAlone, zoomClient]);
+  }, [onChatMessage, zoomClient]);
 
   useEffect(() => unregisterListeners, [unregisterListeners]);
 
@@ -204,19 +65,13 @@ const Videocall = (props: VideoCallProps) => {
     try {
       await init();
       unregisterListeners();
-      zoomClient.on("peer-video-state-change", onPeerVideoStateChange);
       zoomClient.on("chat-on-message", onChatMessage);
-      zoomClient.on("user-added", updateAlone);
-      zoomClient.on("user-removed", onUserRemoved);
 
       await zoomClient.join(session, jwt, data?.user.name ?? "User");
       setInCall(true);
-      updateAlone();
 
-      // Let React reveal the persistent call surface before attaching video.
-      await new Promise<void>((resolve) =>
-        requestAnimationFrame(() => resolve()),
-      );
+      // Let the React media hooks mount before starting audio and video.
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
       const mediaStream = zoomClient.getMediaStream();
       // @ts-expect-error Safari exposes this browser-specific property.
@@ -231,32 +86,13 @@ const Videocall = (props: VideoCallProps) => {
       } else {
         await mediaStream.unmuteAudio();
       }
-      setIsAudioMuted(
-        zoomClient.getCurrentUserInfo()?.muted ?? isAudioMuted,
-      );
+      setIsAudioMuted(zoomClient.getCurrentUserInfo()?.muted ?? isAudioMuted);
 
       if (!isVideoMuted) {
-        await mediaStream.startVideo(
-          currentBackground
-            ? { virtualBackground: { imageUrl: currentBackground } }
-            : undefined,
-        );
+        await mediaStream.startVideo(currentBackground ? { virtualBackground: { imageUrl: currentBackground } } : undefined);
       }
 
-      const users: Participant[] = zoomClient.getAllUser();
-      await Promise.all(
-        users
-          .filter((user) => user.bVideoOn)
-          .map((user) =>
-            renderVideo({ action: "Start", userId: user.userId }),
-          ),
-      );
-      users
-        .filter((user) => !user.bVideoOn)
-        .forEach((user) => togglePlaceholder(user.userId, true));
-      setIsVideoMuted(
-        !zoomClient.getCurrentUserInfo()?.bVideoOn,
-      );
+      setIsVideoMuted(!zoomClient.getCurrentUserInfo()?.bVideoOn);
 
       const zoomSessionId = zoomClient.getSessionInfo()?.sessionId;
       if (isCreator && zoomSessionId) {
@@ -287,15 +123,12 @@ const Videocall = (props: VideoCallProps) => {
     toast({ title: "Leaving appointment…" });
     unregisterListeners();
 
-    await Promise.all(
-      [...attachedVideosRef.current.keys()].map(removeAttachedVideo),
-    );
     try {
       await zoomClient.leave();
     } catch (error) {
       console.error("Unable to leave Zoom session cleanly", error);
     }
-    window.location.assign("/");
+    router.push("/");
   };
 
   return (
@@ -314,23 +147,28 @@ const Videocall = (props: VideoCallProps) => {
       <div
         className={
           inCall
-            ? "relative mx-auto flex min-h-[32rem] w-full max-w-7xl flex-1 overflow-hidden rounded-2xl bg-slate-950 shadow-2xl shadow-slate-950/20"
-            : "pointer-events-none fixed -left-[9999px] h-px w-px overflow-hidden"
+            ? "relative mx-auto flex min-h-128 w-full max-w-7xl flex-1 overflow-hidden rounded-2xl bg-slate-950 shadow-2xl shadow-slate-950/20"
+            : "pointer-events-none fixed left-[-9999px] h-px w-px overflow-hidden"
         }
         aria-hidden={!inCall}
       >
-        <video-player-container
-          ref={(element: HTMLElement | null) => {
-            videoContainerRef.current = element;
-          }}
-          className="grid h-full min-h-[32rem] w-full grid-cols-1 gap-1 bg-slate-950 sm:grid-cols-2"
-        />
-        {inCall && isAlone && (
+        <VideoPlayerContainerComponent className="grid h-full min-h-128 w-full grid-cols-1 gap-1 bg-slate-950 sm:grid-cols-2">
+          {participants.map((participant) =>
+            participant.bVideoOn ? (
+              <VideoPlayerComponent key={participant.userId} user={participant} />
+            ) : (
+              <div key={participant.userId} className="flex h-full min-h-64 w-full items-center justify-center bg-slate-800">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-600 text-3xl font-semibold text-white">
+                  {participant.displayName.charAt(0).toUpperCase()}
+                </div>
+              </div>
+            )
+          )}
+        </VideoPlayerContainerComponent>
+        {inCall && participants.length <= 1 && (
           <div className="pointer-events-none absolute inset-x-0 bottom-6 flex justify-center">
             <p className="rounded-full bg-slate-950/70 px-5 py-2.5 text-sm font-medium text-white backdrop-blur">
-              {data?.user.role === "doctor"
-                ? "Waiting for the patient to join…"
-                : "Please wait for the healthcare provider to join…"}
+              {data?.user.role === "doctor" ? "Waiting for the patient to join…" : "Please wait for the healthcare provider to join…"}
             </p>
           </div>
         )}
@@ -338,31 +176,14 @@ const Videocall = (props: VideoCallProps) => {
 
       {inCall && (
         <div className="sticky bottom-5 z-20 mx-auto mt-5 flex max-w-fit items-center gap-2 rounded-2xl border border-slate-200/80 bg-white/95 p-2 shadow-xl shadow-slate-950/10 backdrop-blur">
-          <CameraButton
-            client={client}
-            isVideoMuted={isVideoMuted}
-            setIsVideoMuted={setIsVideoMuted}
-            renderVideo={renderVideo}
-            currentBackground={currentBackground}
-          />
-          <MicButton
-            isAudioMuted={isAudioMuted}
-            client={client}
-            setIsAudioMuted={setIsAudioMuted}
-          />
-          <TranscriptionButton
-            setTranscriptionSubtitle={setTranscriptionSubtitle}
-            client={client}
-          />
+          <CameraButton currentBackground={currentBackground} />
+          <MicButton />
+          <TranscriptionButton setTranscriptionSubtitle={setTranscriptionSubtitle} client={client} />
           <RecordingButton client={client} />
           <SettingsModal client={client} />
           <ActionModal />
           <div className="mx-1 h-7 w-px bg-slate-200" />
-          <Button
-            variant="destructive"
-            onClick={() => void leaveCall()}
-            title="Leave appointment"
-          >
+          <Button variant="destructive" onClick={() => void leaveCall()} title="Leave appointment">
             <PhoneOff />
             <span className="hidden sm:inline">Leave</span>
           </Button>
@@ -379,6 +200,14 @@ const Videocall = (props: VideoCallProps) => {
       )}
     </div>
   );
+};
+
+const getErrorMessage = (error: unknown) => {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "object" && error !== null && "reason" in error && typeof error.reason === "string") {
+    return error.reason;
+  }
+  return "Please check your device permissions and try again.";
 };
 
 type VideoCallProps = {
