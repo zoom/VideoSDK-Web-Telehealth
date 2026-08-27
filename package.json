@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "next build",
+    "vercel-build": "drizzle-kit migrate && bun run db:seed && SKIP_ENV_VALIDATION=1 bun run build",
     "db:pull": "drizzle-kit pull",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
