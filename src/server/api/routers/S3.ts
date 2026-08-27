@@ -10,10 +10,26 @@ import { z } from "zod";
 
 import { env } from "~/env";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { resolveTargetPatient } from "~/server/files";
 import { files, patients } from "~/server/db/schema";
 
-// Storage backend: Vercel Blob when its token is present, else S3/R2.
-const STORAGE_BACKEND = env.BLOB_READ_WRITE_TOKEN ? "blob" : "s3";
+// Storage backend: Vercel Blob when a store is connected (OIDC sets BLOB_STORE_ID;
+// self-hosted may set the read-write token instead), else S3/R2.
+const STORAGE_BACKEND =
+  env.BLOB_STORE_ID ?? env.BLOB_READ_WRITE_TOKEN ? "blob" : "s3";
+
+async function requirePatient(
+  sessionUser: { id: string; role?: string | null },
+  targetUserId: string,
+) {
+  try {
+    return await resolveTargetPatient(sessionUser, targetUserId);
+  } catch (e) {
+    throw new TRPCError({
+      code: (e as Error).message === "FORBIDDEN" ? "FORBIDDEN" : "NOT_FOUND",
+    });
+  }
+}
 
 let s3Client: S3Client | undefined;
 function getS3() {
@@ -41,12 +57,16 @@ function getS3() {
 export const S3Router = createTRPCRouter({
   getBackend: protectedProcedure.query(() => STORAGE_BACKEND),
   createPresignedUrl: protectedProcedure
-    .input(z.object({ filename: z.string() }))
+    .input(z.object({ filename: z.string(), userId: z.string().optional() }))
     .mutation(async ({ input, ctx }) => {
       if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
         throw new TRPCError({ code: "FORBIDDEN" });
       }
-      const filename = `${ctx.session.user.id}_${new Date().getTime().toString().slice(8)}_${input.filename}`;
+      const patient = await requirePatient(
+        ctx.session.user,
+        input.userId ?? ctx.session.user.id,
+      );
+      const filename = `${patient.userId}_${new Date().getTime().toString().slice(8)}_${input.filename}`;
       const url = await getSignedUrl(
         getS3(),
         new PutObjectCommand({ Bucket: env.S3_BUCKET, Key: filename }),
@@ -55,20 +75,21 @@ export const S3Router = createTRPCRouter({
       return { url, filename };
     }),
   registerUpload: protectedProcedure
-    .input(z.object({ filename: z.string(), storageKey: z.string().optional() }))
+    .input(
+      z.object({
+        filename: z.string(),
+        storageKey: z.string().optional(),
+        userId: z.string().optional(),
+      }),
+    )
     .mutation(async ({ input, ctx }) => {
       if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
         throw new TRPCError({ code: "FORBIDDEN" });
       }
-      const patient = await ctx.db.query.patients.findFirst({
-        where: eq(patients.userId, ctx.session.user.id),
-      });
-      if (!patient) {
-        throw new TRPCError({
-          code: "NOT_FOUND",
-          message: "Patient not found",
-        });
-      }
+      const patient = await requirePatient(
+        ctx.session.user,
+        input.userId ?? ctx.session.user.id,
+      );
       await ctx.db.insert(files).values({
         name: input.filename,
         storageKey: input.storageKey,

@@ -9,13 +9,15 @@ import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
 import { Input } from "~/components/ui/input";
 import { Skeleton } from "~/components/ui/skeleton";
+import { UploadButton } from "~/components/UploadButton";
 import { api } from "~/utils/api";
 
 export function ViewPatient({ userId }: { userId: string }) {
   const { data: sessionData } = useSession();
   const { data: patientData, isLoading: patientLoading } = api.user.getPatientDetails.useQuery({ userId });
-  const { data, isLoading } = api.S3.getUploadList.useQuery({ userId }, { retry: 0 });
+  const { data, isLoading, refetch } = api.S3.getUploadList.useQuery({ userId }, { retry: 0 });
   const { mutateAsync } = api.S3.getDownloadLink.useMutation();
+  const isDoctor = sessionData?.user.role === "doctor";
 
   return (
     <>
@@ -79,6 +81,12 @@ export function ViewPatient({ userId }: { userId: string }) {
               </div>
             </Card>
           ))
+        )}
+        {isDoctor && (
+          <Card className="my-2 flex w-full max-w-xl flex-col self-center p-6">
+            <p className="mb-2 text-md font-bold">Upload a document for this patient</p>
+            <UploadButton userId={userId} onUploaded={() => void refetch()} />
+          </Card>
         )}
       </div>
     </>

@@ -28,7 +28,10 @@ export const env = createEnv({
     S3_SECRET_ACCESS_KEY: z.string().optional(),
     // "auto" works for Cloudflare R2; set a real AWS region for Amazon S3.
     S3_REGION: z.string().default("auto"),
-    // Auto-injected by the Vercel Blob integration; presence selects Blob storage.
+    // Auto-injected when a Blob store is connected. Under OIDC (the default) only
+    // BLOB_STORE_ID is set; the read-write token is absent. Either one selects
+    // Blob storage — the SDK authenticates via OIDC on Vercel.
+    BLOB_STORE_ID: z.string().optional(),
     BLOB_READ_WRITE_TOKEN: z.string().optional(),
     ZOOM_SDK_KEY: z.string(),
     ZOOM_SDK_SECRET: z.string(),
@@ -63,6 +66,7 @@ export const env = createEnv({
     S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
     S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
     S3_REGION: process.env.S3_REGION,
+    BLOB_STORE_ID: process.env.BLOB_STORE_ID,
     BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     ZOOM_SDK_KEY: process.env.ZOOM_SDK_KEY,
     ZOOM_SDK_SECRET: process.env.ZOOM_SDK_SECRET,
