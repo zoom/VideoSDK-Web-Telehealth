@@ -13,6 +13,13 @@ async function main() {
 
   console.log("Start seeding ...");
   try {
+    // runs on every Vercel build; guard makes re-runs a no-op so the deploy doesn't fail on the seeded rows.
+    const [existing] = await db.select({ id: schema.users.id }).from(schema.users).limit(1);
+    if (existing) {
+      console.log("Users already present, skipping seed.");
+      return;
+    }
+
     const { alice, bob } = await db.transaction(async (tx) => {
       const [alice] = await tx
         .insert(schema.users)

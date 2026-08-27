@@ -4,11 +4,11 @@ A full-stack telehealth sample built with the Zoom Video SDK. It includes GitHub
 
 ## Deploy to Vercel
 
-<a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzoom%2FVideoSDK-Web-Telehealth&amp;env=AUTH_SECRET,GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,ZOOM_SDK_KEY,ZOOM_SDK_SECRET,ZOOM_API_KEY,ZOOM_API_SECRET,S3_ENDPOINT,S3_BUCKET,S3_ACCESS_KEY_ID,S3_SECRET_ACCESS_KEY&amp;envDescription=Auth.js%2C%20Zoom%20Video%20SDK%2C%20Zoom%20API%2C%20and%20S3-compatible%20storage%20credentials%20required%20by%20the%20app.&amp;envLink=https%3A%2F%2Fgithub.com%2Fzoom%2FVideoSDK-Web-Telehealth%23environment-variables&amp;project-name=zoom-telehealth&amp;repository-name=zoom-telehealth&amp;build-command=bunx%20drizzle-kit%20migrate%20%26%26%20SKIP_ENV_VALIDATION%3D1%20bun%20run%20build&amp;products=%5B%7B%22type%22%3A%22integration%22%2C%22protocol%22%3A%22storage%22%2C%22productSlug%22%3A%22neon%22%2C%22integrationSlug%22%3A%22neon%22%7D%5D&amp;skippable-integrations=0"><img src="https://vercel.com/button" alt="Deploy with Vercel" /></a>
+<a href="https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fzoom%2FVideoSDK-Web-Telehealth&amp;env=AUTH_SECRET,GITHUB_CLIENT_ID,GITHUB_CLIENT_SECRET,ZOOM_SDK_KEY,ZOOM_SDK_SECRET,ZOOM_API_KEY,ZOOM_API_SECRET,S3_ENDPOINT,S3_BUCKET,S3_ACCESS_KEY_ID,S3_SECRET_ACCESS_KEY&amp;envDescription=Auth.js%2C%20Zoom%20Video%20SDK%2C%20Zoom%20API%2C%20and%20S3-compatible%20storage%20credentials%20required%20by%20the%20app.&amp;envLink=https%3A%2F%2Fgithub.com%2Fzoom%2FVideoSDK-Web-Telehealth%23environment-variables&amp;project-name=zoom-telehealth&amp;repository-name=zoom-telehealth&amp;build-command=bunx%20drizzle-kit%20migrate%20%26%26%20bun%20run%20db%3Aseed%20%26%26%20SKIP_ENV_VALIDATION%3D1%20bun%20run%20build&amp;products=%5B%7B%22type%22%3A%22integration%22%2C%22protocol%22%3A%22storage%22%2C%22productSlug%22%3A%22neon%22%2C%22integrationSlug%22%3A%22neon%22%7D%5D&amp;skippable-integrations=0"><img src="https://vercel.com/button" alt="Deploy with Vercel" /></a>
 
-The deployment flow creates a copy of this repository, provisions a Neon Postgres database through Vercel Marketplace, injects `DATABASE_URL`, and applies the committed Drizzle migrations. You may need to select or confirm Neon's free plan. No separate Neon account or manual database setup is required.
+The deployment flow creates a copy of this repository, provisions a Neon Postgres database through Vercel Marketplace, injects `DATABASE_URL`, applies the committed Drizzle migrations, and seeds demo accounts. Seeding is a no-op once the database has users, so later deploys are unaffected. You may need to select or confirm Neon's free plan. No separate Neon account or manual database setup is required.
 
-Vercel does not consistently show the Deploy Button's environment-variable form when a Marketplace product is included. The initial build therefore skips application credential validation. Before using the deployment, open **Project Settings → Environment Variables**, add the following values for Production, Preview, and Development, and then redeploy:
+Enter these values in the Deploy Button's environment-variable form. If the form does not appear (Vercel can omit it when a Marketplace product is included), let the initial build finish, then add them under **Project Settings → Environment Variables** for Production, Preview, and Development and redeploy. The build skips build-time credential validation, so the first deploy succeeds whether or not the values are set yet:
 
 ```dotenv
 AUTH_SECRET=
@@ -28,7 +28,7 @@ Generate `AUTH_SECRET` with `npx auth secret`. Neon supplies `DATABASE_URL`, and
 
 After creating the Vercel project:
 
-1. Add the environment variables above and redeploy.
+1. Add any environment variables you did not enter in the form, then redeploy.
 2. Set the production GitHub OAuth callback URL to `https://<your-domain>/api/auth/callback/github`.
 3. Redeploy again if the OAuth configuration or any environment variable changes.
 

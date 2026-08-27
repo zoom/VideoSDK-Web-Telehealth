@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build --webpack",
+    "build": "next build",
     "db:pull": "drizzle-kit pull",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",

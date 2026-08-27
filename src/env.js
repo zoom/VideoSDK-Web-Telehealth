@@ -24,6 +24,8 @@ export const env = createEnv({
     S3_BUCKET: z.string(),
     S3_ACCESS_KEY_ID: z.string(),
     S3_SECRET_ACCESS_KEY: z.string(),
+    // "auto" works for Cloudflare R2; set a real AWS region for Amazon S3.
+    S3_REGION: z.string().default("auto"),
     ZOOM_SDK_KEY: z.string(),
     ZOOM_SDK_SECRET: z.string(),
     ZOOM_API_KEY: z.string(),
@@ -56,6 +58,7 @@ export const env = createEnv({
     S3_BUCKET: process.env.S3_BUCKET,
     S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
     S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
+    S3_REGION: process.env.S3_REGION,
     ZOOM_SDK_KEY: process.env.ZOOM_SDK_KEY,
     ZOOM_SDK_SECRET: process.env.ZOOM_SDK_SECRET,
     ZOOM_API_KEY: process.env.ZOOM_API_KEY,

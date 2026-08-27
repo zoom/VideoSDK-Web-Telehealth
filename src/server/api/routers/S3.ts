@@ -13,7 +13,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { files, patients } from "~/server/db/schema";
 
 const S3 = new S3Client({
-  region: "auto",
+  region: env.S3_REGION,
   endpoint: env.S3_ENDPOINT,
   credentials: {
     accessKeyId: env.S3_ACCESS_KEY_ID,
