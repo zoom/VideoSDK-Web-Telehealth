@@ -13,15 +13,15 @@ import { type Room } from "~/server/db/schema";
 import { api } from "~/utils/api";
 
 export default function SchedulePage() {
-  const { data: createdRoomsPast, isLoading: loadingPast } =
-    api.room.getCreatedPast.useQuery();
-  const { data: createdRoomsUpcoming, isLoading: loadingUpcoming } =
-    api.room.getCreatedUpcoming.useQuery();
+  const { data: roomsPast, isLoading: loadingPast } =
+    api.room.getPast.useQuery();
+  const { data: roomsUpcoming, isLoading: loadingUpcoming } =
+    api.room.getUpcoming.useQuery();
 
-  const upcoming = createdRoomsUpcoming
+  const upcoming = roomsUpcoming
     ?.slice()
     .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
-  const past = createdRoomsPast
+  const past = roomsPast
     ?.slice()
     .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime());
 

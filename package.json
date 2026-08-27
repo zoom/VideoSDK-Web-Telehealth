@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "next build",
+    "build": "next build --webpack",
     "db:pull": "drizzle-kit pull",
     "db:push": "drizzle-kit push",
     "db:generate": "drizzle-kit generate",
@@ -13,7 +13,8 @@
     "db:seed": "bun src/server/db/seed.ts",
     "dev": "next dev",
     "lint": "eslint src",
-    "start": "next start"
+    "start": "next start",
+    "doctor": "npx react-doctor@latest"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.3",
@@ -83,6 +84,7 @@
     "postcss": "^8.5.25",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "react-doctor": "^0.9.12",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.5",
     "typescript": "6.0.3"

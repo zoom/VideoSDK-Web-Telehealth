@@ -7,20 +7,16 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    DATABASE_URL: z
-      .string()
-      .url()
-      .refine((str) => !str.includes("YOUR_MYSQL_URL_HERE"), "You forgot to change the default URL"),
+    DATABASE_URL: z.url().refine((str) => !str.includes("YOUR_MYSQL_URL_HERE"), "You forgot to change the default URL"),
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-    AUTH_SECRET: z
-      .string()
-      .min(32, "AUTH_SECRET must contain at least 32 characters"),
+    AUTH_SECRET: z.string().min(32, "AUTH_SECRET must contain at least 32 characters"),
+    AUTH_TRUST_HOST: z.enum(["true", "false"]).optional(),
     NEXTAUTH_URL: z.preprocess(
       // This makes Vercel deployments not fail if you don't set NEXTAUTH_URL
       // Since NextAuth.js automatically uses the VERCEL_URL if present.
       (str) => process.env.VERCEL_URL ?? str,
       // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-      process.env.VERCEL ? z.string() : z.string().url()
+      process.env.VERCEL ? z.string() : z.url()
     ),
     GITHUB_CLIENT_ID: z.string(),
     GITHUB_CLIENT_SECRET: z.string(),
@@ -52,6 +48,7 @@ export const env = createEnv({
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_TESTMODE: process.env.NEXT_PUBLIC_TESTMODE,
     AUTH_SECRET: process.env.AUTH_SECRET,
+    AUTH_TRUST_HOST: process.env.AUTH_TRUST_HOST,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     GITHUB_CLIENT_ID: process.env.GITHUB_CLIENT_ID,
     GITHUB_CLIENT_SECRET: process.env.GITHUB_CLIENT_SECRET,

@@ -38,7 +38,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost:
     env.NODE_ENV !== "production" ||
     !!process.env.VERCEL ||
-    process.env.AUTH_TRUST_HOST === "true",
+    env.AUTH_TRUST_HOST === "true",
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,

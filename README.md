@@ -116,6 +116,7 @@ The current environment schema validates all integration credentials at startup 
 | `DATABASE_DIRECT_URL` | Optional direct PostgreSQL connection used by Drizzle Kit; falls back to `DATABASE_URL`. Useful when `DATABASE_URL` points to a pooled endpoint. |
 | `AUTH_SECRET` | Auth.js signing secret containing at least 32 characters. |
 | `NEXTAUTH_URL` | Local canonical URL, normally `http://localhost:3000`. Vercel supplies its deployment URL automatically. |
+| `AUTH_TRUST_HOST` | Set to `true` for self-hosted production only when a trusted reverse proxy overwrites forwarded host/protocol headers. Not required on Vercel or in development. |
 | `GITHUB_CLIENT_ID` | GitHub OAuth application client ID. |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth application client secret. |
 | `ZOOM_SDK_KEY` | Zoom Video SDK key used to join video sessions. |

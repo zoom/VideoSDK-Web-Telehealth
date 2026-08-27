@@ -1,6 +1,5 @@
 import { TRPCError } from "@trpc/server";
 import { and, asc, eq, gte, inArray, lte, or, sql } from "drizzle-orm";
-import moment from "moment";
 import { z } from "zod";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
@@ -75,7 +74,7 @@ export const sessionRouter = createTRPCRouter({
       });
     }),
   getUpcoming: protectedProcedure.query(async ({ ctx }) => {
-    const time = moment().utc().toDate();
+    const time = new Date();
     const result = await ctx.db.query.rooms.findMany({
       orderBy: [asc(rooms.time)],
       where: and(
@@ -92,8 +91,26 @@ export const sessionRouter = createTRPCRouter({
     });
     return result.map(flattenInvited);
   }),
+  getPast: protectedProcedure.query(async ({ ctx }) => {
+    const time = new Date();
+    const result = await ctx.db.query.rooms.findMany({
+      orderBy: [asc(rooms.time)],
+      where: and(
+        lte(rooms.time, time),
+        or(
+          eq(rooms.createByUserId, ctx.session.user.id),
+          inArray(rooms.id, invitedRoomIds(ctx.session.user.id)),
+        ),
+      ),
+      with: {
+        User_CreatedFor: { with: { user: true } },
+        User_CreatedBy: true,
+      },
+    });
+    return result.map(flattenInvited);
+  }),
   getCreatedUpcoming: protectedProcedure.query(async ({ ctx }) => {
-    const time = moment().utc().toDate();
+    const time = new Date();
     const result = await ctx.db.query.rooms.findMany({
       orderBy: [asc(rooms.time)],
       where: and(
@@ -108,7 +125,7 @@ export const sessionRouter = createTRPCRouter({
     return result.map(flattenInvited);
   }),
   getInvitedUpcoming: protectedProcedure.query(async ({ ctx }) => {
-    const time = moment().utc().toDate();
+    const time = new Date();
     return ctx.db.query.rooms.findMany({
       orderBy: [asc(rooms.time)],
       where: and(
@@ -118,7 +135,7 @@ export const sessionRouter = createTRPCRouter({
     });
   }),
   getCreatedPast: protectedProcedure.query(async ({ ctx }) => {
-    const time = moment().utc().toDate();
+    const time = new Date();
     const result = await ctx.db.query.rooms.findMany({
       orderBy: [asc(rooms.time)],
       where: and(
@@ -133,7 +150,7 @@ export const sessionRouter = createTRPCRouter({
     return result.map(flattenInvited);
   }),
   getInvitedPast: protectedProcedure.query(async ({ ctx }) => {
-    const time = moment().utc().toDate();
+    const time = new Date();
     return ctx.db.query.rooms.findMany({
       orderBy: [asc(rooms.time)],
       where: and(

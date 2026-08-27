@@ -3,14 +3,7 @@ import { Button } from "~/components/ui/button";
 import { useAudioState, useVideoState } from "@zoom/videosdk-react";
 import { Loader2, Mic, MicOff, Video, VideoOff } from "lucide-react";
 import { useToast } from "~/components/ui/use-toast";
-
-const getDeviceError = (error: unknown) => {
-  if (error instanceof Error) return error.message;
-  if (typeof error === "object" && error !== null && "reason" in error && typeof error.reason === "string") {
-    return error.reason;
-  }
-  return "Check your browser permissions and try again.";
-};
+import { createVideoOptions, getZoomErrorMessage } from "~/lib/zoom-video";
 
 const MicButton = () => {
   const [isChanging, setIsChanging] = useState(false);
@@ -24,7 +17,7 @@ const MicButton = () => {
     } catch (error) {
       toast({
         title: "Could not change microphone",
-        description: getDeviceError(error),
+        description: getZoomErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -38,7 +31,7 @@ const MicButton = () => {
   );
 };
 
-const CameraButton = ({ currentBackground }: { currentBackground: string }) => {
+const CameraButton = ({ currentCamera, currentBackground }: { currentCamera: string; currentBackground: string }) => {
   const [isChanging, setIsChanging] = useState(false);
   const { isVideoOn, toggleVideo } = useVideoState();
   const { toast } = useToast();
@@ -46,11 +39,11 @@ const CameraButton = ({ currentBackground }: { currentBackground: string }) => {
   const onCameraClick = async () => {
     setIsChanging(true);
     try {
-      await toggleVideo(currentBackground ? { virtualBackground: { imageUrl: currentBackground } } : undefined);
+      await toggleVideo(createVideoOptions(currentCamera, currentBackground));
     } catch (error) {
       toast({
         title: "Could not change camera",
-        description: getDeviceError(error),
+        description: getZoomErrorMessage(error),
         variant: "destructive",
       });
     } finally {

@@ -1,36 +1,52 @@
 import { Button } from "~/components/ui/button";
-import { type Dispatch, type RefObject, type SetStateAction, useRef, useState } from "react";
-import type { LiveTranscriptionClient, LiveTranscriptionMessage, VideoClient } from "@zoom/videosdk";
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useState } from "react";
+import type { LiveTranscriptionMessage } from "@zoom/videosdk";
 import { MessageCircleMore, MessageCircleOff } from "lucide-react";
 import { useToast } from "../ui/use-toast";
+import { getZoomClient } from "~/lib/zoom-video";
 
-const TranscriptionButton = (props: { setTranscriptionSubtitle: setTranscriptionSubtitle; client: RefObject<typeof VideoClient> }) => {
-  const { setTranscriptionSubtitle, client } = props;
-  const [isStartedLiveTranscription, setIsStartedLiveTranscription] = useState(false);
-  const transcriptionClient = useRef<typeof LiveTranscriptionClient>(client.current.getLiveTranscriptionClient());
+const TranscriptionButton = (props: { setTranscriptionSubtitle: setTranscriptionSubtitle }) => {
+  const { setTranscriptionSubtitle } = props;
+  const client = getZoomClient();
+  const transcriptionClient = client.getLiveTranscriptionClient();
+  const [isStartedLiveTranscription, setIsStartedLiveTranscription] = useState(
+    () => transcriptionClient.getLiveTranscriptionStatus().isLiveTranscriptionEnabled
+  );
   const { toast } = useToast();
 
-  const onTranscriptionClick = async () => {
-    const handleCaptions = (payload: LiveTranscriptionMessage) => {
-      setTranscriptionSubtitle(
-        (prev) =>
-        (prev = {
-          ...prev,
-          [payload.msgId]: { name: payload.displayName, text: payload.text, isSelf: payload.userId === client.current.getCurrentUserInfo().userId },
-        })
-      );
+  const handleCaptions = useCallback(
+    (payload: LiveTranscriptionMessage) => {
+      setTranscriptionSubtitle((previous) => ({
+        ...previous,
+        [payload.msgId]: {
+          name: payload.displayName,
+          text: payload.text,
+          isSelf: payload.userId === client.getCurrentUserInfo().userId,
+        },
+      }));
+    },
+    [client, setTranscriptionSubtitle]
+  );
+
+  useEffect(() => {
+    const handleStatus = ({ autoCaption }: { autoCaption: boolean }) => {
+      setIsStartedLiveTranscription(autoCaption);
     };
+    client.on("caption-message", handleCaptions);
+    client.on("caption-status", handleStatus);
+    return () => {
+      client.off("caption-message", handleCaptions);
+      client.off("caption-status", handleStatus);
+    };
+  }, [client, handleCaptions]);
 
-    if (transcriptionClient.current === undefined) return;
-
+  const onTranscriptionClick = async () => {
     if (isStartedLiveTranscription) {
-      client.current.off(`caption-message`, handleCaptions);
-      await transcriptionClient.current.disableCaptions(true);
+      await transcriptionClient.disableCaptions(true);
       setIsStartedLiveTranscription(false);
     } else {
       toast({ title: "Starting live transcription", description: "You can view them in the top right menu" });
-      client.current.on(`caption-message`, handleCaptions);
-      await transcriptionClient.current.startLiveTranscription();
+      await transcriptionClient.startLiveTranscription();
       setIsStartedLiveTranscription(true);
     }
   };

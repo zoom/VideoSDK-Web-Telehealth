@@ -1,29 +1,6 @@
-import ZoomVideo, {
-  type LocalAudioTrack,
-  type LocalVideoTrack,
-  type TestMicrophoneReturn,
-  type TestSpeakerReturn,
-  type VideoPlayer,
-} from "@zoom/videosdk";
-import {
-  CheckIcon,
-  ChevronDown,
-  Image as ImageIcon,
-  Loader2,
-  Mic,
-  MicOff,
-  Volume2,
-  Video,
-  VideoOff,
-} from "lucide-react";
-import {
-  type Dispatch,
-  type SetStateAction,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import ZoomVideo, { type LocalAudioTrack, type LocalVideoTrack, type TestMicrophoneReturn, type TestSpeakerReturn, type VideoPlayer } from "@zoom/videosdk";
+import { CheckIcon, ChevronDown, Image as ImageIcon, Loader2, Mic, MicOff, Volume2, Video, VideoOff } from "lucide-react";
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 
 import VirtualBackgroundImage from "../../../public/VirtualBackgroundImage.png";
 import { Button } from "~/components/ui/button";
@@ -36,34 +13,33 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { useToast } from "~/components/ui/use-toast";
+import { getZoomErrorMessage, initializeZoom } from "~/lib/zoom-video";
+import { useZoomMediaDevices } from "./useZoomMediaDevices";
 
 type PreviewProps = {
-  init: () => Promise<void>;
-  onJoin: () => Promise<void>;
+  onJoin: () => void;
   setIsVideoMuted: Dispatch<SetStateAction<boolean>>;
   setIsAudioMuted: Dispatch<SetStateAction<boolean>>;
+  currentCamera: string;
+  setCurrentCamera: Dispatch<SetStateAction<string>>;
+  currentMicrophone: string;
+  setCurrentMicrophone: Dispatch<SetStateAction<string>>;
+  currentSpeaker: string;
+  setCurrentSpeaker: Dispatch<SetStateAction<string>>;
   currentBackground: string;
   setCurrentBackground: Dispatch<SetStateAction<string>>;
 };
 
-const getErrorMessage = (error: unknown) => {
-  if (error instanceof Error) return error.message;
-  if (
-    typeof error === "object" &&
-    error !== null &&
-    "reason" in error &&
-    typeof error.reason === "string"
-  ) {
-    return error.reason;
-  }
-  return "Check your browser permissions and try again.";
-};
-
 const Preview = ({
-  init,
   onJoin,
   setIsVideoMuted,
   setIsAudioMuted,
+  currentCamera,
+  setCurrentCamera,
+  currentMicrophone,
+  setCurrentMicrophone,
+  currentSpeaker,
+  setCurrentSpeaker,
   currentBackground,
   setCurrentBackground,
 }: PreviewProps) => {
@@ -74,17 +50,17 @@ const Preview = ({
   const speakerTesterRef = useRef<TestSpeakerReturn | null>(null);
   const mountedRef = useRef(false);
   const initialBackgroundRef = useRef(currentBackground);
+  const initialDevicesRef = useRef({
+    camera: currentCamera,
+    microphone: currentMicrophone,
+    speaker: currentSpeaker,
+  });
 
-  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
-  const [audioInDevices, setAudioInDevices] = useState<MediaDeviceInfo[]>([]);
-  const [audioOutDevices, setAudioOutDevices] = useState<MediaDeviceInfo[]>([]);
-  const [currentCamera, setCurrentCamera] = useState("");
-  const [currentMicrophone, setCurrentMicrophone] = useState("");
-  const [currentSpeaker, setCurrentSpeaker] = useState("");
+  const { cameras: videoDevices, microphones: audioInDevices, speakers: audioOutDevices, refresh: refreshDevices } = useZoomMediaDevices(false);
   const [audioOn, setAudioOn] = useState(true);
   const [videoOn, setVideoOn] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
-  const [isJoining, setIsJoining] = useState(false);
+  const [isPreparingToJoin, setIsPreparingToJoin] = useState(false);
   const [isTestingSpeaker, setIsTestingSpeaker] = useState(false);
   const [isChangingBackground, setIsChangingBackground] = useState(false);
   const { toast } = useToast();
@@ -117,17 +93,16 @@ const Preview = ({
   const startMicrophoneTest = useCallback(
     (track: LocalAudioTrack, microphoneId: string) => {
       stopMicrophoneTester();
-      microphoneTesterRef.current = track.testMicrophone({
-        microphoneId,
-        onAnalyseFrequency: (value) => {
-          const meter = document.querySelector<HTMLProgressElement>(
-            "#mic-input-level",
-          );
-          if (meter) meter.value = value;
-        },
-      }) ?? null;
+      microphoneTesterRef.current =
+        track.testMicrophone({
+          microphoneId,
+          onAnalyseFrequency: (value) => {
+            const meter = document.querySelector<HTMLProgressElement>("#mic-input-level");
+            if (meter) meter.value = value;
+          },
+        }) ?? null;
     },
-    [stopMicrophoneTester],
+    [stopMicrophoneTester]
   );
 
   useEffect(() => {
@@ -136,39 +111,26 @@ const Preview = ({
 
     const initialisePreview = async () => {
       try {
-        await init();
+        await initializeZoom();
         if (cancelled) return;
 
-        const devices = await ZoomVideo.getDevices();
+        const { cameras, microphones, speakers } = await refreshDevices();
         if (cancelled) return;
 
-        const cameras = devices.filter((device) => device.kind === "videoinput");
-        const microphones = devices.filter(
-          (device) => device.kind === "audioinput",
-        );
-        const speakers = devices.filter(
-          (device) => device.kind === "audiooutput",
-        );
-
-        setVideoDevices(cameras);
-        setAudioInDevices(microphones);
-        setAudioOutDevices(speakers);
-
-        const cameraId = cameras[0]?.deviceId ?? "";
-        const microphoneId = microphones[0]?.deviceId ?? "";
+        const initialDevices = initialDevicesRef.current;
+        const cameraId = cameras.find((device) => device.deviceId === initialDevices.camera)?.deviceId ?? cameras[0]?.deviceId ?? "";
+        const microphoneId = microphones.find((device) => device.deviceId === initialDevices.microphone)?.deviceId ?? microphones[0]?.deviceId ?? "";
+        const speakerId = speakers.find((device) => device.deviceId === initialDevices.speaker)?.deviceId ?? speakers[0]?.deviceId ?? "";
         setCurrentCamera(cameraId);
         setCurrentMicrophone(microphoneId);
-        setCurrentSpeaker(speakers[0]?.deviceId ?? "");
+        setCurrentSpeaker(speakerId);
 
         const previewElement = previewElementRef.current;
         if (previewElement && cameraId) {
           const videoTrack = ZoomVideo.createLocalVideoTrack(cameraId);
           videoTrackRef.current = videoTrack;
           const initialBackground = initialBackgroundRef.current;
-          await videoTrack.start(
-            previewElement,
-            initialBackground ? { imageUrl: initialBackground } : undefined,
-          );
+          await videoTrack.start(previewElement, initialBackground ? { imageUrl: initialBackground } : undefined);
           if (cancelled) {
             await videoTrack.stop();
             return;
@@ -199,7 +161,7 @@ const Preview = ({
         if (!cancelled) {
           toast({
             title: "Camera or microphone unavailable",
-            description: getErrorMessage(error),
+            description: getZoomErrorMessage(error),
             variant: "destructive",
           });
         }
@@ -215,14 +177,7 @@ const Preview = ({
       mountedRef.current = false;
       void stopPreview();
     };
-  }, [
-    init,
-    setIsAudioMuted,
-    setIsVideoMuted,
-    startMicrophoneTest,
-    stopPreview,
-    toast,
-  ]);
+  }, [refreshDevices, setIsAudioMuted, setIsVideoMuted, setCurrentCamera, setCurrentMicrophone, setCurrentSpeaker, startMicrophoneTest, stopPreview, toast]);
 
   const toggleCamera = async () => {
     const track = videoTrackRef.current;
@@ -235,17 +190,14 @@ const Preview = ({
         setVideoOn(false);
         setIsVideoMuted(true);
       } else {
-        await track.start(
-          previewElement,
-          currentBackground ? { imageUrl: currentBackground } : undefined,
-        );
+        await track.start(previewElement, currentBackground ? { imageUrl: currentBackground } : undefined);
         setVideoOn(true);
         setIsVideoMuted(false);
       }
     } catch (error) {
       toast({
         title: "Could not change camera",
-        description: getErrorMessage(error),
+        description: getZoomErrorMessage(error),
         variant: "destructive",
       });
     }
@@ -270,7 +222,7 @@ const Preview = ({
     } catch (error) {
       toast({
         title: "Could not change microphone",
-        description: getErrorMessage(error),
+        description: getZoomErrorMessage(error),
         variant: "destructive",
       });
     }
@@ -309,30 +261,22 @@ const Preview = ({
     const previousBackground = currentBackground;
     setIsChangingBackground(true);
     try {
-      // Starting without a background does not initialize Zoom's background
-      // processor. Restarting is reliable for transitions both to and from it.
+      // Zoom does not initialize its background processor when the track starts
+      // without one, so restart the preview to support both directions reliably.
       await track.stop();
-      await track.start(
-        previewElement,
-        background ? { imageUrl: background } : undefined,
-      );
+      await track.start(previewElement, background ? { imageUrl: background } : undefined);
       setCurrentBackground(background);
     } catch (error) {
-      // Restore the previous preview so a failed effect never leaves the
-      // camera active behind an empty player.
       try {
         await track.stop();
-        await track.start(
-          previewElement,
-          previousBackground ? { imageUrl: previousBackground } : undefined,
-        );
+        await track.start(previewElement, previousBackground ? { imageUrl: previousBackground } : undefined);
       } catch {
         setVideoOn(false);
         setIsVideoMuted(true);
       }
       toast({
         title: "Could not change background",
-        description: getErrorMessage(error),
+        description: getZoomErrorMessage(error),
         variant: "destructive",
       });
     } finally {
@@ -341,28 +285,38 @@ const Preview = ({
   };
 
   const testSpeaker = () => {
+    const track = audioTrackRef.current;
+    // Restore the mic level meter once the speaker test stops (the track runs one tester at a time).
+    const resumeMicrophoneTest = () => {
+      if (track && audioOn) startMicrophoneTest(track, currentMicrophone);
+    };
+
     if (isTestingSpeaker) {
       stopSpeakerTester();
+      resumeMicrophoneTest();
       return;
     }
 
-    const tester = audioTrackRef.current?.testSpeaker({
-      speakerId: currentSpeaker || undefined,
-    });
+    if (!track) return;
+    // testSpeaker and testMicrophone share the track's single tester, so pause the mic test first.
+    stopMicrophoneTester();
+    const tester = track.testSpeaker({ speakerId: currentSpeaker || undefined });
     if (tester) {
       speakerTesterRef.current = tester;
       setIsTestingSpeaker(true);
+    } else {
+      resumeMicrophoneTest();
     }
   };
 
   const join = async () => {
-    setIsJoining(true);
+    if (isPreparingToJoin) return;
+    setIsPreparingToJoin(true);
     await stopPreview();
-    await onJoin();
-    if (mountedRef.current) setIsJoining(false);
+    if (mountedRef.current) onJoin();
   };
 
-  const disabled = isLoading || isJoining || isChangingBackground;
+  const disabled = isLoading || isPreparingToJoin || isChangingBackground;
 
   return (
     <section className="mx-auto flex w-full max-w-5xl flex-col gap-5">
@@ -406,13 +360,7 @@ const Preview = ({
             menuLabel="Microphone"
             onSelect={(id) => void switchMicrophone(id)}
           />
-          <progress
-            id="mic-input-level"
-            aria-label="Microphone input level"
-            max="100"
-            value="0"
-            className="h-1.5 w-16 accent-emerald-600"
-          />
+          <progress id="mic-input-level" aria-label="Microphone input level" max="100" value="0" className="h-1.5 w-16 accent-emerald-600" />
           <DeviceControl
             label={videoOn ? "Turn camera off" : "Turn camera on"}
             onClick={() => void toggleCamera()}
@@ -425,12 +373,7 @@ const Preview = ({
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="icon"
-                title="Virtual background"
-                disabled={disabled}
-              >
+              <Button variant="outline" size="icon" title="Virtual background" disabled={disabled}>
                 <ImageIcon />
               </Button>
             </DropdownMenuTrigger>
@@ -442,14 +385,9 @@ const Preview = ({
                 { label: "Blur", value: "blur" },
                 { label: "Beach", value: VirtualBackgroundImage.src },
               ].map((background) => (
-                <DropdownMenuItem
-                  key={background.label}
-                  onClick={() => void changeBackground(background.value)}
-                >
+                <DropdownMenuItem key={background.label} onClick={() => void changeBackground(background.value)}>
                   {background.label}
-                  {currentBackground === background.value && (
-                    <CheckIcon className="ml-auto" />
-                  )}
+                  {currentBackground === background.value && <CheckIcon className="ml-auto" />}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -457,11 +395,7 @@ const Preview = ({
           {audioOutDevices.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button
-                  variant="outline"
-                  title="Speaker options"
-                  disabled={disabled}
-                >
+                <Button variant="outline" title="Speaker options" disabled={disabled}>
                   <Volume2 />
                   <ChevronDown />
                 </Button>
@@ -470,33 +404,21 @@ const Preview = ({
                 <DropdownMenuLabel>Speaker</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {audioOutDevices.map((speaker) => (
-                  <DropdownMenuItem
-                    key={speaker.deviceId}
-                    onClick={() => setCurrentSpeaker(speaker.deviceId)}
-                  >
+                  <DropdownMenuItem key={speaker.deviceId} onClick={() => setCurrentSpeaker(speaker.deviceId)}>
                     {speaker.label || "Default speaker"}
-                    {currentSpeaker === speaker.deviceId && (
-                      <CheckIcon className="ml-auto" />
-                    )}
+                    {currentSpeaker === speaker.deviceId && <CheckIcon className="ml-auto" />}
                   </DropdownMenuItem>
                 ))}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={testSpeaker}>
-                  {isTestingSpeaker ? "Stop test" : "Test speaker"}
-                </DropdownMenuItem>
+                <DropdownMenuItem onClick={testSpeaker}>{isTestingSpeaker ? "Stop test" : "Test speaker"}</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           )}
         </div>
 
-        <Button
-          size="lg"
-          className="min-w-36"
-          onClick={() => void join()}
-          disabled={disabled}
-        >
-          {isJoining && <Loader2 className="animate-spin" />}
-          {isJoining ? "Joining…" : "Join appointment"}
+        <Button size="lg" className="min-w-36" onClick={() => void join()} disabled={disabled}>
+          {isPreparingToJoin && <Loader2 className="animate-spin" />}
+          {isPreparingToJoin ? "Joining…" : "Join appointment"}
         </Button>
       </div>
     </section>
@@ -514,24 +436,9 @@ type DeviceControlProps = {
   onSelect: (deviceId: string) => void;
 };
 
-const DeviceControl = ({
-  label,
-  onClick,
-  disabled,
-  icon,
-  devices,
-  currentDevice,
-  menuLabel,
-  onSelect,
-}: DeviceControlProps) => (
+const DeviceControl = ({ label, onClick, disabled, icon, devices, currentDevice, menuLabel, onSelect }: DeviceControlProps) => (
   <div className="inline-flex">
-    <Button
-      variant="outline"
-      className="rounded-r-none border-r-0"
-      title={label}
-      onClick={onClick}
-      disabled={disabled}
-    >
+    <Button variant="outline" className="rounded-r-none border-r-0" title={label} onClick={onClick} disabled={disabled}>
       {icon}
       <span className="sr-only">{label}</span>
     </Button>
@@ -551,14 +458,9 @@ const DeviceControl = ({
         <DropdownMenuLabel>{menuLabel}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {devices.map((device) => (
-          <DropdownMenuItem
-            key={device.deviceId}
-            onClick={() => onSelect(device.deviceId)}
-          >
+          <DropdownMenuItem key={device.deviceId} onClick={() => onSelect(device.deviceId)}>
             {device.label || `Default ${menuLabel.toLowerCase()}`}
-            {currentDevice === device.deviceId && (
-              <CheckIcon className="ml-auto" />
-            )}
+            {currentDevice === device.deviceId && <CheckIcon className="ml-auto" />}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
