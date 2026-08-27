@@ -21,8 +21,8 @@ const Chat = ({ records, sendToAll }: ChatProps) => {
   }, [records]);
 
   return (
-    <div className="flex h-[80vh] w-80 flex-1 flex-col">
-      <div ref={chatWrapRef} className="flex-1 flex-col overflow-y-scroll pr-2">
+    <div className="flex w-full flex-col">
+      <div ref={chatWrapRef} className="flex max-h-[50vh] min-h-40 flex-1 flex-col overflow-y-auto pr-2">
         {records.map((record) => (
           <ChatMessageItem record={record} currentUserId={getZoomClient().getSessionInfo().userId} key={record.timestamp} />
         ))}

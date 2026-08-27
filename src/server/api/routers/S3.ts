@@ -12,16 +12,34 @@ import { env } from "~/env";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { files, patients } from "~/server/db/schema";
 
-const S3 = new S3Client({
-  region: env.S3_REGION,
-  endpoint: env.S3_ENDPOINT,
-  credentials: {
-    accessKeyId: env.S3_ACCESS_KEY_ID,
-    secretAccessKey: env.S3_SECRET_ACCESS_KEY,
-  },
-});
+// Storage backend: Vercel Blob when its token is present, else S3/R2.
+const STORAGE_BACKEND = env.BLOB_READ_WRITE_TOKEN ? "blob" : "s3";
+
+let s3Client: S3Client | undefined;
+function getS3() {
+  if (
+    !env.S3_ENDPOINT ||
+    !env.S3_BUCKET ||
+    !env.S3_ACCESS_KEY_ID ||
+    !env.S3_SECRET_ACCESS_KEY
+  ) {
+    throw new TRPCError({
+      code: "PRECONDITION_FAILED",
+      message: "S3 storage is not configured",
+    });
+  }
+  return (s3Client ??= new S3Client({
+    region: env.S3_REGION,
+    endpoint: env.S3_ENDPOINT,
+    credentials: {
+      accessKeyId: env.S3_ACCESS_KEY_ID,
+      secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+    },
+  }));
+}
 
 export const S3Router = createTRPCRouter({
+  getBackend: protectedProcedure.query(() => STORAGE_BACKEND),
   createPresignedUrl: protectedProcedure
     .input(z.object({ filename: z.string() }))
     .mutation(async ({ input, ctx }) => {
@@ -30,14 +48,14 @@ export const S3Router = createTRPCRouter({
       }
       const filename = `${ctx.session.user.id}_${new Date().getTime().toString().slice(8)}_${input.filename}`;
       const url = await getSignedUrl(
-        S3,
+        getS3(),
         new PutObjectCommand({ Bucket: env.S3_BUCKET, Key: filename }),
         { expiresIn: 3600 },
       );
       return { url, filename };
     }),
   registerUpload: protectedProcedure
-    .input(z.object({ filename: z.string() }))
+    .input(z.object({ filename: z.string(), storageKey: z.string().optional() }))
     .mutation(async ({ input, ctx }) => {
       if (env.NEXT_PUBLIC_TESTMODE === "TESTING") {
         throw new TRPCError({ code: "FORBIDDEN" });
@@ -53,6 +71,7 @@ export const S3Router = createTRPCRouter({
       }
       await ctx.db.insert(files).values({
         name: input.filename,
+        storageKey: input.storageKey,
         type: "PDF",
         patientId: patient.id,
       });
@@ -85,7 +104,7 @@ export const S3Router = createTRPCRouter({
     .input(z.object({ filename: z.string() }))
     .mutation(async ({ input }) => {
       const url = await getSignedUrl(
-        S3,
+        getS3(),
         new GetObjectCommand({ Bucket: env.S3_BUCKET, Key: input.filename }),
         { expiresIn: 3600 },
       );

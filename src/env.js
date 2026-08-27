@@ -20,12 +20,16 @@ export const env = createEnv({
     ),
     GITHUB_CLIENT_ID: z.string(),
     GITHUB_CLIENT_SECRET: z.string(),
-    S3_ENDPOINT: z.string(),
-    S3_BUCKET: z.string(),
-    S3_ACCESS_KEY_ID: z.string(),
-    S3_SECRET_ACCESS_KEY: z.string(),
+    // Storage is pluggable: set either the S3 vars OR BLOB_READ_WRITE_TOKEN.
+    // The S3 vars are optional so a Vercel Blob-only deploy can omit them.
+    S3_ENDPOINT: z.string().optional(),
+    S3_BUCKET: z.string().optional(),
+    S3_ACCESS_KEY_ID: z.string().optional(),
+    S3_SECRET_ACCESS_KEY: z.string().optional(),
     // "auto" works for Cloudflare R2; set a real AWS region for Amazon S3.
     S3_REGION: z.string().default("auto"),
+    // Auto-injected by the Vercel Blob integration; presence selects Blob storage.
+    BLOB_READ_WRITE_TOKEN: z.string().optional(),
     ZOOM_SDK_KEY: z.string(),
     ZOOM_SDK_SECRET: z.string(),
     ZOOM_API_KEY: z.string(),
@@ -59,6 +63,7 @@ export const env = createEnv({
     S3_ACCESS_KEY_ID: process.env.S3_ACCESS_KEY_ID,
     S3_SECRET_ACCESS_KEY: process.env.S3_SECRET_ACCESS_KEY,
     S3_REGION: process.env.S3_REGION,
+    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     ZOOM_SDK_KEY: process.env.ZOOM_SDK_KEY,
     ZOOM_SDK_SECRET: process.env.ZOOM_SDK_SECRET,
     ZOOM_API_KEY: process.env.ZOOM_API_KEY,

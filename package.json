@@ -45,6 +45,7 @@
     "@trpc/server": "^11.18.0",
     "@types/jsrsasign": "^10.5.15",
     "@uidotdev/usehooks": "^2.4.1",
+    "@vercel/blob": "^2.8.0",
     "@zoom/videosdk": "^2.5.0",
     "@zoom/videosdk-react": "^0.0.3",
     "class-variance-authority": "^0.7.1",

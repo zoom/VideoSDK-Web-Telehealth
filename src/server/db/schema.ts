@@ -106,6 +106,9 @@ export const files = pgTable("File", {
   id: text("id").primaryKey().$defaultFn(cuid),
   name: text("name").notNull(),
   type: text("type").notNull(),
+  // Vercel Blob object pathname (served via a Function); null for S3/R2, which
+  // keys off `name` and presigns on demand.
+  storageKey: text("storageKey"),
   patientId: text("patientId")
     .notNull()
     .references(() => patients.id, { onDelete: "cascade" }),

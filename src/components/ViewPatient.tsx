@@ -67,7 +67,10 @@ export function ViewPatient({ userId }: { userId: string }) {
                 </div>
                 <Button
                   onClick={async () => {
-                    const link = await mutateAsync({ filename: e.name });
+                    // Private Blob streams through an auth-gated route; S3/R2 presigns on demand.
+                    const link = e.storageKey
+                      ? `/api/blob/download?fileId=${e.id}`
+                      : await mutateAsync({ filename: e.name });
                     window.open(link, "_blank");
                   }}
                 >

@@ -1,4 +1,6 @@
 "use client";
+import { upload } from "@vercel/blob/client";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRef, useState } from "react";
 import { Button } from "~/components/ui/button";
@@ -11,6 +13,8 @@ import { env } from "~/env";
 import { api } from "~/utils/api";
 
 const InputFile = () => {
+  const { data: sessionData } = useSession();
+  const backend = api.S3.getBackend.useQuery();
   const uploadUrl = api.S3.createPresignedUrl.useMutation();
   const registerUpload = api.S3.registerUpload.useMutation();
   const [file, setFile] = useState<File | null>(null);
@@ -53,19 +57,26 @@ const InputFile = () => {
                 if (file) {
                   setLoading(true);
                   setStatus("Uploading...");
-                  const { url, filename } = await uploadUrl.mutateAsync({ filename: file.name });
-                  const newfile = new File([file], filename, { type: file.type });
-                  await fetch(url, {
-                    method: "PUT",
-                    body: newfile,
-                  }).catch((e) => {
+                  try {
+                    if (backend.data === "blob") {
+                      const filename = `${sessionData?.user.id}_${Date.now().toString().slice(8)}_${file.name}`;
+                      const blob = await upload(filename, file, {
+                        access: "private",
+                        handleUploadUrl: "/api/blob/upload",
+                      });
+                      await registerUpload.mutateAsync({ filename, storageKey: blob.pathname });
+                    } else {
+                      const { url, filename } = await uploadUrl.mutateAsync({ filename: file.name });
+                      const newfile = new File([file], filename, { type: file.type });
+                      await fetch(url, { method: "PUT", body: newfile });
+                      await registerUpload.mutateAsync({ filename });
+                    }
+                    inputref.current!.value = "";
+                    setStatus("File uploaded");
+                  } catch (e) {
                     setStatus("Error uploading file");
                     console.error(e);
-                    setLoading(false);
-                  });
-                  await registerUpload.mutateAsync({ filename });
-                  inputref.current!.value = "";
-                  setStatus("File uploaded");
+                  }
                   setLoading(false);
                 }
               }}
