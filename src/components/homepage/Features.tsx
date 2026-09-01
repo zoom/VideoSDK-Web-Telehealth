@@ -1,70 +1,74 @@
-import { Wand } from "lucide-react";
+import {
+  CalendarCheck,
+  Captions,
+  FileText,
+  ShieldCheck,
+  UsersRound,
+  Video,
+} from "lucide-react";
 
-const Features = () => {
-  return (
-    <section className="relative">
-      {/* Section background (needs .relative class on parent and next sibling elements) */}
-      <div className="pointer-events-none absolute inset-0 top-1/2 bg-gray-900 md:mt-24 lg:mt-0" aria-hidden="true"></div>
-      <div className="absolute bottom-0 left-0 right-0 m-auto h-20 w-px translate-y-1/2 transform bg-gray-200 p-px"></div>
+const features = [
+  {
+    icon: CalendarCheck,
+    title: "Appointment timeline",
+    description: "Schedule, invite, and see what is next without digging.",
+  },
+  {
+    icon: Video,
+    title: "Reliable care rooms",
+    description: "Check devices first, then enter a focused video visit.",
+  },
+  {
+    icon: UsersRound,
+    title: "Role-aware workspaces",
+    description: "Doctors and patients each see the tools they actually need.",
+  },
+  {
+    icon: Captions,
+    title: "Live transcription",
+    description: "Follow the conversation with clear in-call captions.",
+  },
+  {
+    icon: FileText,
+    title: "Visit context",
+    description: "Keep notes and relevant patient details close to the call.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Purposeful access",
+    description: "Appointment rooms are tied to invited, signed-in users.",
+  },
+];
 
-      <div className="relative mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="py-12 md:py-20">
-          {/* Section header */}
-          <div className="mx-auto max-w-3xl pb-12 text-center md:pb-20">
-            <h1 className="leading-tighter mb-1 text-5xl font-extrabold tracking-tighter md:text-4xl" data-aos="zoom-y-out">
-              <span className="bg-gradient-to-r from-blue-500 to-teal-400 bg-clip-text text-transparent">Customized</span> Features
-            </h1>
-            <p className="text-xl text-gray-600">Curated to meet the specific needs of a healthcare audience.</p>
-          </div>
-
-          {/* Items */}
-          <div className="mx-auto grid max-w-sm items-start gap-6 md:max-w-2xl md:grid-cols-2 lg:max-w-none lg:grid-cols-3">
-            {/* 1st item */}
-            <div className="relative flex flex-col items-center rounded bg-white p-6 shadow-xl">
-              <Wand />
-              <h4 className="mb-1 text-xl font-bold leading-snug tracking-tight">Differentiated User Portals</h4>
-              <p className="text-center text-gray-600">Register as either a doctor or patient and log in to your portal for profile and appointment access.</p>
-            </div>
-
-            {/* 2nd item */}
-            <div className="relative flex flex-col items-center rounded bg-white p-6 shadow-xl">
-              <Wand />
-              <h4 className="mb-1 text-xl font-bold leading-snug tracking-tight">Live Transcription</h4>
-              <p className="text-center text-gray-600">Turn on transcription during your virtual appointment for live, auto-generated captions.</p>
-            </div>
-
-            {/* 3rd item */}
-            <div className="relative flex flex-col items-center rounded bg-white p-6 shadow-xl">
-              <Wand />
-              <h4 className="mb-1 text-xl font-bold leading-snug tracking-tight">Appointment Management</h4>
-              <p className="text-center text-gray-600">Search for a user and schedule an appointment with them. The process is as easy as a few clicks.</p>
-            </div>
-
-            {/* 4th item */}
-            <div className="relative flex flex-col items-center rounded bg-white p-6 shadow-xl">
-              <Wand />
-              <h4 className="mb-1 text-xl font-bold leading-snug tracking-tight">Customized Video-Call Toolbar</h4>
-              <p className="text-center text-gray-600">Customize the actions users can take during the virtual appointment using the built-in action-menu.</p>
-            </div>
-
-            {/* 5th item */}
-            <div className="relative flex flex-col items-center rounded bg-white p-6 shadow-xl">
-              <Wand />
-              <h4 className="mb-1 text-xl font-bold leading-snug tracking-tight">Add to Calendar</h4>
-              <p className="text-center text-gray-600">Users can easily add an appointment to their calendar with an auto-generated ICS file.</p>
-            </div>
-
-            {/* 6th item */}
-            <div className="relative flex flex-col items-center rounded bg-white p-6 shadow-xl">
-              <Wand />
-              <h4 className="mb-1 text-xl font-bold leading-snug tracking-tight">Secured Appointment Links</h4>
-              <p className="text-center text-gray-600">Be sure that the only people entering your appointments are those that you&apos;ve invted.</p>
-            </div>
-          </div>
-        </div>
+const Features = () => (
+  <section id="capabilities" className="bg-[#102e31] text-white">
+    <div className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <div className="max-w-2xl">
+        <p className="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-emerald-300">
+          The care flow
+        </p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+          The essentials, kept within reach.
+        </h2>
+        <p className="mt-4 text-sm leading-relaxed text-white/65 sm:text-base">
+          Each part of the experience is designed to reduce decisions before,
+          during, and after an appointment.
+        </p>
       </div>
-    </section>
-  );
-};
+
+      <div className="mt-10 grid gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
+        {features.map(({ icon: Icon, title, description }) => (
+          <div key={title} className="bg-[#102e31] p-6 sm:p-7">
+            <Icon className="h-5 w-5 text-emerald-300" />
+            <h3 className="mt-5 font-semibold">{title}</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/60">
+              {description}
+            </p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
 
 export default Features;

@@ -15,7 +15,7 @@ const ActionModal = () => {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
+      <DropdownMenuTrigger asChild>
         <Button variant="outline" title="action menu">
           <Wand />
         </Button>

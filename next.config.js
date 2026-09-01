@@ -7,15 +7,19 @@ await import("./src/env.js");
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
-
-  /**
-   * If you are using `appDir` then you must comment the below `i18n` config out.
-   *
-   * @see https://github.com/vercel/next.js/issues/41980
-   */
-  i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
+  reactCompiler: true,
+  async headers() {
+    // Cross-origin isolation everywhere so Zoom SDK gets SharedArrayBuffer no matter the entry route.
+    // credentialless avoids requiring CORP on every Zoom CDN / avatar asset.
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+          { key: "Cross-Origin-Embedder-Policy", value: "credentialless" },
+        ],
+      },
+    ];
   },
   images: {
     remotePatterns: [

@@ -1,24 +1,30 @@
+import { HeartPulse } from "lucide-react";
 import Link from "next/link";
 
 export default function Footer() {
   return (
-    <footer className="m-auto flex flex-col gap-5 bg-white py-6">
-      <div className="m-auto flex w-full max-w-2xl flex-col">
-        <div className="flex flex-col items-center gap-2 sm:items-start sm:gap-1">
-          <Link className="inline-flex" href="#">
-            <span className="sr-only">Home</span>
-          </Link>
-          <p className="text-xs text-gray-500">
-            This is a reference application built to show the Zoom Video SDK implemented in a telehealth setting. The Zoom Video SDK is a HIPAA-compliant
-            solution; but this reference app is not intended to be used.
+    <footer className="border-t border-border/80 bg-white/70">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-6 py-8 text-sm text-muted-foreground sm:flex-row sm:items-end sm:justify-between lg:px-8">
+        <div className="max-w-xl">
+          <div className="mb-3 flex items-center gap-2 font-semibold text-foreground">
+            <HeartPulse className="h-4 w-4 text-primary" />
+            Care Rooms
+          </div>
+          <p className="text-xs leading-relaxed">
+            A reference implementation of Zoom Video SDK for telehealth.
+            Review your clinical, privacy, and compliance requirements before
+            using it in patient care.
           </p>
         </div>
+        <nav className="flex shrink-0 gap-4 text-xs" aria-label="Legal">
+          <Link className="hover:text-foreground" href="/privacy">
+            Privacy
+          </Link>
+          <Link className="hover:text-foreground" href="/terms">
+            Terms
+          </Link>
+        </nav>
       </div>
-      <nav className="m-auto flex w-full max-w-2xl flex-row text-xs sm:items-start sm:gap-2">
-        <Link href="/privacy">Privacy Policy</Link>
-        <Link href="/terms">Terms of Use</Link>
-        <p className="text-xs italic text-gray-400">(Replace with your own!)</p>
-      </nav>
     </footer>
   );
 }

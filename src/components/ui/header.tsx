@@ -1,66 +1,85 @@
-import Link from "next/link";
-import { useRouter } from "next/router";
-import { Button } from "./button";
+"use client";
+
+import { CalendarDays, HeartPulse, Home, LogOut, Plus } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+
+import { cn } from "~/lib/utils";
 import { Avatar, AvatarImage } from "./avatar";
+import { Button } from "./button";
+
+const links = [
+  { href: "/", label: "Home", icon: Home },
+  { href: "/schedule", label: "Appointments", icon: CalendarDays },
+  { href: "/create", label: "New appointment", icon: Plus },
+];
 
 function Header() {
   const { status, data } = useSession();
-  const router = useRouter();
+  const pathname = usePathname();
 
   return (
-    <div className="w-screen bg-white px-4 lg:px-8">
-      <header className="flex h-20 w-full shrink-0 items-center px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <Image className="inline" src={"/logo.svg"} height={24} width={80} alt="product logo" />
-          <span className="text-xl leading-tight tracking-tighter">
-            Video SDK <span>for Healthcare</span>
+    <div className="sticky top-0 z-40 border-b border-border/80 bg-white/90 backdrop-blur-xl">
+      <header className="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4 sm:px-6 lg:px-8">
+        <Link href="/" className="flex shrink-0 items-center gap-2.5">
+          <span className="grid h-9 w-9 place-items-center rounded-xl bg-primary text-primary-foreground shadow-sm">
+            <HeartPulse className="h-5 w-5" />
           </span>
+          <span className="hidden leading-tight sm:block">
+            <span className="block text-sm font-bold tracking-tight">
+              Care Rooms
+            </span>
+            <span className="block text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Video health
+            </span>
+          </span>
+          <span className="sr-only sm:hidden">Care Rooms</span>
         </Link>
 
-        <div className="ml-auto flex gap-2">
-          <Link
-            className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
-              router.pathname === "/"
-                ? "bg-gray-100 text-gray-900"
-                : "bg-white hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50"
-            }`}
-            href="/"
-          >
-            Home
-          </Link>
-          <Link
-            className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
-              router.pathname === "/schedule"
-                ? "bg-gray-100 text-gray-900"
-                : "bg-white hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50"
-            }`}
-            href="/schedule"
-          >
-            Appointments
-          </Link>
-          <Link
-            className={`group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors focus:outline-none disabled:pointer-events-none disabled:opacity-50 ${
-              router.pathname === "/create"
-                ? "bg-gray-100 text-gray-900"
-                : "bg-white hover:bg-gray-100 hover:text-gray-900 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50"
-            }`}
-            href="/create"
-          >
-            Create
-          </Link>
+        <nav className="ml-auto flex items-center gap-1" aria-label="Primary">
+          {links.map(({ href, label, icon: Icon }) => {
+            const active =
+              href === "/" ? pathname === href : pathname.startsWith(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  "inline-flex h-10 items-center gap-2 rounded-xl px-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
+                  active && "bg-accent text-accent-foreground",
+                )}
+              >
+                <Icon className="h-4 w-4" />
+                <span className="sr-only md:not-sr-only">{label}</span>
+              </Link>
+            );
+          })}
+        </nav>
+
+        <div className="ml-1 flex items-center gap-2 border-l pl-3">
           {status === "authenticated" ? (
             <>
-              <Button variant={"outline"} className="self-center" onClick={() => void signOut()}>
-                Sign Out
-              </Button>
-              <Avatar className="ml-4">
-                <AvatarImage src={data?.user.image ?? undefined} alt="User Avatar" />
+              <Avatar className="h-9 w-9 border border-border">
+                <AvatarImage
+                  src={data.user.image ?? undefined}
+                  alt={data.user.name ?? "User"}
+                />
               </Avatar>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => void signOut()}
+                title="Sign out"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
             </>
           ) : (
-            <Button onClick={() => void signIn()}>Sign in</Button>
+            <Button size="sm" onClick={() => void signIn()}>
+              Sign in
+            </Button>
           )}
         </div>
       </header>

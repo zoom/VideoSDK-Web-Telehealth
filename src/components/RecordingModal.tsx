@@ -11,7 +11,7 @@ const RecordingModal = (props: { roomId: string; buttonVariant?: "link" | "defau
     <Dialog>
       <DialogTrigger asChild>
         <Button
-          variant={buttonVariant ? buttonVariant : "link"}
+          variant={buttonVariant ?? "link"}
           onClick={() => {
             if (fetchAllRecordings.status === "idle") fetchAllRecordings.mutate({ roomId: props.roomId }, {});
           }}
@@ -23,7 +23,7 @@ const RecordingModal = (props: { roomId: string; buttonVariant?: "link" | "defau
         <DialogHeader>
           <DialogTitle>Recordings</DialogTitle>
         </DialogHeader>
-        {fetchAllRecordings.isLoading ? (
+        {fetchAllRecordings.isPending ? (
           <DialogDescription>Loading...</DialogDescription>
         ) : (
           fetchAllRecordings.data?.map((e) => (
